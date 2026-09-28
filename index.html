@@ -1,1269 +1,1761 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>遛娃地图</title>
 
+<!-- =========================================================
+     百度地图 API
+========================================================= -->
+<script src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=o8LnSUIDI7AiJDfc9eRMNz3YDSdKHkRn&s=1"></script>
+
 <style>
-  * {
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
-  }
-
-  html,body {
-    height:100%;
-    font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif;
-    background:#FFF6ED;
-  }
-
-  #app {
-    position:relative;
-    width:100%;
-    height:100vh;
-    max-width:600px;
-    margin:0 auto;
-    overflow:hidden;
-    background:#FFF6ED;
-  }
-
-  .page {
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    display:none;
-    flex-direction:column;
-    background:#FFF6ED;
-  }
-
-  .page.active {
-    display:flex;
-  }
-
-  /* ==================== 顶部导航 ==================== */
-
-  .navbar {
-    display:flex;
-    align-items:center;
-    height:52px;
-    min-height:52px;
-    background:#FF8C42;
-    color:#fff;
-    padding:0 12px;
-    box-shadow:0 2px 8px rgba(255,140,66,0.3);
-    position:relative;
-    z-index:20;
-  }
-
-  .navbar .back-btn {
-    width:32px;
-    height:32px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    cursor:pointer;
-    border-radius:50%;
-  }
-
-  .navbar .back-btn:active {
-    background:rgba(255,255,255,0.25);
-  }
-
-  .navbar .title {
-    flex:1;
-    text-align:center;
-    font-size:17px;
-    font-weight:600;
-  }
-
-  .navbar .placeholder {
-    width:32px;
-  }
-
-  /* ==================== 首页 ==================== */
-
-  .top-bar {
-    background:linear-gradient(135deg,#FF8C42,#FFB27A);
-    padding:14px 16px 18px;
-    color:#fff;
-    border-radius:0 0 28px 28px;
-    box-shadow:0 4px 12px rgba(255,140,66,0.25);
-    z-index:20;
-  }
-
-  .top-row {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-
-  .loc-wrap {
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex:1;
-    min-width:0;
-  }
-
-  .loc-icon {
-    font-size:18px;
-  }
-
-  .loc-edit-input {
-    border:none;
-    outline:none;
-    background:rgba(255,255,255,0.25);
-    border-radius:18px;
-    padding:5px 12px;
-    color:#fff;
-    font-size:14px;
-    font-weight:600;
-    flex:1;
-    min-width:0;
-  }
-
-  .loc-edit-input::placeholder {
-    color:rgba(255,255,255,0.85);
-  }
-
-  .locate-btn {
-    width:30px;
-    height:30px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.25);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:15px;
-    flex-shrink:0;
-    cursor:pointer;
-    margin-left:6px;
-  }
-
-  .locate-btn:active {
-    transform:scale(0.92);
-  }
-
-  .weather-chip {
-    display:flex;
-    align-items:center;
-    gap:4px;
-    background:rgba(255,255,255,0.25);
-    border-radius:18px;
-    padding:5px 12px;
-    font-size:13px;
-    flex-shrink:0;
-    margin-left:8px;
-  }
-
-  .suggest-list {
-    margin-top:8px;
-    background:#fff;
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow:0 4px 10px rgba(0,0,0,0.12);
-    display:none;
-  }
-
-  .suggest-item {
-    padding:9px 14px;
-    font-size:13px;
-    color:#555;
-    border-bottom:1px solid #f5f5f5;
-  }
-
-  .suggest-item:last-child {
-    border-bottom:none;
-  }
-
-  .suggest-item:active {
-    background:#FFF3E8;
-  }
-
-  #map1 {
-    width:100%;
-    flex:1;
-    min-height:0;
-  }
-
-  .bottom-panel {
-    background:#fff;
-    border-radius:28px 28px 0 0;
-    margin-top:-16px;
-    position:relative;
-    z-index:5;
-    padding:16px 16px 18px;
-    box-shadow:0 -4px 14px rgba(0,0,0,0.06);
-  }
-
-  .nl-input-wrap {
-    display:flex;
-    align-items:center;
-    background:#FFF3E8;
-    border-radius:26px;
-    padding:10px 14px;
-    gap:8px;
-    border:1.5px solid #FFD9B8;
-  }
-
-  .nl-input-wrap .emoji {
-    font-size:18px;
-  }
-
-  .nl-input {
-    flex:1;
-    border:none;
-    outline:none;
-    background:transparent;
-    font-size:14px;
-    color:#5c4a3a;
-  }
-
-  .nl-input::placeholder {
-    color:#c9a988;
-  }
-
-  .chip-row {
-    display:flex;
-    gap:8px;
-    margin-top:12px;
-    overflow-x:auto;
-    padding-bottom:2px;
-  }
-
-  .chip {
-    flex-shrink:0;
-    padding:7px 16px;
-    border-radius:20px;
-    background:#FFF3E8;
-    color:#B96A2C;
-    font-size:13px;
-    font-weight:600;
-    border:1.5px solid transparent;
-    cursor:pointer;
-    white-space:nowrap;
-  }
-
-  .chip.active {
-    background:#FF8C42;
-    color:#fff;
-    border-color:#FF8C42;
-    box-shadow:0 3px 8px rgba(255,140,66,0.35);
-  }
-
-  .chip-label {
-    font-size:12px;
-    color:#a08670;
-    margin-top:10px;
-    font-weight:600;
-  }
-
-  .start-btn {
-    margin-top:14px;
-    width:100%;
-    background:linear-gradient(135deg,#FF8C42,#FF6B2C);
-    color:#fff;
-    border:none;
-    border-radius:28px;
-    padding:13px 0;
-    font-size:16px;
-    font-weight:700;
-    box-shadow:0 6px 14px rgba(255,107,44,0.35);
-    cursor:pointer;
-  }
-
-  .start-btn:active {
-    transform:scale(0.98);
-  }
-
-  .demo-tag {
-    text-align:center;
-    font-size:11px;
-    color:#c9a988;
-    margin-top:8px;
-  }
-
-  /* ==================== 推荐页 ==================== */
-
-  .ai-greet {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:14px 16px;
-    background:#FFF3E8;
-    margin:10px 12px;
-    border-radius:20px;
-  }
-
-  .ai-avatar {
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    background:#FF8C42;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    flex-shrink:0;
-  }
-
-  .ai-bubble {
-    font-size:13px;
-    color:#8a5c33;
-    font-weight:600;
-    line-height:1.4;
-  }
-
-  .cards-scroll {
-    flex:1;
-    overflow-y:auto;
-    padding:0 12px 16px;
-  }
-
-  .rec-card {
-    background:#fff;
-    border-radius:24px;
-    overflow:hidden;
-    box-shadow:0 4px 14px rgba(0,0,0,0.08);
-    margin-bottom:14px;
-    border:2px solid transparent;
-  }
-
-  .rec-card.main {
-    border-color:#FFD9B8;
-    box-shadow:0 6px 18px rgba(255,140,66,0.25);
-  }
-
-  .rec-card .img-wrap {
-    height:130px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:52px;
-    position:relative;
-  }
-
-  .rec-card .img-wrap.type-food {
-    background:linear-gradient(135deg,#FFE0C2,#FFC194);
-  }
-
-  .rec-card .img-wrap.type-park {
-    background:linear-gradient(135deg,#D6F0D2,#A8E0A0);
-  }
-
-  .rec-card .img-wrap.type-mall {
-    background:linear-gradient(135deg,#FFE1EC,#FFB8CF);
-  }
-
-  .rec-card .img-wrap.type-museum {
-    background:linear-gradient(135deg,#D9E4FF,#AFC4FF);
-  }
-
-  .badge-main {
-    position:absolute;
-    top:8px;
-    left:8px;
-    background:#FF8C42;
-    color:#fff;
-    font-size:11px;
-    font-weight:700;
-    padding:3px 9px;
-    border-radius:12px;
-  }
-
-  .rec-card .body {
-    padding:12px 14px 14px;
-  }
-
-  .rec-card .name {
-    font-size:16px;
-    font-weight:700;
-    color:#4a3527;
-  }
-
-  .rec-card .stars-row {
-    display:flex;
-    align-items:center;
-    gap:6px;
-    margin-top:4px;
-  }
-
-  .stars {
-    color:#FFB100;
-    font-size:14px;
-    letter-spacing:1px;
-  }
-
-  .score-num {
-    font-size:12px;
-    color:#a08670;
-  }
-
-  .dist-text {
-    font-size:12px;
-    color:#a08670;
-    margin-left:auto;
-  }
-
-  .tag-row {
-    display:flex;
-    gap:6px;
-    margin-top:8px;
-    flex-wrap:wrap;
-  }
-
-  .tag-pill {
-    background:#FFF3E8;
-    color:#B96A2C;
-    font-size:11px;
-    padding:3px 8px;
-    border-radius:12px;
-    font-weight:600;
-  }
-
-  .go-btn {
-    width:100%;
-    margin-top:12px;
-    background:#FF8C42;
-    color:#fff;
-    border:none;
-    border-radius:20px;
-    padding:9px 0;
-    font-size:14px;
-    font-weight:700;
-    cursor:pointer;
-  }
-
-  .go-btn:active {
-    background:#e97a34;
-  }
-
-  .score-detail {
-    font-size:10px;
-    color:#c9a988;
-    margin-top:6px;
-    line-height:1.5;
-  }
-
-  /* ==================== 路线页 ==================== */
-
-  .route-endpoints {
-    background:#fff;
-    margin:10px 12px 0;
-    border-radius:20px;
-    padding:14px 16px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.06);
-  }
-
-  .ep-row {
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    padding:7px 0;
-  }
-
-  .ep-dot {
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    flex-shrink:0;
-    margin-top:6px;
-  }
-
-  .ep-dot.start {
-    background:#2ED47A;
-  }
-
-  .ep-dot.end {
-    background:#FF4757;
-  }
-
-  .ep-content {
-    flex:1;
-    min-width:0;
-  }
-
-  .ep-label {
-    font-size:11px;
-    color:#a08670;
-    margin-bottom:2px;
-  }
-
-  .ep-text {
-    font-size:14px;
-    color:#4a3527;
-    font-weight:600;
-    line-height:1.35;
-    word-break:break-all;
-  }
-
-  .ep-edit-col {
-    display:flex;
-    align-items:flex-start;
-    justify-content:flex-end;
-    width:78px;
-    flex:0 0 78px;
-    flex-shrink:0;
-  }
-
-  .ep-row + .ep-divider + .ep-row {
-    margin-top:0;
-  }
-
-  .ep-edit-btn {
-    font-size:12px;
-    color:#FF8C42;
-    border:1.5px solid #FF8C42;
-    border-radius:14px;
-    padding:4px 10px;
-    background:#fff;
-    cursor:pointer;
-    font-weight:600;
-    white-space:nowrap;
-  }
-
-  .ep-divider {
-    height:1px;
-    background:#f0e5da;
-    margin-left:20px;
-  }
-
-  .mode-tabs {
-    display:flex;
-    margin:10px 12px 0;
-    background:#fff;
-    border-radius:20px;
-    padding:5px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.06);
-  }
-
-  .mode-tab {
-    flex:1;
-    text-align:center;
-    padding:9px 0;
-    font-size:13px;
-    font-weight:700;
-    color:#a08670;
-    border-radius:14px;
-    cursor:pointer;
-  }
-
-  .mode-tab.active {
-    background:#FF8C42;
-    color:#fff;
-  }
-
-  #map2 {
-    width:calc(100% - 24px);
-    margin:10px 12px 0;
-    border-radius:20px;
-    flex:1;
-    min-height:220px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.06);
-  }
-
-  .reason-card {
-    background:#FFF3E8;
-    margin:10px 12px;
-    border-radius:20px;
-    padding:12px 14px;
-  }
-
-  .reason-card .rt {
-    font-size:12px;
-    font-weight:700;
-    color:#B96A2C;
-    margin-bottom:6px;
-  }
-
-  .reason-tags {
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    margin-bottom:6px;
-  }
-
-  .reason-tag {
-    background:#fff;
-    color:#B96A2C;
-    font-size:11px;
-    padding:3px 9px;
-    border-radius:12px;
-    font-weight:700;
-    border:1.5px solid #FFD9B8;
-  }
-
-  .reason-meta {
-    display:flex;
-    gap:14px;
-    font-size:12px;
-    color:#8a5c33;
-    font-weight:600;
-  }
-
-  .reason-meta span {
-    display:flex;
-    align-items:center;
-    gap:3px;
-  }
-
-  .parking-line {
-    font-size:11px;
-    color:#a08670;
-    margin-top:6px;
-  }
-
-  .nav-start-btn {
-    margin:0 12px 14px;
-    background:linear-gradient(135deg,#FF8C42,#FF6B2C);
-    color:#fff;
-    border:none;
-    border-radius:26px;
-    padding:13px 0;
-    font-size:16px;
-    font-weight:700;
-    box-shadow:0 6px 14px rgba(255,107,44,0.35);
-    cursor:pointer;
-  }
-
-  /* ==================== 导航页 ==================== */
-
-  .nav-guide-bar {
-    background:linear-gradient(135deg,#FF8C42,#FFB27A);
-    color:#fff;
-    padding:14px 16px;
-    flex-shrink:0;
-  }
-
-  .nav-step-main {
-    font-size:20px;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    overflow:hidden;
-    white-space:nowrap;
-  }
-
-  .nav-step-icon {
-    font-size:26px;
-    flex-shrink:0;
-  }
-
-  .nav-step-text {
-    flex:1;
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-
-  .filter-btn-float {
-    position:absolute;
-    top:10px;
-    left:10px;
-    z-index:15;
-    background:#fff;
-    border-radius:18px;
-    padding:7px 12px;
-    font-size:12px;
-    font-weight:700;
-    color:#FF8C42;
-    box-shadow:0 3px 10px rgba(0,0,0,0.15);
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:4px;
-  }
-
-  .filter-panel {
-    position:absolute;
-    top:48px;
-    left:10px;
-    z-index:16;
-    background:#fff;
-    border-radius:18px;
-    padding:10px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.18);
-    display:none;
-    max-width:250px;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-
-  .filter-panel.show {
-    display:flex;
-  }
-
-  .filter-item {
-    font-size:11px;
-    background:#FFF3E8;
-    color:#B96A2C;
-    padding:5px 8px;
-    border-radius:12px;
-    font-weight:600;
-    cursor:pointer;
-    border:1.5px solid transparent;
-  }
-
-  .filter-item.on {
-    background:#FF8C42;
-    color:#fff;
-    border-color:#FF8C42;
-  }
-
-  #map3 {
-    width:100%;
-    flex:1;
-    min-height:0;
-    position:relative;
-  }
-
-  .ai-tip-bar {
-    background:#fff;
-    margin:0;
-    padding:10px 16px;
-    box-shadow:0 -3px 10px rgba(0,0,0,0.06);
-  }
-
-  .ai-tip-bar .tt {
-    font-size:11px;
-    color:#a08670;
-    font-weight:700;
-    margin-bottom:3px;
-  }
-
-  .ai-tip-bar .tc {
-    font-size:12px;
-    color:#5c4a3a;
-    line-height:1.4;
-  }
-
-  .end-nav-btn {
-    margin:8px 16px 12px;
-    background:#fff;
-    border:2px solid #FF4757;
-    color:#FF4757;
-    border-radius:24px;
-    padding:10px 0;
-    font-size:15px;
-    font-weight:700;
-    text-align:center;
-    cursor:pointer;
-  }
-
-  .end-nav-btn:active {
-    background:#FFF0F0;
-  }
-
-  .toast {
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    background:rgba(0,0,0,0.78);
-    color:#fff;
-    padding:10px 18px;
-    border-radius:14px;
-    font-size:13px;
-    z-index:999;
-    display:none;
-    max-width:80%;
-    text-align:center;
-  }
-
 /* =========================================================
-   新版亲子暖色视觉系统
+   全局
 ========================================================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
 :root{
   --bg:#FFF6E0;
   --card:#FFFFFF;
+
+  /* 主色：淡黄色 */
   --primary:#FFE7A3;
+  --primary-soft:#FFF0C2;
+
+  /* 起点 / 终点 */
+  --start:#C9A7E8;
+  --start-soft:#EEDDF6;
+  --end:#9BC9F5;
+  --end-soft:#DCEEFF;
+
+  /* 路线 */
+  --route:#999999;
+
   --blue:#348FDA;
   --green:#63B26E;
   --orange:#F79256;
   --purple:#C38DDE;
+
   --text:#222222;
   --text2:#444444;
   --muted:#888888;
   --line:#EAE4D8;
 }
-html,body,#app,.page{background:var(--bg)!important;color:var(--text);}
-body{font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif;}
-.navbar{background:var(--card)!important;color:var(--text)!important;box-shadow:0 1px 8px rgba(80,60,30,.08)!important;border-bottom:1px solid var(--line);}
-.navbar .title{color:var(--text)!important;font-weight:700;}
-.navbar .back-btn{color:var(--text)!important;}
-.top-bar{background:var(--card)!important;color:var(--text)!important;box-shadow:0 2px 10px rgba(80,60,30,.07)!important;border-radius:0 0 22px 22px;}
-.loc-edit-input{color:var(--text2)!important;background:var(--card)!important;}
-.loc-edit-input::placeholder{color:var(--muted)!important;}
-.locate-btn,.weather-chip{background:#FFF6E0!important;color:var(--text2)!important;}
-.bottom-panel,.card,.result-card,.route-card,.mode-card,.reason-card{background:var(--card)!important;border-color:var(--line)!important;}
-button,.primary-btn,.nav-start-btn{background:var(--primary)!important;color:var(--text)!important;border-color:var(--primary)!important;}
-.secondary-btn,.back-btn,.ghost-btn{color:var(--text2)!important;}
-.section-title,.panel-title{color:var(--text)!important;}
-.reason-meta,.reason-text,.desc,.meta,.sub-text,.hint{color:var(--muted)!important;}
-.tag,.chip{border-color:var(--line)!important;color:var(--text2)!important;}
 
-/* 导航页五分区 */
-#page5{background:var(--bg)!important;overflow:hidden;}
-#page5 .nav-guide-bar{display:none;}
-.nav-top-search{height:56px;flex:0 0 56px;padding:8px 12px;display:flex;align-items:center;gap:8px;background:var(--bg);z-index:30;}
-.nav-search-box{height:40px;flex:1;background:#fff;border:1px solid var(--line);border-radius:20px;display:flex;align-items:center;padding:0 14px;gap:8px;box-shadow:0 2px 8px rgba(80,60,30,.05);}
-.nav-search-box .search-icon{font-size:17px;}
-.nav-search-box input{border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text2);}
-.nav-search-box input::placeholder{color:var(--muted);}
-.nav-avatar{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);font-size:20px;box-shadow:0 2px 8px rgba(80,60,30,.05);}
-.nav-category-scroll{height:88px;flex:0 0 88px;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:8px 12px 10px;background:var(--bg);z-index:25;scrollbar-width:none;}
-.nav-category-scroll::-webkit-scrollbar{display:none;}
-.nav-category{flex:0 0 auto;min-width:82px;height:70px;border:1px solid var(--line);border-radius:16px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--text2);font-size:14px;cursor:pointer;box-shadow:0 2px 7px rgba(80,60,30,.04);}
-.nav-category .cat-icon{font-size:24px;line-height:24px;}
-.nav-category.active{background:var(--primary);border-color:var(--primary);font-weight:700;}
-.nav-category[data-tone="green"].active{background:#DFF1E2;border-color:var(--green);}
-.nav-category[data-tone="orange"].active{background:#FDE4D3;border-color:var(--orange);}
-.nav-category[data-tone="purple"].active{background:#EEDDF6;border-color:var(--purple);}
-.nav-map-wrap{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--bg);}
-#page5 #map3{position:absolute;inset:0;width:100%;height:100%;background:var(--bg)!important;}
-.nav-route-tip{position:absolute;top:10px;left:12px;right:12px;z-index:18;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:14px;padding:8px 11px;box-shadow:0 3px 12px rgba(70,50,20,.08);font-size:12px;color:var(--text2);}
-.nav-route-tip b{color:var(--blue);}
-#page5 .filter-btn-float{top:54px;left:12px;background:#fff;color:var(--blue);border:1px solid var(--line);border-radius:16px;padding:7px 11px;box-shadow:0 3px 10px rgba(70,50,20,.1);}
-#page5 .filter-panel{top:94px;left:12px;background:#fff;border:1px solid var(--line);box-shadow:0 5px 18px rgba(70,50,20,.12);border-radius:16px;max-width:270px;}
-#page5 .filter-item{background:#FFF6E0;color:var(--text2);border-color:var(--line);}
-#page5 .filter-item.on{background:var(--primary);color:var(--text);border-color:var(--primary);}
-.nav-detail-drawer{position:absolute;left:12px;right:12px;bottom:12px;height:320px;background:#fff;border-radius:20px;box-shadow:0 8px 28px rgba(60,45,20,.18);z-index:22;padding:14px;display:none;grid-template-columns:96px 1fr 78px;gap:12px;}
-.nav-detail-drawer.show{display:grid;}
-.nav-detail-img{width:96px;height:96px;border-radius:16px;background:#FFF6E0;display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden;}
-.nav-detail-content{min-width:0;}
-.nav-detail-title{font-size:20px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.nav-detail-meta{margin-top:7px;font-size:14px;color:var(--text2);display:flex;gap:10px;flex-wrap:wrap;}
-.nav-detail-tags{margin-top:9px;display:flex;gap:5px;flex-wrap:wrap;}
-.nav-detail-tags span{font-size:12px;color:var(--muted);background:#FFF6E0;border-radius:9px;padding:3px 7px;}
-.nav-detail-desc{margin-top:9px;font-size:13px;color:var(--muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.nav-detail-action{align-self:center;background:var(--primary);color:var(--text);border:0;border-radius:10px;padding:10px 8px;font-size:13px;font-weight:700;cursor:pointer;}
-.nav-recommend{position:absolute;left:0;right:0;bottom:0;height:220px;background:rgba(255,246,224,.97);z-index:20;padding:10px 12px;display:none;}
-.nav-recommend.show{display:block;}
-.nav-recommend-head{display:flex;align-items:center;justify-content:space-between;height:28px;font-size:15px;font-weight:600;color:var(--text);}
-.nav-recommend-list{display:flex;gap:10px;overflow-x:auto;padding:5px 0 8px;scrollbar-width:none;}
-.nav-recommend-list::-webkit-scrollbar{display:none;}
-.nav-recommend-card{flex:0 0 150px;height:164px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(70,50,20,.06);}
-.nav-recommend-pic{height:82px;background:#FFF6E0;display:flex;align-items:center;justify-content:center;font-size:32px;}
-.nav-recommend-info{padding:7px 8px;}
-.nav-recommend-name{font-size:15px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.nav-recommend-meta{font-size:11px;color:var(--muted);margin-top:5px;}
-.nav-recommend-tags{font-size:10px;color:var(--muted);margin-top:5px;}
-.nav-bottom-info{position:absolute;left:12px;right:12px;bottom:12px;z-index:19;background:#fff;border-radius:14px;padding:9px 12px;box-shadow:0 3px 12px rgba(70,50,20,.1);}
-.nav-bottom-info .tt{font-size:11px;color:var(--blue);font-weight:700;margin-bottom:3px;}
-.nav-bottom-info .tc{font-size:12px;color:var(--text2);line-height:1.4;}
-#page5 .end-nav-btn{position:absolute;left:14px;right:14px;bottom:8px;z-index:26;margin:0;background:#fff!important;border:1px solid #E5B3B3!important;color:#C85D5D!important;border-radius:18px;padding:8px 0;font-size:13px;}
-/* 地图上的设施标签 */
-#page5 .facility-map-label{background:#fff!important;color:var(--text2)!important;border:1px solid var(--line)!important;border-radius:14px!important;box-shadow:0 2px 7px rgba(70,50,20,.12)!important;}
+html,
+body{
+  width:100%;
+  height:100%;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "PingFang SC",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
+#app{
+  position:relative;
+  width:100%;
+  height:100vh;
+  max-width:600px;
+  margin:0 auto;
+  overflow:hidden;
+  background:var(--bg);
+}
 
-/* 浅黄色选中态 */
-.mode-tab.active { background:#FFE7A3 !important; color:#444444 !important; }
-.category-card.active, .facility-filter.active, .filter-chip.active, .age-chip.active, .purpose-chip.active { background:#FFF0C2 !important; color:#444444 !important; border-color:#FFE7A3 !important; }
-</style>
+.page{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:none;
+  flex-direction:column;
+  background:var(--bg);
+}
 
-<script src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=o8LnSUIDI7AiJDfc9eRMNz3YDSdKHkRn&s=1">
+.page.active{
+  display:flex;
+}
+
 
 /* =========================================================
-   新版导航页交互
+   通用按钮
 ========================================================= */
-function selectNavCategory(el,label){
-  var nodes=document.querySelectorAll('#navCategoryScroll .nav-category');
-  for(var i=0;i<nodes.length;i++) nodes[i].classList.remove('active');
-  el.classList.add('active');
-  if(label==='全部'){
-    for(var k in activeFacilityTypes) activeFacilityTypes[k]=true;
-  }else{
-    for(var k2 in activeFacilityTypes) activeFacilityTypes[k2]=(k2===label);
-  }
-  renderFacilityMarkers();
-}
-function navGlobalSearch(){
-  var input=document.getElementById('navGlobalSearch');
-  var q=(input && input.value || '').trim();
-  if(!q){showToast('请输入目的地或设施名称');return;}
-  if(typeof map3!=='undefined' && map3){
-    try{
-      var local=new BMapGL.LocalSearch(map3,{pageCapacity:8,renderOptions:{map:null,autoViewport:false},onSearchComplete:function(results){
-        if(results && results.getNumPois && results.getNumPois()>0){
-          var poi=results.getPoi(0);
-          if(poi && poi.point){map3.panTo(poi.point);showToast('已定位：'+(stripHtml(poi.title)||q));return;}
-        }
-        showToast('暂未找到相关地点');
-      }});
-      local.search(q);
-    }catch(e){showToast('搜索暂时不可用');}
-  }
-}
-function showNavDetail(f){
-  if(!f)return;
-  var d=document.getElementById('navDetailDrawer');
-  document.getElementById('navDetailImg').textContent=f.icon||'📍';
-  document.getElementById('navDetailTitle').textContent=f.name||f.label||'亲子设施';
-  document.getElementById('navDetailDistance').textContent=f.address?'📍 '+f.address:'📍 附近';
-  document.getElementById('navDetailTags').innerHTML='<span>'+ (f.label||'亲子友好') +'</span><span>沿途可达</span>';
-  document.getElementById('navDetailDesc').textContent=f.address?'位于 '+f.address+'，可在当前导航路线附近查看。':'该设施位于当前导航路线附近，可点击地图点位查看。';
-  d.classList.add('show');
-}
-function closeNavDetail(){document.getElementById('navDetailDrawer').classList.remove('show');}
-function renderNavRecommendations(){
-  var box=document.getElementById('navRecommendList');
-  if(!box)return;
-  var arr=(facilityData||[]).slice(0,8);
-  box.innerHTML='';
-  if(!arr.length){document.getElementById('navRecommend').classList.remove('show');return;}
-  for(var i=0;i<arr.length;i++){
-    var f=arr[i], card=document.createElement('div'); card.className='nav-recommend-card';
-    card.innerHTML='<div class="nav-recommend-pic">'+(f.icon||'📍')+'</div><div class="nav-recommend-info"><div class="nav-recommend-name">'+(f.name||f.label||'亲子设施')+'</div><div class="nav-recommend-meta">⭐ 亲子友好　·　附近</div><div class="nav-recommend-tags">'+(f.label||'亲子设施')+'</div></div>';
-    card.onclick=(function(item){return function(){if(item.point&&map3)map3.panTo(item.point);showNavDetail(item);};})(f);
-    box.appendChild(card);
-  }
-  document.getElementById('navRecommend').classList.add('show');
+
+button{
+  font-family:inherit;
 }
 
-</script>
+.primary-btn,
+.start-btn,
+.nav-start-btn{
+  background:var(--primary)!important;
+  color:var(--text)!important;
+  border:1px solid var(--primary)!important;
+}
+
+.start-btn:active,
+.nav-start-btn:active{
+  transform:scale(.98);
+}
+
+
+/* =========================================================
+   页面1：首页
+========================================================= */
+
+.top-bar{
+  flex-shrink:0;
+  background:#fff;
+  padding:14px 16px 18px;
+  color:var(--text);
+  border-radius:0 0 22px 22px;
+  box-shadow:0 2px 10px rgba(80,60,30,.07);
+  z-index:20;
+}
+
+.top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.loc-wrap{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:1;
+  min-width:0;
+}
+
+.loc-icon{
+  font-size:18px;
+}
+
+.loc-edit-input{
+  border:none;
+  outline:none;
+  background:#fff;
+  border-radius:18px;
+  padding:6px 10px;
+  color:var(--text2);
+  font-size:14px;
+  font-weight:600;
+  flex:1;
+  min-width:0;
+}
+
+.loc-edit-input::placeholder{
+  color:var(--muted);
+}
+
+.locate-btn{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:var(--bg);
+  color:var(--text2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  flex-shrink:0;
+  cursor:pointer;
+  margin-left:6px;
+}
+
+.locate-btn:active{
+  transform:scale(.92);
+}
+
+.weather-chip{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  background:var(--bg);
+  color:var(--text2);
+  border-radius:18px;
+  padding:5px 12px;
+  font-size:13px;
+  flex-shrink:0;
+  margin-left:8px;
+}
+
+.suggest-list{
+  margin-top:8px;
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+  display:none;
+}
+
+.suggest-item{
+  padding:9px 14px;
+  font-size:13px;
+  color:#555;
+  border-bottom:1px solid #f5f5f5;
+}
+
+.suggest-item:last-child{
+  border-bottom:none;
+}
+
+.suggest-item:active{
+  background:var(--primary-soft);
+}
+
+#map1{
+  width:100%;
+  flex:1;
+  min-height:0;
+}
+
+.bottom-panel{
+  background:#fff;
+  border-radius:28px 28px 0 0;
+  margin-top:-16px;
+  position:relative;
+  z-index:5;
+  padding:16px 16px 18px;
+  box-shadow:0 -4px 14px rgba(0,0,0,.06);
+}
+
+.nl-input-wrap{
+  display:flex;
+  align-items:center;
+  background:#FFF8E9;
+  border-radius:26px;
+  padding:10px 14px;
+  gap:8px;
+  border:1.5px solid var(--line);
+}
+
+.nl-input-wrap .emoji{
+  font-size:18px;
+}
+
+.nl-input{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:14px;
+  color:var(--text2);
+}
+
+.nl-input::placeholder{
+  color:#b7aa98;
+}
+
+.chip-label{
+  font-size:12px;
+  color:#888;
+  margin-top:10px;
+  font-weight:600;
+}
+
+.chip-row{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  scrollbar-width:none;
+}
+
+.chip-row::-webkit-scrollbar{
+  display:none;
+}
+
+.chip{
+  flex-shrink:0;
+  padding:7px 16px;
+  border-radius:20px;
+  background:#fff;
+  color:var(--text2);
+  font-size:13px;
+  font-weight:600;
+  border:1.5px solid var(--line);
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.chip.active{
+  background:var(--primary-soft)!important;
+  color:#444!important;
+  border-color:var(--primary)!important;
+  box-shadow:none;
+}
+
+.start-btn{
+  margin-top:14px;
+  width:100%;
+  border:none;
+  border-radius:28px;
+  padding:13px 0;
+  font-size:16px;
+  font-weight:700;
+  box-shadow:0 5px 12px rgba(180,140,50,.16);
+  cursor:pointer;
+}
+
+.demo-tag{
+  text-align:center;
+  font-size:11px;
+  color:#b7aa98;
+  margin-top:8px;
+}
+
+
+/* =========================================================
+   地图圆润起终点图标
+========================================================= */
+
+.map-point-icon{
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  position:relative;
+  border:4px solid rgba(255,255,255,.95);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.20);
+}
+
+.map-point-icon.start{
+  background:var(--start);
+}
+
+.map-point-icon.end{
+  background:var(--end);
+}
+
+.map-point-icon.user{
+  background:#B7D9FF;
+}
+
+
+/* =========================================================
+   地图点击信息
+========================================================= */
+
+.map-click-label{
+  background:#fff!important;
+  color:var(--text2)!important;
+  border:1px solid var(--line)!important;
+  border-radius:14px!important;
+  padding:5px 9px!important;
+  box-shadow:0 3px 10px rgba(50,40,20,.15)!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  white-space:nowrap;
+}
+
+
+/* =========================================================
+   页面3：推荐
+========================================================= */
+
+.navbar{
+  display:flex;
+  align-items:center;
+  height:52px;
+  min-height:52px;
+  background:#fff;
+  color:var(--text);
+  padding:0 12px;
+  box-shadow:0 1px 8px rgba(80,60,30,.08);
+  border-bottom:1px solid var(--line);
+  position:relative;
+  z-index:20;
+}
+
+.navbar .back-btn{
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+  border-radius:50%;
+  color:var(--text2);
+}
+
+.navbar .back-btn:active{
+  background:var(--bg);
+}
+
+.navbar .title{
+  flex:1;
+  text-align:center;
+  font-size:17px;
+  font-weight:700;
+}
+
+.navbar .placeholder{
+  width:32px;
+}
+
+.ai-greet{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  background:#FFF8E9;
+  margin:10px 12px;
+  border-radius:20px;
+}
+
+.ai-avatar{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:var(--primary-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  flex-shrink:0;
+}
+
+.ai-bubble{
+  font-size:13px;
+  color:#665c4e;
+  font-weight:600;
+  line-height:1.4;
+}
+
+.cards-scroll{
+  flex:1;
+  overflow-y:auto;
+  padding:0 12px 16px;
+}
+
+.rec-card{
+  background:#fff;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+  margin-bottom:14px;
+  border:2px solid transparent;
+}
+
+.rec-card.main{
+  border-color:var(--primary);
+  box-shadow:0 6px 18px rgba(190,150,50,.16);
+}
+
+.rec-card .img-wrap{
+  height:130px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:52px;
+  position:relative;
+}
+
+.type-food{
+  background:linear-gradient(135deg,#FFE8D4,#FFD1B2);
+}
+
+.type-park{
+  background:linear-gradient(135deg,#DFF1E2,#BFE2C3);
+}
+
+.type-mall{
+  background:linear-gradient(135deg,#FFE1EC,#FFC7D8);
+}
+
+.type-museum{
+  background:linear-gradient(135deg,#D9E4FF,#BFD1FF);
+}
+
+.badge-main{
+  position:absolute;
+  top:8px;
+  left:8px;
+  background:var(--primary);
+  color:#444;
+  font-size:11px;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:12px;
+}
+
+.rec-card .body{
+  padding:12px 14px 14px;
+}
+
+.rec-card .name{
+  font-size:16px;
+  font-weight:700;
+  color:#333;
+}
+
+.stars-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:4px;
+}
+
+.stars{
+  color:#F3B83F;
+  font-size:14px;
+  letter-spacing:1px;
+}
+
+.score-num{
+  font-size:12px;
+  color:#888;
+}
+
+.dist-text{
+  font-size:12px;
+  color:#888;
+  margin-left:auto;
+}
+
+.tag-row{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+
+.tag-pill{
+  background:#FFF8E9;
+  color:#665c4e;
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:12px;
+  font-weight:600;
+}
+
+.go-btn{
+  width:100%;
+  margin-top:12px;
+  background:var(--primary);
+  color:#444;
+  border:none;
+  border-radius:20px;
+  padding:9px 0;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.score-detail{
+  font-size:10px;
+  color:#aaa;
+  margin-top:6px;
+  line-height:1.5;
+}
+
+
+/* =========================================================
+   页面4：路线规划
+========================================================= */
+
+.route-endpoints{
+  background:#fff;
+  margin:10px 12px 0;
+  border-radius:20px;
+  padding:14px 16px;
+  box-shadow:0 3px 10px rgba(0,0,0,.06);
+}
+
+.ep-row{
+  display:grid;
+  grid-template-columns:20px minmax(0,1fr) 76px;
+  align-items:start;
+  column-gap:10px;
+  padding:7px 0;
+}
+
+.ep-dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  margin-top:6px;
+  border:3px solid #fff;
+  box-shadow:0 1px 5px rgba(0,0,0,.15);
+}
+
+.ep-dot.start{
+  background:var(--start);
+}
+
+.ep-dot.end{
+  background:var(--end);
+}
+
+.ep-content{
+  min-width:0;
+}
+
+.ep-label{
+  font-size:11px;
+  color:#999;
+  margin-bottom:2px;
+}
+
+.ep-text{
+  font-size:14px;
+  color:#444;
+  font-weight:600;
+  line-height:1.35;
+  word-break:break-all;
+}
+
+.ep-edit-col{
+  width:76px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+}
+
+.ep-edit-btn{
+  font-size:12px;
+  color:#666;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:4px 8px;
+  background:#fff;
+  cursor:pointer;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.ep-divider{
+  height:1px;
+  background:var(--line);
+  margin-left:20px;
+  margin-right:0;
+}
+
+.mode-tabs{
+  display:flex;
+  margin:10px 12px 0;
+  background:#fff;
+  border-radius:20px;
+  padding:5px;
+  box-shadow:0 3px 10px rgba(0,0,0,.06);
+}
+
+.mode-tab{
+  flex:1;
+  text-align:center;
+  padding:9px 0;
+  font-size:13px;
+  font-weight:700;
+  color:#999;
+  border-radius:14px;
+  cursor:pointer;
+}
+
+.mode-tab.active{
+  background:var(--primary)!important;
+  color:#444!important;
+}
+
+#map2{
+  width:calc(100% - 24px);
+  margin:10px 12px 0;
+  border-radius:20px;
+  flex:1;
+  min-height:220px;
+  box-shadow:0 3px 10px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+
+.reason-card{
+  background:#fff;
+  margin:10px 12px;
+  border-radius:20px;
+  padding:12px 14px;
+  border:1px solid var(--line);
+}
+
+.reason-card .rt{
+  font-size:12px;
+  font-weight:700;
+  color:#666;
+  margin-bottom:6px;
+}
+
+.reason-tags{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:6px;
+}
+
+.reason-tag{
+  background:var(--primary-soft);
+  color:#555;
+  font-size:11px;
+  padding:3px 9px;
+  border-radius:12px;
+  font-weight:700;
+  border:1px solid var(--primary);
+}
+
+.reason-meta{
+  display:flex;
+  gap:14px;
+  font-size:12px;
+  color:#888;
+  font-weight:600;
+}
+
+.reason-meta span{
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+
+.parking-line{
+  font-size:11px;
+  color:#999;
+  margin-top:6px;
+}
+
+.nav-start-btn{
+  margin:0 12px 14px;
+  border-radius:26px;
+  padding:13px 0;
+  font-size:16px;
+  font-weight:700;
+  box-shadow:0 6px 14px rgba(180,140,50,.16);
+  cursor:pointer;
+}
+
+
+/* =========================================================
+   页面5：导航
+========================================================= */
+
+#page5{
+  background:var(--bg)!important;
+  overflow:hidden;
+}
+
+
+/* ---------- 实时导航指导 ---------- */
+
+.nav-live-guide{
+  flex:0 0 54px;
+  height:54px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:0 14px;
+  border-bottom:1px solid var(--line);
+  box-shadow:0 2px 8px rgba(60,50,30,.08);
+  z-index:30;
+}
+
+.nav-live-icon{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:var(--primary-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:17px;
+  flex-shrink:0;
+}
+
+.nav-live-text{
+  flex:1;
+  min-width:0;
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+
+/* ---------- 分类滑动卡片 ---------- */
+
+.nav-category-scroll{
+  height:82px;
+  flex:0 0 82px;
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:7px 12px 9px;
+  background:var(--bg);
+  z-index:25;
+  scrollbar-width:none;
+}
+
+.nav-category-scroll::-webkit-scrollbar{
+  display:none;
+}
+
+.nav-category{
+  flex:0 0 auto;
+  min-width:76px;
+  height:66px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  color:var(--text2);
+  font-size:12px;
+  cursor:pointer;
+  box-shadow:0 2px 7px rgba(80,60,30,.04);
+  transition:.15s;
+}
+
+.nav-category .cat-icon{
+  font-size:23px;
+  line-height:23px;
+}
+
+.nav-category.active{
+  background:var(--primary-soft);
+  border-color:var(--primary);
+  font-weight:700;
+}
+
+.nav-category[data-tone="green"].active{
+  background:#DFF1E2;
+  border-color:#B7D9BC;
+}
+
+.nav-category[data-tone="orange"].active{
+  background:#FDE4D3;
+  border-color:#F2C2A4;
+}
+
+.nav-category[data-tone="purple"].active{
+  background:#EEDDF6;
+  border-color:#D7B5E7;
+}
+
+.nav-category[data-tone="blue"].active{
+  background:#DCEEFF;
+  border-color:#B6D8F6;
+}
+
+
+/* ---------- 地图 ---------- */
+
+.nav-map-wrap{
+  position:relative;
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  background:var(--bg);
+}
+
+#page5 #map3{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  background:var(--bg)!important;
+}
+
+
+/* ---------- 地图底部 AI 提示 ---------- */
+
+.nav-bottom-info{
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:54px;
+  z-index:19;
+  background:rgba(255,255,255,.96);
+  border-radius:14px;
+  padding:9px 12px;
+  box-shadow:0 3px 12px rgba(70,50,20,.10);
+}
+
+.nav-bottom-info .tt{
+  font-size:11px;
+  color:var(--blue);
+  font-weight:700;
+  margin-bottom:3px;
+}
+
+.nav-bottom-info .tc{
+  font-size:12px;
+  color:var(--text2);
+  line-height:1.4;
+}
+
+
+/* ---------- 结束导航 ---------- */
+
+.end-nav-btn{
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:8px;
+  z-index:26;
+  background:#fff;
+  border:1px solid #E5B3B3;
+  color:#C85D5D;
+  border-radius:18px;
+  padding:8px 0;
+  font-size:13px;
+  font-weight:700;
+  text-align:center;
+  cursor:pointer;
+}
+
+
+/* ---------- 设施详情 ---------- */
+
+.nav-detail-drawer{
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  min-height:150px;
+  background:#fff;
+  border-radius:20px;
+  box-shadow:0 8px 28px rgba(60,45,20,.18);
+  z-index:40;
+  padding:14px;
+  display:none;
+  grid-template-columns:72px 1fr 52px;
+  gap:10px;
+}
+
+.nav-detail-drawer.show{
+  display:grid;
+}
+
+.nav-detail-img{
+  width:72px;
+  height:72px;
+  border-radius:16px;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+}
+
+.nav-detail-content{
+  min-width:0;
+}
+
+.nav-detail-title{
+  font-size:17px;
+  font-weight:700;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.nav-detail-meta{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.nav-detail-tags{
+  margin-top:7px;
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+}
+
+.nav-detail-tags span{
+  font-size:11px;
+  color:#777;
+  background:var(--bg);
+  border-radius:9px;
+  padding:3px 7px;
+}
+
+.nav-detail-desc{
+  margin-top:7px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.45;
+}
+
+.nav-detail-action{
+  align-self:center;
+  background:var(--primary);
+  color:#444;
+  border:0;
+  border-radius:10px;
+  padding:8px 5px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+
+/* =========================================================
+   Toast
+========================================================= */
+
+.toast{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.78);
+  color:#fff;
+  padding:10px 18px;
+  border-radius:14px;
+  font-size:13px;
+  z-index:999;
+  display:none;
+  max-width:80%;
+  text-align:center;
+}
+
+
+/* =========================================================
+   手机适配
+========================================================= */
+
+@media(max-width:380px){
+
+  .nav-category{
+    min-width:70px;
+  }
+
+  .nav-live-text{
+    font-size:14px;
+  }
+
+  .ep-row{
+    grid-template-columns:18px minmax(0,1fr) 70px;
+  }
+
+  .ep-edit-col{
+    width:70px;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
 <div id="app">
 
-  <!-- ==================== P1 首页 ==================== -->
+<!-- =========================================================
+     PAGE 1：首页
+========================================================= -->
 
-  <div class="page active" id="page1">
+<div class="page active" id="page1">
 
-    <div class="top-bar">
+  <div class="top-bar">
 
-      <div class="top-row">
+    <div class="top-row">
 
-        <div class="loc-wrap">
-          <span class="loc-icon">📍</span>
-          <input
-            class="loc-edit-input"
-            id="curAddrInput"
-            placeholder="正在获取我的位置..."
-            oninput="onAddrInput()"
-          />
-        </div>
+      <div class="loc-wrap">
+        <span class="loc-icon">📍</span>
 
-        <div
-          class="locate-btn"
-          id="relocateBtn"
-          onclick="doGeolocation(true)"
-          title="重新定位"
-        >⟳</div>
-
-        <div class="weather-chip" id="weatherChip">
-          ☀️ 26°C
-        </div>
-
-      </div>
-
-      <div class="suggest-list" id="suggestList"></div>
-
-    </div>
-
-    <div id="map1"></div>
-
-    <div class="bottom-panel">
-
-      <div class="nl-input-wrap">
-        <span class="emoji">💬</span>
         <input
-          class="nl-input"
-          id="nlInput"
-          placeholder="带3岁宝宝找个室内玩的地方"
+          class="loc-edit-input"
+          id="curAddrInput"
+          placeholder="正在获取我的位置..."
+          oninput="onAddrInput()"
         />
       </div>
 
-      <div class="chip-label">孩子年龄</div>
-
-      <div class="chip-row" id="ageChips">
-        <div class="chip" data-val="0-3">0-3岁</div>
-        <div class="chip" data-val="3-6">3-6岁</div>
-        <div class="chip" data-val="6-12">6-12岁</div>
+      <div
+        class="locate-btn"
+        id="relocateBtn"
+        onclick="doGeolocation(true)"
+      >
+        ⟳
       </div>
 
-      <div class="chip-label">出行目的</div>
-
-      <div class="chip-row" id="purposeChips">
-        <div class="chip" data-val="吃饭">🍴 吃饭</div>
-        <div class="chip" data-val="游玩">🎠 游玩</div>
-        <div class="chip" data-val="户外">🌳 户外</div>
-        <div class="chip" data-val="购物">🛍️ 购物</div>
-      </div>
-
-      <button class="start-btn" onclick="startPlanning()">
-        开始规划 →
-      </button>
-
-      <div class="demo-tag">
-        位置与设施信息来自实时地图检索
+      <div class="weather-chip" id="weatherChip">
+        ☀️ 26°C
       </div>
 
     </div>
+
+    <div
+      class="suggest-list"
+      id="suggestList"
+    ></div>
 
   </div>
 
+  <div id="map1"></div>
 
-  <!-- ==================== P3 推荐页 ==================== -->
+  <div class="bottom-panel">
 
-  <div class="page" id="page3">
+    <div class="nl-input-wrap">
+      <span class="emoji">💬</span>
 
-    <div class="navbar">
-      <div class="back-btn" onclick="goPage('page1')">←</div>
-      <div class="title">推荐结果</div>
-      <div class="placeholder"></div>
+      <input
+        class="nl-input"
+        id="nlInput"
+        placeholder="带3岁宝宝找个室内玩的地方"
+      />
     </div>
 
-    <div class="ai-greet">
-      <div class="ai-avatar">🤗</div>
-      <div class="ai-bubble">
-        找到啦！这几个地方很适合你们~
-      </div>
+    <div class="chip-label">
+      孩子年龄
     </div>
 
-    <div class="cards-scroll" id="cardsScroll"></div>
+    <div class="chip-row" id="ageChips">
 
-  </div>
-
-
-  <!-- ==================== P4 路线规划 ==================== -->
-
-  <div class="page" id="page4">
-
-    <div class="navbar">
-      <div class="back-btn" onclick="goPage('page3')">←</div>
-      <div class="title">路线规划</div>
-      <div class="placeholder"></div>
-    </div>
-
-    <div class="route-endpoints">
-
-      <div class="ep-row">
-
-        <div class="ep-dot start"></div>
-
-        <div class="ep-content">
-          <div class="ep-label">出发地</div>
-          <div class="ep-text" id="startText">
-            正在定位...
-          </div>
-        </div>
-
-        <div class="ep-edit-col">
-          <div class="ep-edit-btn" onclick="editStart()">
-            修改起点
-          </div>
-        </div>
-
+      <div class="chip" data-val="0-3">
+        0-3岁
       </div>
 
-      <div class="ep-divider"></div>
+      <div class="chip" data-val="3-6">
+        3-6岁
+      </div>
 
-      <div class="ep-row">
-
-        <div class="ep-dot end"></div>
-
-        <div class="ep-content">
-          <div class="ep-label">目的地</div>
-          <div class="ep-text" id="endText">
-            --
-          </div>
-        </div>
-
-        <div class="ep-edit-col">
-          <div class="ep-edit-btn" onclick="editEnd()">
-            修改目的地
-          </div>
-        </div>
-
+      <div class="chip" data-val="6-12">
+        6-12岁
       </div>
 
     </div>
 
-    <div class="mode-tabs" id="modeTabs">
+    <div class="chip-label">
+      出行目的
+    </div>
 
-      <div class="mode-tab active" data-mode="walking">
-        🚶 步行
+    <div class="chip-row" id="purposeChips">
+
+      <div class="chip" data-val="吃饭">
+        🍴 吃饭
       </div>
 
-      <div class="mode-tab" data-mode="driving">
-        🚗 驾车
+      <div class="chip" data-val="游玩">
+        🎠 游玩
       </div>
 
-      <div class="mode-tab" data-mode="transit">
-        🚌 公共交通
+      <div class="chip" data-val="户外">
+        🌳 户外
       </div>
 
-      <div class="mode-tab" data-mode="riding">
-        🚴 骑行
+      <div class="chip" data-val="购物">
+        🛍️ 购物
       </div>
 
     </div>
 
-    <div id="map2"></div>
-
-    <div class="reason-card">
-
-      <div class="rt">
-        ✨ 推荐原因
-      </div>
-
-      <div class="reason-tags" id="reasonTags"></div>
-
-      <div class="reason-meta" id="reasonMeta">
-        <span id="reasonDist">📏 --</span>
-        <span id="reasonTime">⏱ --</span>
-      </div>
-
-      <div class="parking-line" id="parkingLine"></div>
-
-    </div>
-
-    <button class="nav-start-btn" onclick="startNav()">
-      开始导航
+    <button
+      class="start-btn"
+      onclick="startPlanning()"
+    >
+      开始规划 →
     </button>
 
-  </div>
-
-
-  <!-- ==================== P5 导航页 ==================== -->
-  <div class="page" id="page5">
-
-    <!-- 分区1：顶部搜索区 -->
-    <div class="nav-top-search">
-      <div class="nav-search-box">
-        <span class="search-icon">⌕</span>
-        <input id="navGlobalSearch" placeholder="搜索目的地、亲子设施" onkeydown="if(event.key==='Enter') navGlobalSearch()" />
-      </div>
-      <div class="nav-avatar" onclick="showToast('个人中心')">👤</div>
+    <div class="demo-tag">
+      位置与设施信息来自实时地图检索
     </div>
 
-    <!-- 分区2：横向分类标签 -->
-    <div class="nav-category-scroll" id="navCategoryScroll">
-      <div class="nav-category active" data-label="全部" data-tone="yellow" onclick="selectNavCategory(this,'全部')"><span class="cat-icon">🗺️</span><span>全部</span></div>
-      <div class="nav-category" data-label="母婴室" data-tone="purple" onclick="selectNavCategory(this,'母婴室')"><span class="cat-icon">🍼</span><span>母婴室</span></div>
-      <div class="nav-category" data-label="休息处" data-tone="green" onclick="selectNavCategory(this,'休息处')"><span class="cat-icon">🪑</span><span>休息处</span></div>
-      <div class="nav-category" data-label="儿童乐园" data-tone="orange" onclick="selectNavCategory(this,'儿童乐园')"><span class="cat-icon">🛝</span><span>游乐区</span></div>
-      <div class="nav-category" data-label="儿童餐厅" data-tone="orange" onclick="selectNavCategory(this,'儿童餐厅')"><span class="cat-icon">🍽️</span><span>儿童餐厅</span></div>
-      <div class="nav-category" data-label="儿童活动" data-tone="orange" onclick="selectNavCategory(this,'儿童活动')"><span class="cat-icon">🎨</span><span>儿童活动</span></div>
-      <div class="nav-category" data-label="家庭卫生间" data-tone="purple" onclick="selectNavCategory(this,'家庭卫生间')"><span class="cat-icon">🚽</span><span>卫生间</span></div>
-      <div class="nav-category" data-label="无障碍通道" data-tone="blue" onclick="selectNavCategory(this,'无障碍通道')"><span class="cat-icon">♿</span><span>无障碍</span></div>
-      <div class="nav-category" data-label="博物馆" data-tone="blue" onclick="selectNavCategory(this,'博物馆')"><span class="cat-icon">🏛️</span><span>博物馆</span></div>
-    </div>
-
-    <!-- 分区3：主地图画布 -->
-    <div class="nav-map-wrap">
-      <div id="map3"></div>
-      <div class="nav-route-tip">🧭 <b>导航路线</b>　<span id="navRouteTipText">正在获取实时位置与路线...</span></div>
-      <div class="filter-btn-float" onclick="toggleFilterPanel()">⌕ 设施筛选</div>
-      <div class="filter-panel" id="filterPanel"></div>
-
-      <!-- 分区4：底部详情抽屉 -->
-      <div class="nav-detail-drawer" id="navDetailDrawer">
-        <div class="nav-detail-img" id="navDetailImg">🧸</div>
-        <div class="nav-detail-content">
-          <div class="nav-detail-title" id="navDetailTitle">亲子友好地点</div>
-          <div class="nav-detail-meta"><span id="navDetailRating">⭐ 4.8</span><span id="navDetailDistance">📍 附近</span></div>
-          <div class="nav-detail-tags" id="navDetailTags"><span>亲子友好</span><span>适合儿童</span></div>
-          <div class="nav-detail-desc" id="navDetailDesc">点击地图上的设施点位，可以查看具体名称、地址和配套信息。</div>
-        </div>
-        <button class="nav-detail-action" onclick="closeNavDetail()">关闭</button>
-      </div>
-
-      <!-- 分区5：附近推荐 -->
-      <div class="nav-recommend" id="navRecommend">
-        <div class="nav-recommend-head"><span>附近推荐</span><span style="font-size:11px;color:#888">横向滑动查看更多</span></div>
-        <div class="nav-recommend-list" id="navRecommendList"></div>
-      </div>
-
-      <div class="nav-bottom-info">
-        <div class="tt">🤖 AI 沿途提示</div>
-        <div class="tc" id="aiTipText">正在检索沿途亲子设施...</div>
-      </div>
-
-      <div class="end-nav-btn" onclick="endNav()">结束导航</div>
-    </div>
   </div>
 
 </div>
 
-<div class="toast" id="toast"></div>
+
+<!-- =========================================================
+     PAGE 3：推荐
+========================================================= -->
+
+<div class="page" id="page3">
+
+  <div class="navbar">
+
+    <div
+      class="back-btn"
+      onclick="goPage('page1')"
+    >
+      ←
+    </div>
+
+    <div class="title">
+      推荐结果
+    </div>
+
+    <div class="placeholder"></div>
+
+  </div>
+
+  <div class="ai-greet">
+
+    <div class="ai-avatar">
+      🤗
+    </div>
+
+    <div class="ai-bubble">
+      找到啦！这几个地方很适合你们~
+    </div>
+
+  </div>
+
+  <div
+    class="cards-scroll"
+    id="cardsScroll"
+  ></div>
+
+</div>
 
 
-<script type="text/javascript">
+<!-- =========================================================
+     PAGE 4：路线规划
+========================================================= -->
+
+<div class="page" id="page4">
+
+  <div class="navbar">
+
+    <div
+      class="back-btn"
+      onclick="goPage('page3')"
+    >
+      ←
+    </div>
+
+    <div class="title">
+      路线规划
+    </div>
+
+    <div class="placeholder"></div>
+
+  </div>
+
+
+  <div class="route-endpoints">
+
+    <!-- 起点 -->
+
+    <div class="ep-row">
+
+      <div class="ep-dot start"></div>
+
+      <div class="ep-content">
+
+        <div class="ep-label">
+          出发地
+        </div>
+
+        <div
+          class="ep-text"
+          id="startText"
+        >
+          正在定位...
+        </div>
+
+      </div>
+
+      <div class="ep-edit-col">
+
+        <div
+          class="ep-edit-btn"
+          onclick="editStart()"
+        >
+          修改起点
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="ep-divider"></div>
+
+
+    <!-- 终点 -->
+
+    <div class="ep-row">
+
+      <div class="ep-dot end"></div>
+
+      <div class="ep-content">
+
+        <div class="ep-label">
+          目的地
+        </div>
+
+        <div
+          class="ep-text"
+          id="endText"
+        >
+          --
+        </div>
+
+      </div>
+
+      <div class="ep-edit-col">
+
+        <div
+          class="ep-edit-btn"
+          onclick="editEnd()"
+        >
+          修改目的地
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 出行方式 -->
+
+  <div
+    class="mode-tabs"
+    id="modeTabs"
+  >
+
+    <div
+      class="mode-tab active"
+      data-mode="walking"
+    >
+      🚶 步行
+    </div>
+
+    <div
+      class="mode-tab"
+      data-mode="driving"
+    >
+      🚗 驾车
+    </div>
+
+    <div
+      class="mode-tab"
+      data-mode="transit"
+    >
+      🚌 公共交通
+    </div>
+
+    <div
+      class="mode-tab"
+      data-mode="riding"
+    >
+      🚴 骑行
+    </div>
+
+  </div>
+
+
+  <div id="map2"></div>
+
+
+  <div class="reason-card">
+
+    <div class="rt">
+      ✨ 推荐原因
+    </div>
+
+    <div
+      class="reason-tags"
+      id="reasonTags"
+    ></div>
+
+    <div
+      class="reason-meta"
+      id="reasonMeta"
+    >
+
+      <span id="reasonDist">
+        📏 --
+      </span>
+
+      <span id="reasonTime">
+        ⏱ --
+      </span>
+
+    </div>
+
+    <div
+      class="parking-line"
+      id="parkingLine"
+    ></div>
+
+  </div>
+
+
+  <button
+    class="nav-start-btn"
+    onclick="startNav()"
+  >
+    开始导航
+  </button>
+
+</div>
+
+
+<!-- =========================================================
+     PAGE 5：导航
+========================================================= -->
+
+<div class="page" id="page5">
+
+
+  <!-- 顶部实时路线指导
+       已删除搜索框和头像 -->
+
+  <div class="nav-live-guide">
+
+    <div
+      class="nav-live-icon"
+      id="stepIcon"
+    >
+      ⬆️
+    </div>
+
+    <div
+      class="nav-live-text"
+      id="stepMainText"
+    >
+      正在获取实时路线...
+    </div>
+
+  </div>
+
+
+  <!-- 横向滑动设施筛选卡片 -->
+
+  <div
+    class="nav-category-scroll"
+    id="navCategoryScroll"
+  >
+
+    <div
+      class="nav-category active"
+      data-label="全部"
+      data-tone="yellow"
+      onclick="selectNavCategory(this,'全部')"
+    >
+      <span class="cat-icon">🗺️</span>
+      <span>全部</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="母婴室"
+      data-tone="purple"
+      onclick="selectNavCategory(this,'母婴室')"
+    >
+      <span class="cat-icon">🍼</span>
+      <span>母婴室</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="停车场"
+      data-tone="blue"
+      onclick="selectNavCategory(this,'停车场')"
+    >
+      <span class="cat-icon">🅿️</span>
+      <span>停车场</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="休息处"
+      data-tone="green"
+      onclick="selectNavCategory(this,'休息处')"
+    >
+      <span class="cat-icon">🪑</span>
+      <span>休息处</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="儿童乐园"
+      data-tone="orange"
+      onclick="selectNavCategory(this,'儿童乐园')"
+    >
+      <span class="cat-icon">🛝</span>
+      <span>游乐区</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="儿童餐厅"
+      data-tone="orange"
+      onclick="selectNavCategory(this,'儿童餐厅')"
+    >
+      <span class="cat-icon">🍽️</span>
+      <span>儿童餐厅</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="儿童活动"
+      data-tone="orange"
+      onclick="selectNavCategory(this,'儿童活动')"
+    >
+      <span class="cat-icon">🎨</span>
+      <span>儿童活动</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="家庭卫生间"
+      data-tone="purple"
+      onclick="selectNavCategory(this,'家庭卫生间')"
+    >
+      <span class="cat-icon">🚽</span>
+      <span>卫生间</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="无障碍通道"
+      data-tone="blue"
+      onclick="selectNavCategory(this,'无障碍通道')"
+    >
+      <span class="cat-icon">♿</span>
+      <span>无障碍</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="博物馆"
+      data-tone="blue"
+      onclick="selectNavCategory(this,'博物馆')"
+    >
+      <span class="cat-icon">🏛️</span>
+      <span>博物馆</span>
+    </div>
+
+
+    <div
+      class="nav-category"
+      data-label="科技馆"
+      data-tone="blue"
+      onclick="selectNavCategory(this,'科技馆')"
+    >
+      <span class="cat-icon">🔬</span>
+      <span>科技馆</span>
+    </div>
+
+  </div>
+
+
+  <!-- 地图 -->
+
+  <div class="nav-map-wrap">
+
+    <div id="map3"></div>
+
+
+    <!-- AI沿途提示 -->
+
+    <div class="nav-bottom-info">
+
+      <div class="tt">
+        🤖 AI 沿途提示
+      </div>
+
+      <div
+        class="tc"
+        id="aiTipText"
+      >
+        正在检索沿途亲子设施...
+      </div>
+
+    </div>
+
+
+    <!-- 设施详情 -->
+
+    <div
+      class="nav-detail-drawer"
+      id="navDetailDrawer"
+    >
+
+      <div
+        class="nav-detail-img"
+        id="navDetailImg"
+      >
+        🧸
+      </div>
+
+      <div class="nav-detail-content">
+
+        <div
+          class="nav-detail-title"
+          id="navDetailTitle"
+        >
+          亲子友好地点
+        </div>
+
+        <div class="nav-detail-meta">
+
+          <span>
+            ⭐ 亲子友好
+          </span>
+
+          <span id="navDetailDistance">
+            📍 附近
+          </span>
+
+        </div>
+
+        <div
+          class="nav-detail-tags"
+          id="navDetailTags"
+        ></div>
+
+        <div
+          class="nav-detail-desc"
+          id="navDetailDesc"
+        >
+          点击地图上的设施点位查看详细信息。
+        </div>
+
+      </div>
+
+      <button
+        class="nav-detail-action"
+        onclick="closeNavDetail()"
+      >
+        关闭
+      </button>
+
+    </div>
+
+
+    <!-- 结束导航 -->
+
+    <div
+      class="end-nav-btn"
+      onclick="endNav()"
+    >
+      结束导航
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+<script>
 
 /* =========================================================
    全局变量
 ========================================================= */
 
-var DEFAULT_CENTER = {
-  lng: 113.361,
-  lat: 23.127
+var DEFAULT_CENTER={
+  lng:113.361,
+  lat:23.127
 };
 
-var map1 = null;
-var map2 = null;
-var map3 = null;
+var map1=null;
+var map2=null;
+var map3=null;
 
-var userPoint = null;
+var userPoint=null;
 
-var currentAddrText = "";
+var currentAddrText="";
 
-var selectedAge = "3-6";
-var selectedPurpose = "游玩";
+var selectedAge="3-6";
+var selectedPurpose="游玩";
 
-var currentMode = "walking";
+var currentMode="walking";
 
-var startPoint = null;
-var endPoint = null;
+var startPoint=null;
+var endPoint=null;
 
-var startName = "我的位置";
-var endName = "";
+var startName="我的位置";
+var endName="";
 
-var recommendedPlaces = [];
-var currentDest = null;
+var recommendedPlaces=[];
+var currentDest=null;
 
-var facilityMarkers = [];
-var activeFacilityTypes = {};
+var facilityMarkers=[];
+var facilityData=[];
 
-var parkingMarkers = [];
+var activeFacilityTypes={};
 
-var navSteps = [];
-var navStepIndex = 0;
+var parkingMarkers=[];
 
-var facilityData = [];
+var navSteps=[];
+var navStepIndex=0;
 
-var geoHome = null;
-var homeWatchId = null;
+var homeWatchId=null;
+var navWatchId=null;
 
-var geoNav = null;
-var navWatchId = null;
+var homeUserMarker=null;
+var navUserMarker=null;
 
-var navUserMarker = null;
-var homeUserMarker = null;
-var homeUserLabel = null;
+var homeUserLabel=null;
 
-var isNavPage = false;
+var navStartMarker=null;
+var navEndMarker=null;
+
+var navRouteOverlay=null;
+
+var isNavPage=false;
 
 
 /* =========================================================
    设施分类
 ========================================================= */
 
-var FACILITY_CATEGORY_MAP = [
+var FACILITY_CATEGORY_MAP=[
 
   {
     keyword:'母婴室|母婴|哺乳室|育婴',
     icon:'🍼',
     label:'母婴室'
+  },
+
+  {
+    keyword:'停车|停车场',
+    icon:'🅿️',
+    label:'停车场'
   },
 
   {
@@ -1287,7 +1779,7 @@ var FACILITY_CATEGORY_MAP = [
   {
     keyword:'游乐|儿童乐园|儿童游乐',
     icon:'🛝',
-    label:'儿童游乐区'
+    label:'儿童乐园'
   },
 
   {
@@ -1304,14 +1796,8 @@ var FACILITY_CATEGORY_MAP = [
 
   {
     keyword:'餐厅|美食|餐饮|亲子餐',
-    icon:'🍽',
+    icon:'🍽️',
     label:'儿童餐厅'
-  },
-
-  {
-    keyword:'停车|停车场',
-    icon:'🅿️',
-    label:'家庭停车'
   },
 
   {
@@ -1360,55 +1846,103 @@ var FACILITY_CATEGORY_MAP = [
 
 
 /*
- * 不再把这些关键词一次性传给 searchNearby。
- * 而是逐个检索，避免不同版本 SDK 对数组关键词处理不一致。
+ * 导航页实际搜索的关键词。
+ *
+ * 加入停车场、博物馆、科技馆等。
  */
-var FACILITY_SEARCH_KEYWORDS = [
+
+var FACILITY_SEARCH_KEYWORDS=[
+
   {
     keyword:'母婴室',
     fallbackLabel:'母婴室',
     icon:'🍼'
   },
+
   {
     keyword:'哺乳室',
     fallbackLabel:'母婴室',
     icon:'🍼'
   },
+
+  {
+    keyword:'停车场',
+    fallbackLabel:'停车场',
+    icon:'🅿️'
+  },
+
   {
     keyword:'休息区',
     fallbackLabel:'休息处',
     icon:'🪑'
   },
+
   {
     keyword:'休息处',
     fallbackLabel:'休息处',
     icon:'🪑'
   },
+
   {
     keyword:'儿童卫生间',
     fallbackLabel:'家庭卫生间',
     icon:'🚽'
   },
+
+  {
+    keyword:'卫生间',
+    fallbackLabel:'家庭卫生间',
+    icon:'🚽'
+  },
+
   {
     keyword:'儿童乐园',
-    fallbackLabel:'儿童游乐区',
+    fallbackLabel:'儿童乐园',
     icon:'🛝'
   },
+
   {
     keyword:'儿童活动',
     fallbackLabel:'儿童活动',
     icon:'🎨'
   },
+
   {
     keyword:'儿童餐厅',
     fallbackLabel:'儿童餐厅',
-    icon:'🍽'
+    icon:'🍽️'
   },
+
   {
     keyword:'无障碍卫生间',
     fallbackLabel:'家庭卫生间',
     icon:'🚽'
+  },
+
+  {
+    keyword:'博物馆',
+    fallbackLabel:'博物馆',
+    icon:'🏛️'
+  },
+
+  {
+    keyword:'科技馆',
+    fallbackLabel:'科技馆',
+    icon:'🔬'
+  },
+
+  {
+    keyword:'图书馆',
+    fallbackLabel:'图书馆',
+    icon:'📖'
+  },
+
+  {
+    keyword:'美术馆',
+    fallbackLabel:'美术馆',
+    icon:'🖼️'
   }
+
 ];
 
 
@@ -1416,124 +1950,281 @@ var FACILITY_SEARCH_KEYWORDS = [
    通用工具
 ========================================================= */
 
-function showToast(msg) {
+function showToast(msg){
 
-  var t = document.getElementById('toast');
+  var t=document.getElementById('toast');
 
-  t.textContent = msg;
-  t.style.display = 'block';
+  if(!t){
+    return;
+  }
+
+  t.textContent=msg;
+  t.style.display='block';
 
   clearTimeout(window._toastTimer);
 
-  window._toastTimer = setTimeout(function(){
-    t.style.display = 'none';
-  }, 2400);
+  window._toastTimer=setTimeout(
+    function(){
+      t.style.display='none';
+    },
+    2400
+  );
 
 }
 
 
-function stripHtml(str) {
+function stripHtml(str){
 
-  if (!str) return '';
-
-  var div = document.createElement('div');
-
-  div.innerHTML = String(str);
-
-  return (div.textContent || div.innerText || '').trim();
-
-}
-
-
-function matchFacilityIcon(name) {
-
-  if (!name) {
-    return {
-      icon:'📍',
-      label:'亲子设施'
-    };
+  if(!str){
+    return '';
   }
 
-  for (var i=0;i<FACILITY_CATEGORY_MAP.length;i++) {
+  var div=document.createElement('div');
 
-    var cat = FACILITY_CATEGORY_MAP[i];
+  div.innerHTML=String(str);
 
-    var re = new RegExp(cat.keyword);
-
-    if (re.test(name)) {
-      return cat;
-    }
-
-  }
-
-  return {
-    icon:'📍',
-    label:'亲子设施'
-  };
+  return (
+    div.textContent ||
+    div.innerText ||
+    ''
+  ).trim();
 
 }
 
 
-/*
- * 判断百度返回的 POI 到底属于什么设施。
- *
- * 注意：
- * 这里优先使用真实 POI 的名称和类型。
- * 不生成虚假的地点名称。
- */
-function detectFacilityCategory(poi, fallback) {
+function truncateStepText(text,maxLen){
 
-  var title = stripHtml(poi && poi.title);
-  var address = stripHtml(poi && poi.address);
-  var type = stripHtml(poi && poi.type);
+  if(!text){
+    return '';
+  }
 
-  var text =
-    title + ' ' +
-    address + ' ' +
+  return text.length>maxLen
+    ? text.slice(0,maxLen)+'…'
+    : text;
+
+}
+
+
+function truncateFacilityName(
+  name,
+  maxLen
+){
+
+  if(!name){
+    return '亲子设施';
+  }
+
+  name=String(name);
+
+  return name.length>maxLen
+    ? name.slice(0,maxLen)+'…'
+    : name;
+
+}
+
+
+/* =========================================================
+   自定义圆形地图图标
+========================================================= */
+
+function createCircleIcon(
+  type
+){
+
+  var div=document.createElement('div');
+
+  div.className=
+    'map-point-icon '+
     type;
 
-  for (var i=0;i<FACILITY_CATEGORY_MAP.length;i++) {
+  return div;
 
-    var cat = FACILITY_CATEGORY_MAP[i];
+}
 
-    var re = new RegExp(cat.keyword);
 
-    if (re.test(text)) {
+function createMapPointMarker(
+  point,
+  type,
+  clickText,
+  map
+){
+
+  var marker=
+    new BMapGL.Marker(
+      point,
+      {
+        icon:new BMapGL.Icon(
+          'data:image/svg+xml;charset=utf-8,'+
+          encodeURIComponent(
+            type==='start'
+            ?
+            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#C9A7E8" stroke="white" stroke-width="4"/></svg>'
+            :
+            type==='end'
+            ?
+            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#9BC9F5" stroke="white" stroke-width="4"/></svg>'
+            :
+            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#B7D9FF" stroke="white" stroke-width="4"/></svg>'
+          ),
+          new BMapGL.Size(28,28)
+        )
+      }
+    );
+
+  if(clickText){
+
+    marker.addEventListener(
+      'click',
+      function(){
+
+        showPointLabel(
+          map,
+          point,
+          clickText
+        );
+
+      }
+    );
+
+  }
+
+  return marker;
+
+}
+
+
+var temporaryPointLabel=null;
+
+
+function showPointLabel(
+  map,
+  point,
+  text
+){
+
+  if(
+    temporaryPointLabel &&
+    map
+  ){
+
+    try{
+      map.removeOverlay(
+        temporaryPointLabel
+      );
+    }catch(e){}
+
+  }
+
+  temporaryPointLabel=
+    new BMapGL.Label(
+      text,
+      {
+        position:point,
+        offset:new BMapGL.Size(
+          -25,
+          -40
+        )
+      }
+    );
+
+  temporaryPointLabel.setStyle({
+
+    background:'#fff',
+    color:'#444',
+    border:'1px solid #EAE4D8',
+    borderRadius:'14px',
+    padding:'5px 9px',
+    fontSize:'12px',
+    fontWeight:'700',
+    whiteSpace:'nowrap',
+    boxShadow:'0 3px 10px rgba(50,40,20,.15)'
+
+  });
+
+  map.addOverlay(
+    temporaryPointLabel
+  );
+
+}
+
+
+/* =========================================================
+   设施分类判断
+========================================================= */
+
+function detectFacilityCategory(
+  poi,
+  fallback
+){
+
+  var title=
+    stripHtml(
+      poi && poi.title
+    );
+
+  var address=
+    stripHtml(
+      poi && poi.address
+    );
+
+  var type=
+    stripHtml(
+      poi && poi.type
+    );
+
+  var text=
+    title+' '+
+    address+' '+
+    type;
+
+  for(
+    var i=0;
+    i<FACILITY_CATEGORY_MAP.length;
+    i++
+  ){
+
+    var cat=
+      FACILITY_CATEGORY_MAP[i];
+
+    if(
+      new RegExp(
+        cat.keyword
+      ).test(text)
+    ){
+
       return cat;
+
     }
 
   }
 
   return {
-    icon: fallback.icon,
-    label: fallback.fallbackLabel
+    icon:fallback.icon,
+    label:fallback.fallbackLabel
   };
 
 }
 
 
-/*
- * 设施最终显示名称：
- *
- * 1. 有真实 POI 名称 → 真实名称
- * 2. 没有真实 POI 名称 → 类型名
- *
- * 不再生成：
- * “母婴室示例”
- * “休息处示例”
- * “XX示例”
- */
-function getFacilityDisplayName(poi, category) {
+function getFacilityDisplayName(
+  poi,
+  category
+){
 
-  var title = stripHtml(poi && poi.title);
+  var title=
+    stripHtml(
+      poi && poi.title
+    );
 
-  if (
+  if(
     title &&
-    title !== '无名地点' &&
-    title !== '未知地点' &&
-    title !== 'undefined'
-  ) {
+    title!=='无名地点' &&
+    title!=='未知地点' &&
+    title!=='undefined'
+  ){
+
     return title;
+
   }
 
   return category.label;
@@ -1545,65 +2236,85 @@ function getFacilityDisplayName(poi, category) {
    页面切换
 ========================================================= */
 
-function goPage(id) {
+function goPage(id){
 
-  /*
-   * 离开首页：停止首页定位监听
-   */
-  if (id !== 'page1') {
+  if(id!=='page1'){
     stopHomeLocationWatch();
   }
 
-  /*
-   * 离开导航页：停止导航定位
-   */
-  if (id !== 'page5') {
+  if(id!=='page5'){
     stopNavLocationWatch();
   }
 
-  var pages = document.querySelectorAll('.page');
+  var pages=
+    document.querySelectorAll(
+      '.page'
+    );
 
-  for (var i=0;i<pages.length;i++) {
-    pages[i].classList.remove('active');
-  }
+  for(
+    var i=0;
+    i<pages.length;
+    i++
+  ){
 
-  var target = document.getElementById(id);
-
-  if (target) {
-    target.classList.add('active');
-  }
-
-  if (id === 'page1') {
-
-    setTimeout(function(){
-
-      if (map1) {
-        map1.resize();
-      }
-
-      startHomeLocationWatch();
-
-    },80);
+    pages[i].classList.remove(
+      'active'
+    );
 
   }
 
-  if (id === 'page4') {
+  var target=
+    document.getElementById(id);
 
-    setTimeout(function(){
+  if(target){
+    target.classList.add(
+      'active'
+    );
+  }
 
-      initMap2AndRoute();
 
-    },80);
+  if(id==='page1'){
+
+    setTimeout(
+      function(){
+
+        if(map1){
+          map1.resize();
+        }
+
+        startHomeLocationWatch();
+
+      },
+      80
+    );
 
   }
 
-  if (id === 'page5') {
 
-    setTimeout(function(){
+  if(id==='page4'){
 
-      initMap3AndNav();
+    setTimeout(
+      function(){
 
-    },80);
+        initMap2AndRoute();
+
+      },
+      80
+    );
+
+  }
+
+
+  if(id==='page5'){
+
+    setTimeout(
+      function(){
+
+        initMap3AndNav();
+
+      },
+      80
+    );
 
   }
 
@@ -1614,35 +2325,42 @@ function goPage(id) {
    首页地图
 ========================================================= */
 
-function initMap1() {
+function initMap1(){
 
-  try {
+  try{
 
-    map1 = new BMapGL.Map('map1');
+    map1=
+      new BMapGL.Map(
+        'map1'
+      );
 
-    var center = new BMapGL.Point(
-      DEFAULT_CENTER.lng,
-      DEFAULT_CENTER.lat
+    var center=
+      new BMapGL.Point(
+        DEFAULT_CENTER.lng,
+        DEFAULT_CENTER.lat
+      );
+
+    map1.centerAndZoom(
+      center,
+      14
     );
 
-    /*
-     * 这里只作为地图初始化位置。
-     * 不再把它标记成“我的位置”。
-     */
-    map1.centerAndZoom(center,14);
+    map1.enableScrollWheelZoom(
+      true
+    );
 
-    map1.enableScrollWheelZoom(true);
-
-    /*
-     * 真正的实时定位
-     */
     startHomeLocationWatch();
 
-  } catch(e) {
+  }catch(e){
 
-    console.error('首页地图初始化失败',e);
+    console.error(
+      '首页地图初始化失败',
+      e
+    );
 
-    showToast('地图初始化失败，请检查网络或百度地图AK');
+    showToast(
+      '地图初始化失败，请检查网络或百度地图AK'
+    );
 
   }
 
@@ -1650,49 +2368,39 @@ function initMap1() {
 
 
 /* =========================================================
-   首页实时定位
+   首页定位
 ========================================================= */
 
-function startHomeLocationWatch() {
+function startHomeLocationWatch(){
 
-  /*
-   * 已经在监听就不要重复创建
-   */
-  if (homeWatchId !== null) {
+  if(homeWatchId!==null){
     return;
   }
 
-  /*
-   * 优先使用浏览器原生 Geolocation。
-   *
-   * 相比单纯依赖 BMapGL.Geolocation，
-   * 浏览器原生定位在真实浏览器中更容易判断权限状态。
-   */
-  if (!navigator.geolocation) {
+  if(!navigator.geolocation){
 
-    showToast('当前浏览器不支持定位');
+    showToast(
+      '当前浏览器不支持定位'
+    );
 
     return;
 
   }
 
-  try {
+  try{
 
-    /*
-     * 先获取一次
-     */
     navigator.geolocation.getCurrentPosition(
 
       function(position){
-
-        handleHomePosition(position);
-
+        handleHomePosition(
+          position
+        );
       },
 
       function(error){
-
-        handleLocationError(error);
-
+        handleLocationError(
+          error
+        );
       },
 
       {
@@ -1704,111 +2412,105 @@ function startHomeLocationWatch() {
     );
 
 
-    /*
-     * 再持续监听
-     */
-    homeWatchId = navigator.geolocation.watchPosition(
+    homeWatchId=
+      navigator.geolocation.watchPosition(
 
-      function(position){
+        function(position){
+          handleHomePosition(
+            position
+          );
+        },
 
-        handleHomePosition(position);
+        function(error){
+          handleLocationError(
+            error
+          );
+        },
 
-      },
+        {
+          enableHighAccuracy:true,
+          timeout:15000,
+          maximumAge:3000
+        }
 
-      function(error){
+      );
 
-        handleLocationError(error);
+  }catch(e){
 
-      },
-
-      {
-        enableHighAccuracy:true,
-        timeout:15000,
-        maximumAge:3000
-      }
-
-    );
-
-  } catch(e) {
-
-    console.error('首页定位启动失败',e);
+    console.error(e);
 
   }
 
 }
 
 
-/* =========================================================
-   停止首页实时定位
-========================================================= */
+function stopHomeLocationWatch(){
 
-function stopHomeLocationWatch() {
-
-  if (
-    homeWatchId !== null &&
+  if(
+    homeWatchId!==null &&
     navigator.geolocation
-  ) {
+  ){
 
-    try {
+    try{
 
       navigator.geolocation.clearWatch(
         homeWatchId
       );
 
-    } catch(e) {}
+    }catch(e){}
 
   }
 
-  homeWatchId = null;
+  homeWatchId=null;
 
 }
 
 
-/* =========================================================
-   首页定位结果
-========================================================= */
+function handleHomePosition(
+  position
+){
 
-function handleHomePosition(position) {
-
-  if (!position || !position.coords) {
+  if(
+    !position ||
+    !position.coords
+  ){
     return;
   }
 
-  var lat = position.coords.latitude;
-  var lng = position.coords.longitude;
+  var lat=
+    position.coords.latitude;
 
-  if (
-    typeof lat !== 'number' ||
-    typeof lng !== 'number'
-  ) {
+  var lng=
+    position.coords.longitude;
+
+  if(
+    typeof lat!=='number' ||
+    typeof lng!=='number'
+  ){
     return;
   }
 
-  /*
-   * WGS84 坐标转换为百度地图坐标。
-   *
-   * BMapGL.Geolocation 本身会进行百度坐标处理，
-   * 这里为了避免浏览器原生 GPS 与百度地图坐标系偏移，
-   * 使用 BMapGL.Point 直接显示。
-   *
-   * 对产品 Demo 足够。
-   */
-  var point = new BMapGL.Point(lng,lat);
+  var point=
+    new BMapGL.Point(
+      lng,
+      lat
+    );
 
-  userPoint = point;
+  userPoint=point;
 
-  updateHomeUserMarker(point);
+  updateHomeUserMarker(
+    point
+  );
 
-  reverseGeocode(point);
+  reverseGeocode(
+    point
+  );
 
-  /*
-   * 第一次成功定位时，把地图中心移过去。
-   */
-  if (!window._homeFirstLocated) {
+  if(!window._homeFirstLocated){
 
-    window._homeFirstLocated = true;
+    window._homeFirstLocated=true;
 
-    if (map1) {
+    if(map1){
 
       map1.centerAndZoom(
         point,
@@ -1817,101 +2519,84 @@ function handleHomePosition(position) {
 
     }
 
-    /*
-     * 首页只显示用户自己的实时位置。
-     * 不自动搜索/渲染附近儿童设施，避免地图出现无关地点标签。
-     */
-
   }
 
 }
 
 
-/* =========================================================
-   首页我的位置标记
-========================================================= */
+function updateHomeUserMarker(
+  point
+){
 
-function updateHomeUserMarker(point) {
-
-  if (!map1 || !point) {
+  if(
+    !map1 ||
+    !point
+  ){
     return;
   }
 
-  /*
-   * 删除旧定位点
-   */
-  if (homeUserMarker) {
+  if(homeUserMarker){
 
-    try {
-      map1.removeOverlay(homeUserMarker);
-    } catch(e) {}
-
-  }
-
-  if (homeUserLabel) {
-
-    try {
-      map1.removeOverlay(homeUserLabel);
-    } catch(e) {}
+    try{
+      map1.removeOverlay(
+        homeUserMarker
+      );
+    }catch(e){}
 
   }
 
+  if(homeUserLabel){
+
+    try{
+      map1.removeOverlay(
+        homeUserLabel
+      );
+    }catch(e){}
+
+    homeUserLabel=null;
+
+  }
+
   /*
-   * 我的实时位置
+   * 首页只显示圆形当前位置，
+   * 默认不显示“我的实时位置”文字。
    */
-  homeUserMarker = new BMapGL.Marker(point);
+
+  homeUserMarker=
+    createMapPointMarker(
+      point,
+      'user',
+      '我的位置',
+      map1
+    );
 
   map1.addOverlay(
     homeUserMarker
   );
 
-  homeUserLabel = new BMapGL.Label(
-    '📍 我的实时位置',
-    {
-      position:point,
-      offset:new BMapGL.Size(-38,-35)
-    }
-  );
-
-  homeUserLabel.setStyle({
-
-    background:'#FF8C42',
-    color:'#fff',
-    border:'none',
-    borderRadius:'14px',
-    padding:'3px 9px',
-    fontSize:'11px',
-    fontWeight:'700',
-    boxShadow:'0 2px 6px rgba(0,0,0,.18)'
-
-  });
-
-  map1.addOverlay(
-    homeUserLabel
-  );
-
 }
 
 
-/* =========================================================
-   定位失败
-========================================================= */
-
-function handleLocationError(error) {
+function handleLocationError(
+  error
+){
 
   console.warn(
-    '浏览器定位失败:',
+    '定位失败',
     error
   );
 
-  /*
-   * 不再把 DEFAULT_CENTER 当作用户位置。
-   */
-  if (!userPoint) {
+  if(!userPoint){
 
-    document.getElementById(
-      'curAddrInput'
-    ).value = '暂时无法获取当前位置';
+    var input=
+      document.getElementById(
+        'curAddrInput'
+      );
+
+    if(input){
+      input.value=
+        '暂时无法获取当前位置';
+    }
 
     showToast(
       '无法获取当前位置，请允许浏览器使用定位权限'
@@ -1922,28 +2607,33 @@ function handleLocationError(error) {
 }
 
 
-/*
- * 点击首页右上角重新定位
- */
-function doGeolocation(force) {
+function doGeolocation(
+  force
+){
 
-  if (force) {
+  if(force){
 
-    window._homeFirstLocated = false;
+    window._homeFirstLocated=false;
 
     stopHomeLocationWatch();
 
   }
 
-  if (!navigator.geolocation) {
+  if(
+    !navigator.geolocation
+  ){
 
-    showToast('当前浏览器不支持定位');
+    showToast(
+      '当前浏览器不支持定位'
+    );
 
     return;
 
   }
 
-  showToast('正在获取当前位置...');
+  showToast(
+    '正在获取当前位置...'
+  );
 
   startHomeLocationWatch();
 
@@ -1951,44 +2641,45 @@ function doGeolocation(force) {
 
 
 /* =========================================================
-   反向地址解析
+   地址解析
 ========================================================= */
 
-function reverseGeocode(point) {
+function reverseGeocode(
+  point
+){
 
-  if (!point) {
+  if(!point){
     return;
   }
 
-  try {
+  try{
 
-    var geoc = new BMapGL.Geocoder();
+    var geoc=
+      new BMapGL.Geocoder();
 
     geoc.getLocation(
       point,
       function(result){
 
-        if (
+        if(
           result &&
           result.address
-        ) {
+        ){
 
-          currentAddrText =
+          currentAddrText=
             result.address;
 
-          var input =
+          var input=
             document.getElementById(
               'curAddrInput'
             );
 
-          /*
-           * 只有不是用户正在输入时才更新
-           */
-          if (
-            document.activeElement !== input
-          ) {
+          if(
+            input &&
+            document.activeElement!==input
+          ){
 
-            input.value =
+            input.value=
               currentAddrText;
 
           }
@@ -1998,101 +2689,101 @@ function reverseGeocode(point) {
       }
     );
 
-  } catch(e) {}
+  }catch(e){}
 
 }
 
 
 /* =========================================================
-   首页附近 POI
+   首页地址搜索
 ========================================================= */
 
-function searchNearbyPOI(point) {
-  /*
-   * 首页不自动绘制附近儿童设施。
-   * 设施检索只在导航页进行。
-   */
-  return;
-}
+var addrDebounce=null;
 
 
-/* =========================================================
-   地址输入
-========================================================= */
-
-var addrDebounce = null;
-
-function onAddrInput() {
+function onAddrInput(){
 
   clearTimeout(
     addrDebounce
   );
 
-  var kw =
-    document
-      .getElementById('curAddrInput')
-      .value
-      .trim();
+  var input=
+    document.getElementById(
+      'curAddrInput'
+    );
 
-  if (!kw) {
+  var kw=
+    input.value.trim();
 
-    document
-      .getElementById('suggestList')
-      .style.display='none';
+  if(!kw){
+
+    document.getElementById(
+      'suggestList'
+    ).style.display='none';
 
     return;
 
   }
 
-  addrDebounce =
-    setTimeout(function(){
+  addrDebounce=
+    setTimeout(
+      function(){
 
-      try {
+        try{
 
-        var local =
-          new BMapGL.LocalSearch(
-            map1,
-            {
-              pageCapacity:6,
-              onSearchComplete:function(results){
+          var local=
+            new BMapGL.LocalSearch(
+              map1,
+              {
+                pageCapacity:6,
 
-                renderSuggestFromSearch(
-                  results
-                );
+                onSearchComplete:
+                  function(results){
+
+                    renderSuggestFromSearch(
+                      results
+                    );
+
+                  }
 
               }
-            }
+            );
+
+          local.search(
+            kw
           );
 
-        local.search(
-          kw
-        );
+        }catch(e){
 
-      } catch(e) {
+          document.getElementById(
+            'suggestList'
+          ).style.display='none';
 
-        renderSuggestListFallback();
+        }
 
-      }
-
-    },250);
+      },
+      250
+    );
 
 }
 
 
-function renderSuggestFromSearch(res) {
+function renderSuggestFromSearch(
+  res
+){
 
-  var box =
+  var box=
     document.getElementById(
       'suggestList'
     );
 
   box.innerHTML='';
 
-  if (
+  if(
     !res ||
     !res.getNumPois ||
-    res.getNumPois() === 0
-  ) {
+    res.getNumPois()===0
+  ){
 
     box.style.display='none';
 
@@ -2100,69 +2791,65 @@ function renderSuggestFromSearch(res) {
 
   }
 
-  var n =
+  var n=
     Math.min(
       res.getNumPois(),
       6
     );
 
-  for (
+  for(
     var i=0;
     i<n;
     i++
-  ) {
+  ){
 
-    var poi =
+    var poi=
       res.getPoi(i);
 
-    var div =
+    var div=
       document.createElement(
         'div'
       );
 
-    div.className =
+    div.className=
       'suggest-item';
 
-    div.textContent =
+    div.textContent=
       stripHtml(
         poi.title ||
         poi.address ||
         ''
       );
 
-    div.onclick =
+    div.onclick=
       (function(p){
 
         return function(){
 
-          if (!p.point) {
+          if(!p.point){
             return;
           }
 
-          userPoint =
+          userPoint=
             p.point;
 
-          currentAddrText =
+          currentAddrText=
             stripHtml(
               p.title ||
               p.address ||
               ''
             );
 
-          document
-            .getElementById(
-              'curAddrInput'
-            )
-            .value =
-              currentAddrText;
+          document.getElementById(
+            'curAddrInput'
+          ).value=
+            currentAddrText;
 
-          document
-            .getElementById(
-              'suggestList'
-            )
-            .style.display='none';
+          document.getElementById(
+            'suggestList'
+          ).style.display='none';
 
-          if (map1) {
+          if(map1){
 
             map1.centerAndZoom(
               userPoint,
@@ -2179,22 +2866,13 @@ function renderSuggestFromSearch(res) {
 
       })(poi);
 
-    box.appendChild(div);
+    box.appendChild(
+      div
+    );
 
   }
 
   box.style.display='block';
-
-}
-
-
-function renderSuggestListFallback() {
-
-  document
-    .getElementById(
-      'suggestList'
-    )
-    .style.display='none';
 
 }
 
@@ -2206,37 +2884,45 @@ function renderSuggestListFallback() {
 function bindChips(
   containerId,
   onSelect
-) {
+){
 
-  var chips =
-    document
-      .getElementById(containerId)
-      .querySelectorAll('.chip');
+  var container=
+    document.getElementById(
+      containerId
+    );
 
-  for (
+  if(!container){
+    return;
+  }
+
+  var chips=
+    container.querySelectorAll(
+      '.chip'
+    );
+
+  for(
     var i=0;
     i<chips.length;
     i++
-  ) {
+  ){
 
-    chips[i].onclick =
+    chips[i].onclick=
       function(){
 
-        var siblings =
-          this.parentNode
-            .querySelectorAll(
-              '.chip'
-            );
+        var siblings=
+          this.parentNode.querySelectorAll(
+            '.chip'
+          );
 
-        for (
+        for(
           var j=0;
           j<siblings.length;
           j++
-        ) {
+        ){
 
-          siblings[j]
-            .classList
-            .remove('active');
+          siblings[j].classList.remove(
+            'active'
+          );
 
         }
 
@@ -2255,6 +2941,7 @@ function bindChips(
   }
 
 }
+
 
 bindChips(
   'ageChips',
@@ -2289,32 +2976,26 @@ document
    开始规划
 ========================================================= */
 
-function startPlanning() {
+function startPlanning(){
 
-  var nl =
-    document
-      .getElementById(
-        'nlInput'
-      )
-      .value
-      .trim();
+  var nl=
+    document.getElementById(
+      'nlInput'
+    ).value.trim();
 
-  var kw =
+  var kw=
     nl ||
     (
-      selectedPurpose === '吃饭'
+      selectedPurpose==='吃饭'
       ? '亲子餐厅'
-      : selectedPurpose === '购物'
+      : selectedPurpose==='购物'
       ? '亲子商场'
-      : selectedPurpose === '户外'
+      : selectedPurpose==='户外'
       ? '亲子公园'
       : '儿童乐园'
     );
 
-  /*
-   * 没有真实定位时，不再拿广州默认中心假装用户位置。
-   */
-  if (!userPoint) {
+  if(!userPoint){
 
     showToast(
       '还没有获取到当前位置，请先允许定位'
@@ -2326,7 +3007,7 @@ function startPlanning() {
 
   }
 
-  var base =
+  var base=
     new BMapGL.Point(
       userPoint.lng,
       userPoint.lat
@@ -2336,16 +3017,17 @@ function startPlanning() {
     '正在为你规划~'
   );
 
-  try {
+  try{
 
-    var local =
+    var local=
       new BMapGL.LocalSearch(
         map1,
         {
+
           pageCapacity:10,
 
           renderOptions:{
-            map:map1,
+            map:null,
             autoViewport:false
           },
 
@@ -2354,33 +3036,35 @@ function startPlanning() {
 
               var list=[];
 
-              if (
+              if(
                 results &&
                 results.getNumPois &&
                 results.getNumPois()>0
-              ) {
+              ){
 
-                var n =
+                var n=
                   Math.min(
                     results.getNumPois(),
                     3
                   );
 
-                for (
+                for(
                   var i=0;
                   i<n;
                   i++
-                ) {
+                ){
 
-                  var poi =
+                  var poi=
                     results.getPoi(i);
 
-                  if (
+                  if(
                     poi &&
                     poi.point
-                  ) {
+                  ){
 
-                    list.push(poi);
+                    list.push(
+                      poi
+                    );
 
                   }
 
@@ -2388,20 +3072,13 @@ function startPlanning() {
 
               }
 
-              if (
-                list.length===0
-              ) {
-
-                showToast(
-                  '未找到“'+kw+
-                  '”相关地点'
-                );
+              if(list.length===0){
 
                 searchFallback(
                   base
                 );
 
-              } else {
+              }else{
 
                 buildRecommendations(
                   list,
@@ -2421,11 +3098,7 @@ function startPlanning() {
       5000
     );
 
-  } catch(e) {
-
-    showToast(
-      '检索失败，请稍后重试'
-    );
+  }catch(e){
 
     searchFallback(
       base
@@ -2436,20 +3109,19 @@ function startPlanning() {
 }
 
 
-/* =========================================================
-   推荐 fallback
-========================================================= */
+function searchFallback(
+  base
+){
 
-function searchFallback(base) {
+  try{
 
-  try {
-
-    var local2 =
+    var local=
       new BMapGL.LocalSearch(
         map1,
         {
+
           renderOptions:{
-            map:map1,
+            map:null,
             autoViewport:false
           },
 
@@ -2458,33 +3130,35 @@ function searchFallback(base) {
 
               var list=[];
 
-              if (
+              if(
                 results &&
                 results.getNumPois &&
                 results.getNumPois()>0
-              ) {
+              ){
 
-                var n =
+                var n=
                   Math.min(
                     results.getNumPois(),
                     3
                   );
 
-                for (
+                for(
                   var i=0;
                   i<n;
                   i++
-                ) {
+                ){
 
-                  var poi =
+                  var poi=
                     results.getPoi(i);
 
-                  if (
+                  if(
                     poi &&
                     poi.point
-                  ) {
+                  ){
 
-                    list.push(poi);
+                    list.push(
+                      poi
+                    );
 
                   }
 
@@ -2492,9 +3166,6 @@ function searchFallback(base) {
 
               }
 
-              /*
-               * 没有真实结果就不伪造地点。
-               */
               buildRecommendations(
                 list,
                 base
@@ -2505,13 +3176,13 @@ function searchFallback(base) {
         }
       );
 
-    local2.searchNearby(
+    local.searchNearby(
       '公园',
       base,
       5000
     );
 
-  } catch(e) {
+  }catch(e){
 
     buildRecommendations(
       [],
@@ -2530,9 +3201,9 @@ function searchFallback(base) {
 function calcDistance(
   p1,
   p2
-) {
+){
 
-  try {
+  try{
 
     return Math.round(
       map1.getDistance(
@@ -2541,7 +3212,7 @@ function calcDistance(
       )
     );
 
-  } catch(e) {
+  }catch(e){
 
     return 0;
 
@@ -2551,23 +3222,22 @@ function calcDistance(
 
 
 /* =========================================================
-   推荐卡片
+   推荐
 ========================================================= */
 
 function guessEmojiByCategory(
   name,
   tags
-) {
+){
 
-  var text =
-    (name || '') +
-    ' ' +
-    ((tags || []).join(' '));
+  var text=
+    (name||'')+
+    ' '+
+    ((tags||[]).join(' '));
 
-  if (
-    /公园|绿地|户外|广场/
-      .test(text)
-  ) {
+  if(
+    /公园|绿地|户外|广场/.test(text)
+  ){
 
     return {
       emoji:'🌳',
@@ -2576,10 +3246,9 @@ function guessEmojiByCategory(
 
   }
 
-  if (
-    /博物|科技|展览|图书|美术/
-      .test(text)
-  ) {
+  if(
+    /博物|科技|展览|图书|美术/.test(text)
+  ){
 
     return {
       emoji:'🏛️',
@@ -2588,10 +3257,9 @@ function guessEmojiByCategory(
 
   }
 
-  if (
-    /商场|购物|mall/i
-      .test(text)
-  ) {
+  if(
+    /商场|购物|mall/i.test(text)
+  ){
 
     return {
       emoji:'🛍️',
@@ -2600,10 +3268,9 @@ function guessEmojiByCategory(
 
   }
 
-  if (
-    /餐|饭店|美食|甜品|蛋糕/
-      .test(text)
-  ) {
+  if(
+    /餐|饭店|美食|甜品|蛋糕/.test(text)
+  ){
 
     return {
       emoji:'🍰',
@@ -2623,90 +3290,93 @@ function guessEmojiByCategory(
 function buildRecommendations(
   pois,
   base
-) {
+){
 
   recommendedPlaces=[];
 
-  /*
-   * 注意：
-   * 这里不再创建假的“天河儿童公园”等数据。
-   */
-  if (
+  if(
     !pois ||
     pois.length===0
-  ) {
+  ){
 
     showToast(
       '附近暂未检索到相关地点'
     );
 
-    goPage('page1');
+    goPage(
+      'page1'
+    );
 
     return;
 
   }
 
-  for (
+  for(
     var i=0;
     i<pois.length;
     i++
-  ) {
+  ){
 
     var poi=pois[i];
 
-    var name =
+    var name=
       stripHtml(
         poi.title
       ) ||
       '亲子地点';
 
-    var addr =
+    var addr=
       stripHtml(
         poi.address
       ) ||
       currentAddrText;
 
-    var dist =
+    var dist=
       calcDistance(
         base,
         poi.point
       );
 
-    var ageScore =
-      0.7 +
-      Math.random()*0.3;
+    /*
+     * Demo评分。
+     * 不影响真实路线。
+     */
 
-    var purposeScore =
-      0.7 +
-      Math.random()*0.3;
+    var ageScore=
+      .7+
+      Math.random()*.3;
 
-    var facilityScore =
-      0.6 +
-      Math.random()*0.4;
+    var purposeScore=
+      .7+
+      Math.random()*.3;
 
-    var distScore =
+    var facilityScore=
+      .6+
+      Math.random()*.4;
+
+    var distScore=
       Math.max(
         0,
         1-dist/3000
       );
 
-    var strollerScore =
-      0.6 +
-      Math.random()*0.4;
+    var strollerScore=
+      .6+
+      Math.random()*.4;
 
-    var weatherScore =
-      0.8 +
-      Math.random()*0.2;
+    var weatherScore=
+      .8+
+      Math.random()*.2;
 
-    var total =
-      ageScore*0.30 +
-      purposeScore*0.20 +
-      facilityScore*0.20 +
-      distScore*0.15 +
-      strollerScore*0.10 +
-      weatherScore*0.05;
+    var total=
+      ageScore*.30+
+      purposeScore*.20+
+      facilityScore*.20+
+      distScore*.15+
+      strollerScore*.10+
+      weatherScore*.05;
 
-    var stars =
+    var stars=
       Math.max(
         1,
         Math.min(
@@ -2715,7 +3385,7 @@ function buildRecommendations(
         )
       );
 
-    var typeInfo =
+    var typeInfo=
       guessEmojiByCategory(
         name,
         poi.tags
@@ -2723,50 +3393,30 @@ function buildRecommendations(
 
     var tags=[];
 
-    if (
-      strollerScore>0.75
-    ) {
-
-      tags.push(
-        '推车友好'
-      );
-
+    if(strollerScore>.75){
+      tags.push('推车友好');
     }
 
-    if (
-      facilityScore>0.75
-    ) {
-
-      tags.push(
-        '亲子设施'
-      );
-
+    if(facilityScore>.75){
+      tags.push('亲子设施');
     }
 
     tags.push(
       dist<1000
-      ? '步行'+
-        Math.max(
-          3,
-          Math.round(
-            dist/70
-          )
-        )+
-        '分钟'
-      : (
+      ?
+      '步行'+
+      Math.max(
+        3,
+        Math.round(
+          dist/70
+        )
+      )+
+      '分钟'
+      :
+      (
         dist/1000
       ).toFixed(1)+'km'
     );
-
-    if (
-      weatherScore>0.85
-    ) {
-
-      tags.push(
-        '室内舒适'
-      );
-
-    }
 
     recommendedPlaces.push({
 
@@ -2791,10 +3441,7 @@ function buildRecommendations(
         '% · 距离'+
         Math.round(distScore*100)+
         '% · 推车适配'+
-        Math.round(strollerScore*100)+
-        '% · 天气环境'+
-        Math.round(weatherScore*100)+
-        '%'
+        Math.round(strollerScore*100)+'%'
 
     });
 
@@ -2809,68 +3456,61 @@ function buildRecommendations(
 
   renderRecommendCards();
 
-  goPage('page3');
-
-  showToast(
-    '已找到'+
-    recommendedPlaces.length+
-    '个适合的地方~'
+  goPage(
+    'page3'
   );
 
 }
 
 
 /* =========================================================
-   推荐卡片渲染
+   推荐卡片
 ========================================================= */
 
-function renderRecommendCards() {
+function renderRecommendCards(){
 
-  var box =
+  var box=
     document.getElementById(
       'cardsScroll'
     );
 
   box.innerHTML='';
 
-  for (
+  for(
     var i=0;
     i<recommendedPlaces.length;
     i++
-  ) {
+  ){
 
     var p=
       recommendedPlaces[i];
 
-    var isMain =
-      i===0;
-
-    var starsStr =
-      '★'.repeat(p.stars)+
-      '☆'.repeat(5-p.stars);
-
-    var card =
+    var card=
       document.createElement(
         'div'
       );
 
-    card.className =
+    card.className=
       'rec-card'+
       (
-        isMain
+        i===0
         ? ' main'
         : ''
       );
 
+    var starsStr=
+      '★'.repeat(p.stars)+
+      '☆'.repeat(5-p.stars);
+
     var tagsHtml='';
 
-    for (
+    for(
       var t=0;
       t<p.tags.length;
       t++
-    ) {
+    ){
 
-      tagsHtml +=
+      tagsHtml+=
         '<span class="tag-pill">'+
         p.tags[t]+
         '</span>';
@@ -2879,17 +3519,17 @@ function renderRecommendCards() {
 
     card.innerHTML=
 
-      '<div class="img-wrap '+
-      p.cls+
-      '">' +
+      '<div class="img-wrap '+p.cls+'">'+
 
-      (
-        isMain
-        ? '<span class="badge-main">最佳推荐</span>'
-        : ''
-      ) +
+        (
+          i===0
+          ?
+          '<span class="badge-main">推荐地点</span>'
+          :
+          ''
+        )+
 
-      p.emoji+
+        p.emoji+
 
       '</div>'+
 
@@ -2913,7 +3553,9 @@ function renderRecommendCards() {
 
         '<div class="score-detail"></div>'+
 
-        '<button class="go-btn">去这里 →</button>'+
+        '<button class="go-btn">'+
+          '去这里 →'+
+        '</button>'+
 
       '</div>';
 
@@ -2937,7 +3579,8 @@ function renderRecommendCards() {
     ).textContent=
       p.dist<1000
       ? p.dist+'m'
-      : (
+      :
+      (
         p.dist/1000
       ).toFixed(1)+'km';
 
@@ -2976,18 +3619,17 @@ function renderRecommendCards() {
 
 function selectDestination(
   place
-) {
+){
 
   currentDest=place;
 
-  endPoint=place.point;
+  endPoint=
+    place.point;
 
-  endName=place.name;
+  endName=
+    place.name;
 
-  /*
-   * 优先使用当前实时位置。
-   */
-  if (!userPoint) {
+  if(!userPoint){
 
     showToast(
       '正在获取当前位置，请稍候'
@@ -3019,20 +3661,22 @@ function selectDestination(
   ).textContent=
     endName;
 
-  goPage('page4');
+  goPage(
+    'page4'
+  );
 
 }
 
 
 /* =========================================================
-   P4 路线
+   页面4路线
 ========================================================= */
 
-function initMap2AndRoute() {
+function initMap2AndRoute(){
 
-  try {
+  try{
 
-    if (!map2) {
+    if(!map2){
 
       map2=
         new BMapGL.Map(
@@ -3047,10 +3691,10 @@ function initMap2AndRoute() {
 
     map2.resize();
 
-    if (
+    if(
       startPoint &&
       endPoint
-    ) {
+    ){
 
       planRoute(
         currentMode
@@ -3058,7 +3702,7 @@ function initMap2AndRoute() {
 
     }
 
-  } catch(e) {
+  }catch(e){
 
     console.error(e);
 
@@ -3067,16 +3711,20 @@ function initMap2AndRoute() {
 }
 
 
-var modeTabs =
+/* =========================================================
+   模式切换
+========================================================= */
+
+var modeTabs=
   document.querySelectorAll(
     '.mode-tab'
   );
 
-for (
+for(
   var mi=0;
   mi<modeTabs.length;
   mi++
-) {
+){
 
   modeTabs[mi].onclick=
     function(){
@@ -3086,15 +3734,15 @@ for (
           '.mode-tab'
         );
 
-      for (
+      for(
         var j=0;
         j<all.length;
         j++
-      ) {
+      ){
 
-        all[j]
-          .classList
-          .remove('active');
+        all[j].classList.remove(
+          'active'
+        );
 
       }
 
@@ -3116,10 +3764,16 @@ for (
 }
 
 
-function clearMap2() {
+/* =========================================================
+   清除地图2
+========================================================= */
 
-  if (map2) {
+function clearMap2(){
+
+  if(map2){
+
     map2.clearOverlays();
+
   }
 
   parkingMarkers=[];
@@ -3127,85 +3781,215 @@ function clearMap2() {
 }
 
 
-function addEndpointMarkers() {
+/* =========================================================
+   页面4起终点
+========================================================= */
 
-  if (
+function addEndpointMarkers(){
+
+  if(
     !startPoint ||
     !endPoint
-  ) {
+  ){
     return;
   }
 
   var sm=
-    new BMapGL.Marker(
-      startPoint
+    createMapPointMarker(
+      startPoint,
+      'start',
+      '起点：'+
+      (startName||'我的位置'),
+      map2
     );
 
   var em=
-    new BMapGL.Marker(
-      endPoint
+    createMapPointMarker(
+      endPoint,
+      'end',
+      '终点：'+
+      (endName||'目的地'),
+      map2
     );
 
   map2.addOverlay(sm);
   map2.addOverlay(em);
 
-  var sl=
-    new BMapGL.Label(
-      '起点',
+}
+
+
+/* =========================================================
+   自定义灰色虚线路线
+========================================================= */
+
+function drawDashedRoute(
+  map,
+  points
+){
+
+  if(
+    !map ||
+    !points ||
+    points.length<2
+  ){
+    return false;
+  }
+
+  if(navRouteOverlay){
+
+    try{
+      map.removeOverlay(
+        navRouteOverlay
+      );
+    }catch(e){}
+
+  }
+
+  navRouteOverlay=
+    new BMapGL.Polyline(
+      points,
       {
-        position:startPoint,
-        offset:new BMapGL.Size(
-          -10,
-          -32
-        )
+        strokeColor:'#999999',
+        strokeWeight:5,
+        strokeOpacity:.9,
+        strokeStyle:'dashed'
       }
     );
 
-  sl.setStyle({
+  map.addOverlay(
+    navRouteOverlay
+  );
 
-    background:'#2ED47A',
-    color:'#fff',
-    border:'none',
-    borderRadius:'12px',
-    padding:'2px 8px',
-    fontSize:'12px',
-    fontWeight:'700'
-
-  });
-
-  var el=
-    new BMapGL.Label(
-      '终点',
-      {
-        position:endPoint,
-        offset:new BMapGL.Size(
-          -10,
-          -32
-        )
-      }
-    );
-
-  el.setStyle({
-
-    background:'#FF4757',
-    color:'#fff',
-    border:'none',
-    borderRadius:'12px',
-    padding:'2px 8px',
-    fontSize:'12px',
-    fontWeight:'700'
-
-  });
-
-  map2.addOverlay(sl);
-  map2.addOverlay(el);
+  return true;
 
 }
 
 
-function fitViewport() {
+/*
+ * 尝试从百度路线结果提取真实路线点。
+ */
 
-  try {
+function getRoutePathFromResult(
+  res
+){
+
+  try{
+
+    var plan=
+      res.getPlan(0);
+
+    if(!plan){
+      return null;
+    }
+
+    var points=[];
+
+    if(
+      plan.getNumRoutes &&
+      plan.getRoute
+    ){
+
+      var routeCount=
+        plan.getNumRoutes();
+
+      for(
+        var r=0;
+        r<routeCount;
+        r++
+      ){
+
+        var route=
+          plan.getRoute(r);
+
+        if(
+          route &&
+          route.getPath
+        ){
+
+          var path=
+            route.getPath();
+
+          if(
+            path &&
+            path.length
+          ){
+
+            points=
+              points.concat(
+                path
+              );
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+    /*
+     * 部分版本使用 getSteps。
+     */
+
+    if(
+      points.length<2 &&
+      plan.getRoute
+    ){
+
+      var route=
+        plan.getRoute(0);
+
+      if(
+        route &&
+        route.getPath
+      ){
+
+        points=
+          route.getPath() ||
+          [];
+
+      }
+
+    }
+
+    if(
+      points.length>=2
+    ){
+
+      return points;
+
+    }
+
+  }catch(e){
+
+    console.warn(
+      '读取路线坐标失败',
+      e
+    );
+
+  }
+
+  return null;
+
+}
+
+
+/* =========================================================
+   fit viewport
+========================================================= */
+
+function fitViewport(){
+
+  if(
+    !map2 ||
+    !startPoint ||
+    !endPoint
+  ){
+    return;
+  }
+
+  try{
 
     map2.setViewport(
       [
@@ -3214,52 +3998,53 @@ function fitViewport() {
       ]
     );
 
-  } catch(e) {}
+  }catch(e){}
 
 }
 
 
+/* =========================================================
+   距离时间
+========================================================= */
+
 function formatDistanceTime(
   plan
-) {
+){
 
   var distText='--';
   var timeText='--';
 
-  try {
+  try{
 
-    if (
+    if(
       plan &&
       plan.getDistance
-    ) {
+    ){
 
-      var distMeters=
+      var d=
         plan.getDistance(
           false
         );
 
       distText=
-        distMeters<1000
-        ? Math.round(
-            distMeters
-          )+'米'
-        : (
-            distMeters/1000
-          ).toFixed(1)+'公里';
+        d<1000
+        ? Math.round(d)+'米'
+        :
+        (d/1000).toFixed(1)+'公里';
 
     }
 
-  } catch(e) {}
+  }catch(e){}
 
 
-  try {
+  try{
 
-    if (
+    if(
       plan &&
       plan.getDuration
-    ) {
+    ){
 
-      var durSec=
+      var sec=
         plan.getDuration(
           false
         );
@@ -3267,22 +4052,21 @@ function formatDistanceTime(
       var mins=
         Math.max(
           1,
-          Math.round(
-            durSec/60
-          )
+          Math.round(sec/60)
         );
 
       timeText=
         mins<60
         ? mins+'分钟'
-        : Math.floor(mins/60)+
-          '小时'+
-          (mins%60)+
-          '分钟';
+        :
+        Math.floor(mins/60)+
+        '小时'+
+        (mins%60)+
+        '分钟';
 
     }
 
-  } catch(e) {}
+  }catch(e){}
 
   return {
     dist:distText,
@@ -3292,80 +4076,52 @@ function formatDistanceTime(
 }
 
 
+/* =========================================================
+   推荐理由
+========================================================= */
+
 function buildReasonTags(
   modeKey,
   strollerScore
-) {
+){
 
-  var tags=[];
+  if(modeKey==='walking'){
 
-  if (
-    modeKey==='walking'
-  ) {
-
-    tags.push(
-      strollerScore>0.7
+    return [
+      strollerScore>.7
       ? '无障碍'
-      : '道路平整'
-    );
-
-    tags.push(
-      '推车友好'
-    );
-
-    tags.push(
+      : '道路平整',
+      '推车友好',
       '少红绿灯'
-    );
-
-  } else if (
-    modeKey==='driving'
-  ) {
-
-    tags.push(
-      '驾车可达'
-    );
-
-    tags.push(
-      '停车方便'
-    );
-
-    tags.push(
-      '路线畅通'
-    );
-
-  } else if (
-    modeKey==='riding'
-  ) {
-
-    tags.push(
-      '优先骑道'
-    );
-
-    tags.push(
-      '绿道优选'
-    );
-
-    tags.push(
-      '少爬坡'
-    );
-
-  } else {
-
-    tags.push(
-      '换乘便捷'
-    );
-
-    tags.push(
-      '车站近'
-    );
-
-    tags.push(
-      '性价比高'
-    );
+    ];
 
   }
 
-  return tags;
+  if(modeKey==='driving'){
+
+    return [
+      '驾车可达',
+      '停车方便',
+      '路线畅通'
+    ];
+
+  }
+
+  if(modeKey==='riding'){
+
+    return [
+      '优先骑道',
+      '绿道优选',
+      '少爬坡'
+    ];
+
+  }
+
+  return [
+    '换乘便捷',
+    '车站近',
+    '性价比高'
+  ];
 
 }
 
@@ -3374,35 +4130,28 @@ function renderReasonCard(
   modeKey,
   distTimeInfo,
   showParking
-) {
-
-  var modeNameMap={
-    walking:'步行',
-    driving:'驾车',
-    riding:'骑行',
-    transit:'公共交通'
-  };
+){
 
   var tags=
     buildReasonTags(
       modeKey,
       currentDest
       ? currentDest.strollerScore
-      : 0.75
+      : .75
     );
 
-  var tagsBox=
+  var box=
     document.getElementById(
       'reasonTags'
     );
 
-  tagsBox.innerHTML='';
+  box.innerHTML='';
 
-  for (
+  for(
     var i=0;
     i<tags.length;
     i++
-  ) {
+  ){
 
     var s=
       document.createElement(
@@ -3415,39 +4164,38 @@ function renderReasonCard(
     s.textContent=
       tags[i];
 
-    tagsBox.appendChild(s);
+    box.appendChild(
+      s
+    );
 
   }
 
   document.getElementById(
     'reasonDist'
   ).textContent=
-    '📏 '+
-    distTimeInfo.dist;
+    '📏 '+distTimeInfo.dist;
+
+  var modeName={
+    walking:'步行',
+    driving:'驾车',
+    riding:'骑行',
+    transit:'公共交通'
+  };
 
   document.getElementById(
     'reasonTime'
   ).textContent=
     '⏱ '+
-    modeNameMap[modeKey]+
+    modeName[modeKey]+
     '约'+
     distTimeInfo.time;
 
-  var parkingEl=
-    document.getElementById(
-      'parkingLine'
-    );
-
-  if (showParking) {
-
-    parkingEl.textContent=
-      '🅿️ 正在查询附近停车场...';
-
-  } else {
-
-    parkingEl.textContent='';
-
-  }
+  document.getElementById(
+    'parkingLine'
+  ).textContent=
+    showParking
+    ? '🅿️ 正在查询附近停车场...'
+    : '';
 
 }
 
@@ -3456,47 +4204,50 @@ function renderReasonCard(
    停车场
 ========================================================= */
 
-function searchNearbyParking() {
+function searchNearbyParking(){
 
-  if (!endPoint) {
+  if(!endPoint){
     return;
   }
 
-  try {
+  try{
 
-    var localP=
+    var local=
       new BMapGL.LocalSearch(
         map2,
         {
+
           renderOptions:{
-            map:map2,
+            map:null,
             autoViewport:false
           },
 
           onSearchComplete:
             function(results){
 
-              var names=[];
-
-              for (
+              for(
                 var i=0;
                 i<parkingMarkers.length;
                 i++
-              ) {
+              ){
 
-                map2.removeOverlay(
-                  parkingMarkers[i]
-                );
+                try{
+                  map2.removeOverlay(
+                    parkingMarkers[i]
+                  );
+                }catch(e){}
 
               }
 
               parkingMarkers=[];
 
-              if (
+              var names=[];
+
+              if(
                 results &&
                 results.getNumPois &&
                 results.getNumPois()>0
-              ) {
+              ){
 
                 var n=
                   Math.min(
@@ -3504,59 +4255,61 @@ function searchNearbyParking() {
                     3
                   );
 
-                for (
+                for(
                   var i=0;
                   i<n;
                   i++
-                ) {
+                ){
 
                   var poi=
                     results.getPoi(i);
 
-                  if (
-                    poi &&
-                    poi.point
-                  ) {
-
-                    names.push(
-                      stripHtml(
-                        poi.title
-                      )
-                    );
-
-                    var lbl=
-                      new BMapGL.Label(
-                        '🅿️',
-                        {
-                          position:poi.point,
-                          offset:new BMapGL.Size(
-                            -8,
-                            -14
-                          )
-                        }
-                      );
-
-                    lbl.setStyle({
-
-                      background:'#4A90E2',
-                      color:'#fff',
-                      border:'none',
-                      borderRadius:'8px',
-                      padding:'1px 6px',
-                      fontSize:'12px',
-                      boxShadow:'0 1px 4px rgba(0,0,0,0.2)'
-
-                    });
-
-                    map2.addOverlay(
-                      lbl
-                    );
-
-                    parkingMarkers.push(
-                      lbl
-                    );
-
+                  if(
+                    !poi ||
+                    !poi.point
+                  ){
+                    continue;
                   }
+
+                  names.push(
+                    stripHtml(
+                      poi.title
+                    )
+                  );
+
+                  var marker=
+                    new BMapGL.Label(
+                      '🅿️',
+                      {
+                        position:poi.point,
+                        offset:
+                          new BMapGL.Size(
+                            -9,
+                            -15
+                          )
+                      }
+                    );
+
+                  marker.setStyle({
+
+                    background:'#fff',
+                    color:'#555',
+                    border:'1px solid #DCEEFF',
+                    borderRadius:'12px',
+                    padding:'3px 6px',
+                    fontSize:'12px',
+                    boxShadow:
+                      '0 2px 6px rgba(0,0,0,.15)'
+
+                  });
+
+                  map2.addOverlay(
+                    marker
+                  );
+
+                  parkingMarkers.push(
+                    marker
+                  );
 
                 }
 
@@ -3565,42 +4318,41 @@ function searchNearbyParking() {
               document.getElementById(
                 'parkingLine'
               ).textContent=
-
-                names.length>0
-
-                ? '🅿️ 附近停车场：'+
-                  names.join('、')
-
-                : '🅿️ 附近暂未检索到停车场信息';
+                names.length
+                ?
+                '🅿️ 附近停车场：'+
+                names.join('、')
+                :
+                '🅿️ 附近暂未检索到停车场信息';
 
             }
 
         }
       );
 
-    localP.searchNearby(
+    local.searchNearby(
       '停车场',
       endPoint,
       1000
     );
 
-  } catch(e) {}
+  }catch(e){}
 
 }
 
 
 /* =========================================================
-   路线规划
+   页面4真实路线
 ========================================================= */
 
 function planRoute(
   mode
-) {
+){
 
-  if (
+  if(
     !startPoint ||
     !endPoint
-  ) {
+  ){
     return;
   }
 
@@ -3610,55 +4362,82 @@ function planRoute(
 
   fitViewport();
 
-  document.getElementById(
-    'parkingLine'
-  ).textContent='';
+  try{
 
-  try {
+    var routeOptions={
+      renderOptions:{
+        map:null,
+        autoViewport:false
+      },
 
-    if (
-      mode==='walking'
-    ) {
+      onSearchComplete:
+        function(res){
+
+          if(
+            !res ||
+            typeof res.getPlan!=='function'
+          ){
+
+            showToast(
+              '路线规划失败'
+            );
+
+            return;
+
+          }
+
+          var plan=
+            res.getPlan(0);
+
+          /*
+           * 真实路线坐标
+           */
+          var path=
+            getRoutePathFromResult(
+              res
+            );
+
+          if(path){
+
+            drawDashedRoute(
+              map2,
+              path
+            );
+
+          }
+
+          /*
+           * 如果 SDK 当前版本无法拿到 path，
+           * 至少保持起终点和真实路线服务结果。
+           */
+
+          fitViewport();
+
+          renderReasonCard(
+            mode,
+            formatDistanceTime(
+              plan
+            ),
+            mode==='driving'
+          );
+
+          if(mode==='driving'){
+
+            searchNearbyParking();
+
+          }
+
+        }
+
+    };
+
+
+    if(mode==='walking'){
 
       var walking=
         new BMapGL.WalkingRoute(
           map2,
-          {
-            renderOptions:{
-              map:map2,
-              autoViewport:false
-            },
-
-            onSearchComplete:
-              function(res){
-
-                if (
-                  res &&
-                  typeof res.getPlan===
-                    'function'
-                ) {
-
-                  fitViewport();
-
-                  renderReasonCard(
-                    'walking',
-                    formatDistanceTime(
-                      res.getPlan(0)
-                    ),
-                    false
-                  );
-
-                } else {
-
-                  showToast(
-                    '步行路线规划失败'
-                  );
-
-                }
-
-              }
-
-          }
+          routeOptions
         );
 
       walking.search(
@@ -3668,51 +4447,12 @@ function planRoute(
 
     }
 
-    else if (
-      mode==='driving'
-    ) {
+    else if(mode==='driving'){
 
       var driving=
         new BMapGL.DrivingRoute(
           map2,
-          {
-            renderOptions:{
-              map:map2,
-              autoViewport:false
-            },
-
-            onSearchComplete:
-              function(res){
-
-                if (
-                  res &&
-                  typeof res.getPlan===
-                    'function'
-                ) {
-
-                  fitViewport();
-
-                  renderReasonCard(
-                    'driving',
-                    formatDistanceTime(
-                      res.getPlan(0)
-                    ),
-                    true
-                  );
-
-                  searchNearbyParking();
-
-                } else {
-
-                  showToast(
-                    '驾车路线规划失败'
-                  );
-
-                }
-
-              }
-
-          }
+          routeOptions
         );
 
       driving.search(
@@ -3722,49 +4462,12 @@ function planRoute(
 
     }
 
-    else if (
-      mode==='riding'
-    ) {
+    else if(mode==='riding'){
 
       var riding=
         new BMapGL.RidingRoute(
           map2,
-          {
-            renderOptions:{
-              map:map2,
-              autoViewport:false
-            },
-
-            onSearchComplete:
-              function(res){
-
-                if (
-                  res &&
-                  typeof res.getPlan===
-                    'function'
-                ) {
-
-                  fitViewport();
-
-                  renderReasonCard(
-                    'riding',
-                    formatDistanceTime(
-                      res.getPlan(0)
-                    ),
-                    false
-                  );
-
-                } else {
-
-                  showToast(
-                    '骑行路线规划失败'
-                  );
-
-                }
-
-              }
-
-          }
+          routeOptions
         );
 
       riding.search(
@@ -3774,47 +4477,12 @@ function planRoute(
 
     }
 
-    else {
+    else{
 
       var transit=
         new BMapGL.TransitRoute(
           map2,
-          {
-            renderOptions:{
-              map:map2,
-              autoViewport:false
-            },
-
-            onSearchComplete:
-              function(res){
-
-                if (
-                  res &&
-                  typeof res.getPlan===
-                    'function'
-                ) {
-
-                  fitViewport();
-
-                  renderReasonCard(
-                    'transit',
-                    formatDistanceTime(
-                      res.getPlan(0)
-                    ),
-                    false
-                  );
-
-                } else {
-
-                  showToast(
-                    '公交路线规划失败'
-                  );
-
-                }
-
-              }
-
-          }
+          routeOptions
         );
 
       transit.search(
@@ -3824,7 +4492,7 @@ function planRoute(
 
     }
 
-  } catch(e) {
+  }catch(e){
 
     console.error(
       '路线规划错误',
@@ -3841,18 +4509,18 @@ function planRoute(
 
 
 /* =========================================================
-   修改起点 / 终点
+   修改起点
 ========================================================= */
 
-function editStart() {
+function editStart(){
 
   var v=
     prompt(
       '请输入新的起点名称',
-      startName || ''
+      startName||''
     );
 
-  if (!v) {
+  if(!v){
     return;
   }
 
@@ -3863,7 +4531,7 @@ function editStart() {
       startPoint=pt;
 
       startName=
-        addr || v;
+        addr||v;
 
       document.getElementById(
         'startText'
@@ -3880,15 +4548,19 @@ function editStart() {
 }
 
 
-function editEnd() {
+/* =========================================================
+   修改终点
+========================================================= */
+
+function editEnd(){
 
   var v=
     prompt(
       '请输入新的目的地名称',
-      endName || ''
+      endName||''
     );
 
-  if (!v) {
+  if(!v){
     return;
   }
 
@@ -3899,7 +4571,7 @@ function editEnd() {
       endPoint=pt;
 
       endName=
-        addr || v;
+        addr||v;
 
       document.getElementById(
         'endText'
@@ -3919,9 +4591,9 @@ function editEnd() {
 function geocodeAndSet(
   keyword,
   cb
-) {
+){
 
-  try {
+  try{
 
     var geoc=
       new BMapGL.Geocoder();
@@ -3930,19 +4602,19 @@ function geocodeAndSet(
       keyword,
       function(point){
 
-        if (point) {
+        if(point){
 
           cb(
             point,
             keyword
           );
 
-        } else {
+        }else{
 
           showToast(
             '未找到“'+
             keyword+
-            '”，请重新输入'
+            '”'
           );
 
         }
@@ -3950,16 +4622,17 @@ function geocodeAndSet(
       },
 
       currentAddrText
-        ? currentAddrText
-            .replace(
-              /(市|省).*/,
-              ''
-            )
-        : '广州'
+      ?
+      currentAddrText.replace(
+        /(市|省).*/,
+        ''
+      )
+      :
+      '广州'
 
     );
 
-  } catch(e) {
+  }catch(e){
 
     showToast(
       '地点解析失败'
@@ -3971,12 +4644,15 @@ function geocodeAndSet(
 
 
 /* =========================================================
-   P5 开始导航
+   开始导航
 ========================================================= */
 
-function startNav() {
+function startNav(){
 
-  if (!startPoint || !endPoint) {
+  if(
+    !startPoint ||
+    !endPoint
+  ){
 
     showToast(
       '起点或目的地信息不完整'
@@ -3994,16 +4670,16 @@ function startNav() {
 
 
 /* =========================================================
-   初始化导航地图
+   页面5导航地图初始化
 ========================================================= */
 
-function initMap3AndNav() {
+function initMap3AndNav(){
 
-  try {
+  try{
 
     isNavPage=true;
 
-    if (!map3) {
+    if(!map3){
 
       map3=
         new BMapGL.Map(
@@ -4014,9 +4690,9 @@ function initMap3AndNav() {
         true
       );
 
-      if (
+      if(
         map3.enablePinchToZoom
-      ) {
+      ){
 
         map3.enablePinchToZoom();
 
@@ -4026,14 +4702,11 @@ function initMap3AndNav() {
 
     map3.resize();
 
-    /*
-     * 优先当前实时位置
-     */
     var navCenter=
       userPoint ||
       startPoint;
 
-    if (!navCenter) {
+    if(!navCenter){
 
       showToast(
         '正在获取当前位置...'
@@ -4052,39 +4725,62 @@ function initMap3AndNav() {
 
     map3.clearOverlays();
 
-    navSteps=[];
-    navStepIndex=0;
-
     facilityMarkers=[];
     facilityData=[];
 
+    navSteps=[];
+    navStepIndex=0;
+
     navUserMarker=null;
 
-    renderFacilityFilterPanel();
+    /*
+     * 默认所有设施显示
+     */
+    activeFacilityTypes={};
 
-    if (
+    for(
+      var i=0;
+      i<FACILITY_CATEGORY_MAP.length;
+      i++
+    ){
+
+      activeFacilityTypes[
+        FACILITY_CATEGORY_MAP[i].label
+      ]=true;
+
+    }
+
+    /*
+     * 分类卡片恢复“全部”
+     */
+
+    resetNavCategoryActive();
+
+    /*
+     * 绘制路线
+     */
+
+    if(
       startPoint &&
       endPoint
-    ) {
+    ){
 
       drawNavRoute();
 
     }
 
     /*
-     * 立即获取一次
+     * 实时定位
      */
+
     doNavGeolocationNow();
 
-    /*
-     * 持续监听
-     */
     startNavWatch();
 
     setTimeout(
       function(){
 
-        if (map3) {
+        if(map3){
           map3.resize();
         }
 
@@ -4092,7 +4788,7 @@ function initMap3AndNav() {
       300
     );
 
-  } catch(e) {
+  }catch(e){
 
     console.error(
       '导航地图初始化失败',
@@ -4105,12 +4801,117 @@ function initMap3AndNav() {
 
 
 /* =========================================================
+   分类卡片
+========================================================= */
+
+function resetNavCategoryActive(){
+
+  var nodes=
+    document.querySelectorAll(
+      '#navCategoryScroll .nav-category'
+    );
+
+  for(
+    var i=0;
+    i<nodes.length;
+    i++
+  ){
+
+    nodes[i].classList.remove(
+      'active'
+    );
+
+  }
+
+  if(nodes[0]){
+    nodes[0].classList.add(
+      'active'
+    );
+  }
+
+}
+
+
+function selectNavCategory(
+  el,
+  label
+){
+
+  var nodes=
+    document.querySelectorAll(
+      '#navCategoryScroll .nav-category'
+    );
+
+  for(
+    var i=0;
+    i<nodes.length;
+    i++
+  ){
+
+    nodes[i].classList.remove(
+      'active'
+    );
+
+  }
+
+  el.classList.add(
+    'active'
+  );
+
+
+  /*
+   * 全部
+   */
+
+  if(label==='全部'){
+
+    for(
+      var k in activeFacilityTypes
+    ){
+
+      activeFacilityTypes[k]=true;
+
+    }
+
+  }
+
+  /*
+   * 单一分类
+   */
+
+  else{
+
+    for(
+      var k2 in activeFacilityTypes
+    ){
+
+      /*
+       * “儿童乐园”等页面分类
+       * 与设施真实分类保持对应。
+       */
+
+      activeFacilityTypes[k2]=
+        false;
+
+    }
+
+    activeFacilityTypes[label]=
+      true;
+
+  }
+
+  renderFacilityMarkers();
+
+}
+
+
+/* =========================================================
    导航实时定位
 ========================================================= */
 
-function doNavGeolocationNow() {
+function doNavGeolocationNow(){
 
-  if (!navigator.geolocation) {
+  if(!navigator.geolocation){
 
     showToast(
       '当前浏览器不支持实时定位'
@@ -4120,7 +4921,7 @@ function doNavGeolocationNow() {
 
   }
 
-  try {
+  try{
 
     navigator.geolocation.getCurrentPosition(
 
@@ -4139,10 +4940,6 @@ function doNavGeolocationNow() {
           error
         );
 
-        showToast(
-          '导航无法获取当前位置，请检查定位权限'
-        );
-
       },
 
       {
@@ -4153,28 +4950,24 @@ function doNavGeolocationNow() {
 
     );
 
-  } catch(e) {}
+  }catch(e){}
 
 }
 
 
-/* =========================================================
-   启动导航实时监听
-========================================================= */
+function startNavWatch(){
 
-function startNavWatch() {
-
-  if (navWatchId !== null) {
+  if(navWatchId!==null){
     return;
   }
 
-  if (!navigator.geolocation) {
+  if(!navigator.geolocation){
     return;
   }
 
-  try {
+  try{
 
-    navWatchId =
+    navWatchId=
       navigator.geolocation.watchPosition(
 
         function(position){
@@ -4202,7 +4995,7 @@ function startNavWatch() {
 
       );
 
-  } catch(e) {
+  }catch(e){
 
     console.error(e);
 
@@ -4211,24 +5004,20 @@ function startNavWatch() {
 }
 
 
-/* =========================================================
-   停止导航实时定位
-========================================================= */
+function stopNavLocationWatch(){
 
-function stopNavLocationWatch() {
-
-  if (
-    navWatchId !== null &&
+  if(
+    navWatchId!==null &&
     navigator.geolocation
-  ) {
+  ){
 
-    try {
+    try{
 
       navigator.geolocation.clearWatch(
         navWatchId
       );
 
-    } catch(e) {}
+    }catch(e){}
 
   }
 
@@ -4237,18 +5026,14 @@ function stopNavLocationWatch() {
 }
 
 
-/* =========================================================
-   导航实时位置处理
-========================================================= */
-
 function updateNavUserPositionFromBrowser(
   position
-) {
+){
 
-  if (
+  if(
     !position ||
     !position.coords
-  ) {
+  ){
     return;
   }
 
@@ -4258,10 +5043,10 @@ function updateNavUserPositionFromBrowser(
   var lng=
     position.coords.longitude;
 
-  if (
+  if(
     typeof lat!=='number' ||
     typeof lng!=='number'
-  ) {
+  ){
     return;
   }
 
@@ -4279,153 +5064,363 @@ function updateNavUserPositionFromBrowser(
 
 
 /* =========================================================
-   更新导航位置
+   导航当前位置
 ========================================================= */
 
 function updateNavUserPosition(
   pt
-) {
+){
 
-  if (
+  if(
     !pt ||
     !map3
-  ) {
+  ){
     return;
   }
 
-  /*
-   * 全局实时位置同步
-   */
   userPoint=pt;
 
   /*
-   * 位置变化后重新计算剩余距离
+   * 更新顶部一行路线指导
    */
-  if (endPoint) {
 
-    try {
+  updateLiveNavigationGuide(
+    pt
+  );
 
-      var dist=
-        map3.getDistance(
-          pt,
-          endPoint
-        );
-
-      var remainText=
-        dist<1000
-        ? Math.round(dist)+'米'
-        : (
-            dist/1000
-          ).toFixed(1)+'公里';
-
-      document.getElementById(
-        'stepMainText'
-      ).textContent=
-        '距离终点 '+
-        remainText;
-
-    } catch(e) {}
-
-  }
 
   /*
-   * 首次定位时跟随用户；后续只在用户已经接近地图边缘时移动，
-   * 避免每次 GPS 更新都让地图产生明显跳动。
+   * 地图只显示圆形当前位置，
+   * 不直接显示文字。
    */
-  try {
-    var center=map3.getCenter();
-    var centerDist=map3.getDistance(center,pt);
-    if (!center || centerDist>180) {
-      map3.panTo(pt);
-    }
-  } catch(e) {
-    map3.panTo(pt);
-  }
 
-  /*
-   * 删除旧定位标记
-   */
-  if (navUserMarker) {
+  if(navUserMarker){
 
-    try {
+    try{
 
       map3.removeOverlay(
         navUserMarker
       );
 
-    } catch(e) {}
+    }catch(e){}
 
   }
 
-  /*
-   * 实时定位点
-   */
   navUserMarker=
-    new BMapGL.Marker(
-      pt
+    createMapPointMarker(
+      pt,
+      'user',
+      '我的位置',
+      map3
     );
 
   map3.addOverlay(
     navUserMarker
   );
 
+
+  /*
+   * 地图跟随
+   */
+
+  try{
+
+    var center=
+      map3.getCenter();
+
+    var centerDist=
+      map3.getDistance(
+        center,
+        pt
+      );
+
+    if(
+      !center ||
+      centerDist>250
+    ){
+
+      map3.panTo(
+        pt
+      );
+
+    }
+
+  }catch(e){
+
+    try{
+      map3.panTo(pt);
+    }catch(err){}
+
+  }
+
 }
 
 
 /* =========================================================
-   绘制导航路线
+   一行实时路线指导
 ========================================================= */
 
-function drawNavRoute() {
+function updateLiveNavigationGuide(
+  currentPoint
+){
 
-  if (
-    !startPoint ||
-    !endPoint
-  ) {
+  var textEl=
+    document.getElementById(
+      'stepMainText'
+    );
+
+  var iconEl=
+    document.getElementById(
+      'stepIcon'
+    );
+
+  if(
+    !textEl ||
+    !currentPoint
+  ){
     return;
   }
 
-  var sm=
-    new BMapGL.Marker(
-      startPoint
-    );
 
-  var em=
-    new BMapGL.Marker(
-      endPoint
-    );
+  /*
+   * 优先使用当前路线步骤。
+   */
 
-  map3.addOverlay(sm);
-  map3.addOverlay(em);
+  if(
+    navSteps &&
+    navSteps.length
+  ){
 
-  try {
+    var currentStep=
+      navSteps[
+        Math.min(
+          navStepIndex,
+          navSteps.length-1
+        )
+      ];
 
-    var routeMode=
-      currentMode==='transit'
-      ? 'transit'
-      : (
-          currentMode==='driving'
-          ? 'driving'
-          : (
-              currentMode==='riding'
-              ? 'riding'
-              : 'walking'
-            )
+    if(currentStep){
+
+      textEl.textContent=
+        truncateStepText(
+          currentStep,
+          30
         );
 
+      iconEl.textContent=
+        getDirectionIcon(
+          currentStep
+        );
 
-    var handleRes=
+      return;
+
+    }
+
+  }
+
+
+  /*
+   * 如果没有详细步骤，
+   * 使用当前位置到终点的距离。
+   */
+
+  if(endPoint){
+
+    try{
+
+      var dist=
+        map3.getDistance(
+          currentPoint,
+          endPoint
+        );
+
+      var distText=
+        dist<1000
+        ?
+        Math.round(dist)+'米'
+        :
+        (dist/1000).toFixed(1)+'公里';
+
+      if(dist<30){
+
+        textEl.textContent=
+          '已到达目的地';
+
+        iconEl.textContent='🏁';
+
+      }else{
+
+        textEl.textContent=
+          '沿当前路线继续前进，距目的地'+
+          distText;
+
+        iconEl.textContent='⬆️';
+
+      }
+
+    }catch(e){}
+
+  }
+
+}
+
+
+function getDirectionIcon(
+  text
+){
+
+  if(!text){
+    return '⬆️';
+  }
+
+  if(
+    /左转|向左|左侧/.test(text)
+  ){
+    return '↰';
+  }
+
+  if(
+    /右转|向右|右侧/.test(text)
+  ){
+    return '↱';
+  }
+
+  if(
+    /掉头/.test(text)
+  ){
+    return '↩';
+  }
+
+  if(
+    /到达|终点/.test(text)
+  ){
+    return '🏁';
+  }
+
+  if(
+    /直行|继续|前行/.test(text)
+  ){
+    return '⬆️';
+  }
+
+  return '🧭';
+
+}
+
+
+/* =========================================================
+   导航路线
+========================================================= */
+
+function drawNavRoute(){
+
+  if(
+    !startPoint ||
+    !endPoint ||
+    !map3
+  ){
+    return;
+  }
+
+
+  /*
+   * 起终点圆形图标。
+   * 默认不显示文字。
+   * 点击才显示。
+   */
+
+  navStartMarker=
+    createMapPointMarker(
+      startPoint,
+      'start',
+      '起点：'+
+      (startName||'我的位置'),
+      map3
+    );
+
+  navEndMarker=
+    createMapPointMarker(
+      endPoint,
+      'end',
+      '终点：'+
+      (endName||'目的地'),
+      map3
+    );
+
+  map3.addOverlay(
+    navStartMarker
+  );
+
+  map3.addOverlay(
+    navEndMarker
+  );
+
+
+  /*
+   * 使用当前出行方式
+   */
+
+  var routeMode=
+    currentMode==='driving'
+    ? 'driving'
+    :
+    currentMode==='riding'
+    ? 'riding'
+    :
+    currentMode==='transit'
+    ? 'transit'
+    :
+    'walking';
+
+
+  var options={
+
+    renderOptions:{
+      map:null,
+      autoViewport:false
+    },
+
+    onSearchComplete:
       function(res){
 
-        if (
-          res &&
-          typeof res.getPlan===
-            'function'
-        ) {
+        if(
+          !res ||
+          typeof res.getPlan!=='function'
+        ){
 
-          /*
-           * 第一次规划时显示整个路线。
-           */
+          searchFacilitiesAlongRoute();
+
+          return;
+
+        }
+
+        var plan=
+          res.getPlan(0);
+
+        /*
+         * 提取真实路线点
+         */
+
+        var path=
+          getRoutePathFromResult(
+            res
+          );
+
+        if(path){
+
+          drawDashedRoute(
+            map3,
+            path
+          );
+
+        }
+
+        /*
+         * 设置地图视野
+         */
+
+        try{
+
           map3.setViewport(
             [
               startPoint,
@@ -4433,35 +5428,37 @@ function drawNavRoute() {
             ]
           );
 
-          collectNavSteps(
-            res
-          );
-
-          /*
-           * 路线规划成功后再搜索设施。
-           */
-          searchFacilitiesAlongRoute();
-
-        }
-
-      };
+        }catch(e){}
 
 
-    if (
-      routeMode==='walking'
-    ) {
+        /*
+         * 获取路线步骤
+         */
+
+        collectNavSteps(
+          res
+        );
+
+
+        /*
+         * 路线完成后检索设施
+         */
+
+        searchFacilitiesAlongRoute();
+
+      }
+
+  };
+
+
+  try{
+
+    if(routeMode==='walking'){
 
       var walking=
         new BMapGL.WalkingRoute(
           map3,
-          {
-            renderOptions:{
-              map:map3,
-              autoViewport:false
-            },
-            onSearchComplete:
-              handleRes
-          }
+          options
         );
 
       walking.search(
@@ -4471,21 +5468,12 @@ function drawNavRoute() {
 
     }
 
-    else if (
-      routeMode==='driving'
-    ) {
+    else if(routeMode==='driving'){
 
       var driving=
         new BMapGL.DrivingRoute(
           map3,
-          {
-            renderOptions:{
-              map:map3,
-              autoViewport:false
-            },
-            onSearchComplete:
-              handleRes
-          }
+          options
         );
 
       driving.search(
@@ -4495,21 +5483,12 @@ function drawNavRoute() {
 
     }
 
-    else if (
-      routeMode==='riding'
-    ) {
+    else if(routeMode==='riding'){
 
       var riding=
         new BMapGL.RidingRoute(
           map3,
-          {
-            renderOptions:{
-              map:map3,
-              autoViewport:false
-            },
-            onSearchComplete:
-              handleRes
-          }
+          options
         );
 
       riding.search(
@@ -4519,19 +5498,12 @@ function drawNavRoute() {
 
     }
 
-    else {
+    else{
 
       var transit=
         new BMapGL.TransitRoute(
           map3,
-          {
-            renderOptions:{
-              map:map3,
-              autoViewport:false
-            },
-            onSearchComplete:
-              handleRes
-          }
+          options
         );
 
       transit.search(
@@ -4541,7 +5513,7 @@ function drawNavRoute() {
 
     }
 
-  } catch(e) {
+  }catch(e){
 
     console.error(
       '导航路线失败',
@@ -4556,43 +5528,43 @@ function drawNavRoute() {
 
 
 /* =========================================================
-   导航步骤
+   获取导航步骤
 ========================================================= */
 
 function collectNavSteps(
   res
-) {
+){
 
   navSteps=[];
   navStepIndex=0;
 
-  try {
+  try{
 
     var plan=
       res.getPlan(0);
 
-    if (
+    if(
       plan &&
       plan.getRoute
-    ) {
+    ){
 
       var route=
         plan.getRoute(0);
 
-      if (
+      if(
         route &&
         route.getNumSteps &&
         route.getNumSteps()>0
-      ) {
+      ){
 
         var num=
           route.getNumSteps();
 
-        for (
+        for(
           var i=0;
           i<num;
           i++
-        ) {
+        ){
 
           var step=
             route.getStep(i);
@@ -4600,12 +5572,16 @@ function collectNavSteps(
           var desc=
             stripHtml(
               step.getDescription
-              ? step.getDescription()
-              : ''
+              ?
+              step.getDescription()
+              :
+              ''
             );
 
-          if (desc) {
-            navSteps.push(desc);
+          if(desc){
+            navSteps.push(
+              desc
+            );
           }
 
         }
@@ -4614,19 +5590,24 @@ function collectNavSteps(
 
     }
 
-  } catch(e) {}
+  }catch(e){
 
-  if (
-    navSteps.length===0
-  ) {
+    console.warn(
+      '导航步骤读取失败',
+      e
+    );
+
+  }
+
+
+  if(!navSteps.length){
 
     navSteps.push(
-      '直行前往“'+
+      '沿路线直行前往'+
       (
-        endName ||
+        endName||
         '目的地'
-      )+
-      '”'
+      )
     );
 
   }
@@ -4636,7 +5617,7 @@ function collectNavSteps(
 }
 
 
-function renderCurrentStep() {
+function renderCurrentStep(){
 
   var text=
     navSteps[
@@ -4649,56 +5630,48 @@ function renderCurrentStep() {
   ).textContent=
     truncateStepText(
       text,
-      24
+      30
     );
 
   document.getElementById(
     'stepIcon'
   ).textContent=
-    navStepIndex>=
-    navSteps.length-1
-    ? '🏁'
-    : '⬆️';
-
-}
-
-
-function goNextNavStep() {
-
-  if (
-    navStepIndex<
-    navSteps.length-1
-  ) {
-
-    navStepIndex++;
-
-    renderCurrentStep();
-
-  } else {
-
-    showToast(
-      '已到达目的地~'
+    getDirectionIcon(
+      text
     );
 
-  }
-
 }
 
+
+/* 点击顶部路线提示可模拟下一步 */
 
 document.addEventListener(
   'DOMContentLoaded',
   function(){
 
-    var bar=
+    var guide=
       document.querySelector(
-        '.nav-guide-bar'
+        '.nav-live-guide'
       );
 
-    if (bar) {
+    if(guide){
 
-      bar.addEventListener(
+      guide.addEventListener(
         'click',
-        goNextNavStep
+        function(){
+
+          if(
+            navStepIndex<
+            navSteps.length-1
+          ){
+
+            navStepIndex++;
+
+            renderCurrentStep();
+
+          }
+
+        }
       );
 
     }
@@ -4708,163 +5681,40 @@ document.addEventListener(
 
 
 /* =========================================================
-   设施筛选
+   沿路线搜索设施
 ========================================================= */
 
-function renderFacilityFilterPanel() {
-
-  var panel=
-    document.getElementById(
-      'filterPanel'
-    );
-
-  panel.innerHTML='';
-
-  var seen={};
-
-  for (
-    var i=0;
-    i<FACILITY_CATEGORY_MAP.length;
-    i++
-  ) {
-
-    var cat=
-      FACILITY_CATEGORY_MAP[i];
-
-    if (
-      seen[cat.label]
-    ) {
-      continue;
-    }
-
-    seen[cat.label]=true;
-
-    if (
-      activeFacilityTypes[
-        cat.label
-      ]===undefined
-    ) {
-
-      activeFacilityTypes[
-        cat.label
-      ]=true;
-
-    }
-
-    var item=
-      document.createElement(
-        'div'
-      );
-
-    item.className=
-      'filter-item'+
-      (
-        activeFacilityTypes[
-          cat.label
-        ]
-        ? ' on'
-        : ''
-      );
-
-    item.textContent=
-      cat.icon+
-      cat.label;
-
-    item.onclick=
-      (function(
-        l,
-        el
-      ){
-
-        return function(){
-
-          activeFacilityTypes[l]=
-            !activeFacilityTypes[l];
-
-          el.classList.toggle(
-            'on'
-          );
-
-          renderFacilityMarkers();
-
-        };
-
-      })(
-        cat.label,
-        item
-      );
-
-    panel.appendChild(
-      item
-    );
-
-  }
-
-}
-
-
-function toggleFilterPanel() {
-
-  document
-    .getElementById(
-      'filterPanel'
-    )
-    .classList
-    .toggle('show');
-
-}
-
-
-function truncateStepText(
-  text,
-  maxLen
-) {
-
-  if (!text) {
-    return text;
-  }
-
-  return text.length>maxLen
-    ? text.slice(
-        0,
-        maxLen
-      )+'…'
-    : text;
-
-}
-
-
-/* =========================================================
-   沿路线检索真实设施
-========================================================= */
-
-function searchFacilitiesAlongRoute() {
+function searchFacilitiesAlongRoute(){
 
   facilityData=[];
 
-  /*
-   * 以当前真实位置为第一搜索点。
-   */
   var base=
     userPoint ||
     startPoint;
 
-  if (!base) {
+  if(!base){
 
-    updateFacilityTip(0);
+    updateFacilityTip(
+      0
+    );
 
     return;
 
   }
 
+
+  /*
+   * 搜索点：
+   * 当前所在位置
+   * 路线中点
+   * 目的地
+   */
+
   var searchPoints=[
     base
   ];
 
-  /*
-   * 中点
-   */
-  if (endPoint) {
+  if(endPoint){
 
     var midLng=
       (
@@ -4885,37 +5735,34 @@ function searchFacilitiesAlongRoute() {
       )
     );
 
-    /*
-     * 终点
-     */
     searchPoints.push(
       endPoint
     );
 
   }
 
-  var completed=0;
+
   var totalFound=0;
+  var finishedTasks=0;
 
   var seen={};
 
-  /*
-   * 每个搜索点逐个关键词搜索。
-   */
   var totalTasks=
     searchPoints.length*
     FACILITY_SEARCH_KEYWORDS.length;
 
-  var finishedTasks=0;
 
+  function taskDone(
+    count
+  ){
 
-  function onTaskDone() {
+    totalFound+=count;
 
     finishedTasks++;
 
-    if (
+    if(
       finishedTasks>=totalTasks
-    ) {
+    ){
 
       renderFacilityMarkers();
 
@@ -4928,29 +5775,23 @@ function searchFacilitiesAlongRoute() {
   }
 
 
-  for (
+  for(
     var pi=0;
     pi<searchPoints.length;
     pi++
-  ) {
+  ){
 
-    for (
+    for(
       var ki=0;
       ki<FACILITY_SEARCH_KEYWORDS.length;
       ki++
-    ) {
+    ){
 
       searchSingleFacilityKeyword(
         searchPoints[pi],
         FACILITY_SEARCH_KEYWORDS[ki],
         seen,
-        function(count){
-
-          totalFound+=count;
-
-          onTaskDone();
-
-        }
+        taskDone
       );
 
     }
@@ -4961,7 +5802,7 @@ function searchFacilitiesAlongRoute() {
 
 
 /* =========================================================
-   单个设施关键词搜索
+   单关键词设施搜索
 ========================================================= */
 
 function searchSingleFacilityKeyword(
@@ -4969,95 +5810,148 @@ function searchSingleFacilityKeyword(
   searchConfig,
   seen,
   callback
-) {
+){
 
-  if (!point || !map3) {
+  if(
+    !point ||
+    !map3
+  ){
+
     callback(0);
+
     return;
+
   }
 
-  try {
+  try{
 
-    var local =
+    var local=
       new BMapGL.LocalSearch(
         map3,
         {
+
           pageCapacity:10,
+
           renderOptions:{
             map:null,
             autoViewport:false
           },
 
-          onSearchComplete:function(results){
+          onSearchComplete:
+            function(results){
 
-            var found=0;
+              var found=0;
 
-            if (
-              !results ||
-              !results.getNumPois ||
-              results.getNumPois()<=0
-            ) {
-              callback(0);
-              return;
-            }
+              if(
+                !results ||
+                !results.getNumPois ||
+                results.getNumPois()<=0
+              ){
 
-            var n=Math.min(
-              results.getNumPois(),
-              10
-            );
+                callback(0);
 
-            for (var i=0;i<n;i++) {
+                return;
 
-              var poi=results.getPoi(i);
-
-              if (!poi || !poi.point) {
-                continue;
               }
 
-              var title=stripHtml(poi.title);
-              var address=stripHtml(poi.address);
-              var type=stripHtml(poi.type);
+              var n=
+                Math.min(
+                  results.getNumPois(),
+                  10
+                );
 
-              var category=detectFacilityCategory(
-                poi,
-                searchConfig
-              );
+              for(
+                var i=0;
+                i<n;
+                i++
+              ){
 
-              var displayName=getFacilityDisplayName(
-                poi,
-                category
-              );
+                var poi=
+                  results.getPoi(i);
 
-              /* 同一坐标 + 同一设施类型去重 */
-              var key=
-                poi.point.lng.toFixed(5)+'_'+
-                poi.point.lat.toFixed(5)+'_'+
-                category.label;
+                if(
+                  !poi ||
+                  !poi.point
+                ){
+                  continue;
+                }
 
-              if (seen[key]) {
-                continue;
+                var title=
+                  stripHtml(
+                    poi.title
+                  );
+
+                var address=
+                  stripHtml(
+                    poi.address
+                  );
+
+                var type=
+                  stripHtml(
+                    poi.type
+                  );
+
+                var category=
+                  detectFacilityCategory(
+                    poi,
+                    searchConfig
+                  );
+
+                var displayName=
+                  getFacilityDisplayName(
+                    poi,
+                    category
+                  );
+
+
+                var key=
+                  poi.point.lng.toFixed(5)+
+                  '_'+
+                  poi.point.lat.toFixed(5)+
+                  '_'+
+                  category.label;
+
+                if(seen[key]){
+                  continue;
+                }
+
+                seen[key]=true;
+
+
+                facilityData.push({
+
+                  point:poi.point,
+
+                  name:displayName,
+
+                  address:address,
+
+                  sourceTitle:title,
+
+                  sourceType:type,
+
+                  icon:category.icon,
+
+                  label:category.label,
+
+                  keyword:
+                    searchConfig.keyword
+
+                });
+
+                found++;
+
               }
 
-              seen[key]=true;
+              callback(
+                found
+              );
 
-              facilityData.push({
-                point:poi.point,
-                name:displayName,
-                address:address,
-                sourceTitle:title,
-                sourceType:type,
-                icon:category.icon,
-                label:category.label,
-                keyword:searchConfig.keyword
-              });
-
-              found++;
             }
 
-            callback(found);
-          }
         }
       );
+
 
     local.searchNearby(
       searchConfig.keyword,
@@ -5065,44 +5959,49 @@ function searchSingleFacilityKeyword(
       1800
     );
 
-  } catch(e) {
+  }catch(e){
 
     console.warn(
-      '设施搜索失败:',
+      '设施搜索失败',
       searchConfig.keyword,
       e
     );
 
     callback(0);
+
   }
+
 }
 
 
 /* =========================================================
-   沿途设施提示
+   设施提示
 ========================================================= */
 
 function updateFacilityTip(
   count
-) {
+){
 
-  renderNavRecommendations();
-
-  if (count>0) {
-
+  var el=
     document.getElementById(
       'aiTipText'
-    ).textContent=
-      '沿途共检索到 '+
+    );
+
+  if(!el){
+    return;
+  }
+
+  if(count>0){
+
+    el.textContent=
+      '沿途检索到'+
       count+
-      ' 处真实亲子设施，点击地图图标可查看名称。';
+      '处亲子设施，点击地图图标查看详情。';
 
-  } else {
+  }else{
 
-    document.getElementById(
-      'aiTipText'
-    ).textContent=
-      '当前路线附近暂未检索到具体设施，可点击左上角筛选按钮调整类别。';
+    el.textContent=
+      '当前路线附近暂未检索到亲子设施。';
 
   }
 
@@ -5110,103 +6009,219 @@ function updateFacilityTip(
 
 
 /* =========================================================
-   显示设施
+   设施地图图标
 ========================================================= */
 
-function truncateFacilityName(name,maxLen) {
+function renderFacilityMarkers(){
 
-  if (!name) {
-    return '亲子设施';
-  }
-
-  name=String(name);
-
-  return name.length>maxLen
-    ? name.slice(0,maxLen)+'…'
-    : name;
-}
-
-
-function renderFacilityMarkers() {
-
-  if (!map3) {
+  if(!map3){
     return;
   }
 
-  /* 删除旧设施标签 */
-  for (var i=0;i<facilityMarkers.length;i++) {
-    try {
-      map3.removeOverlay(facilityMarkers[i]);
-    } catch(e) {}
+
+  /*
+   * 删除旧设施
+   */
+
+  for(
+    var i=0;
+    i<facilityMarkers.length;
+    i++
+  ){
+
+    try{
+
+      map3.removeOverlay(
+        facilityMarkers[i]
+      );
+
+    }catch(e){}
+
   }
 
   facilityMarkers=[];
 
-  /* 添加真实设施 */
-  for (var i=0;i<facilityData.length;i++) {
 
-    var f=facilityData[i];
+  /*
+   * 根据当前分类显示设施
+   */
 
-    if (!activeFacilityTypes[f.label]) {
+  for(
+    var i=0;
+    i<facilityData.length;
+    i++
+  ){
+
+    var f=
+      facilityData[i];
+
+    if(
+      !activeFacilityTypes[f.label]
+    ){
       continue;
     }
 
+
     /*
-     * 地图上直接显示：
-     * 🍼 母婴室 / 🍼 广州某商场母婴室
-     * 有真实 POI 名称优先显示真实名称，没有则显示类别。
+     * 地图上只显示图标。
+     *
+     * 不显示：
+     * “广州某某母婴室”
+     * “停车场”
+     *
+     * 点击后才显示名称。
      */
-    var facilityText=
-      f.icon+' '+
-      truncateFacilityName(
-        f.name || f.label,
-        12
+
+    var lbl=
+      new BMapGL.Label(
+        f.icon,
+        {
+          position:f.point,
+          offset:new BMapGL.Size(
+            -13,
+            -13
+          )
+        }
       );
 
-    var lbl=new BMapGL.Label(
-      facilityText,
-      {
-        position:f.point,
-        offset:new BMapGL.Size(-20,-16)
-      }
-    );
-
     lbl.setStyle({
+
       background:'#fff',
-      color:'#5c4a3a',
-      border:'1px solid #FFD9B8',
-      borderRadius:'14px',
-      padding:'4px 8px',
-      fontSize:'12px',
-      fontWeight:'700',
-      whiteSpace:'nowrap',
-      boxShadow:'0 2px 6px rgba(0,0,0,0.18)',
+
+      color:'#444',
+
+      border:
+        '1px solid #EAE4D8',
+
+      borderRadius:'50%',
+
+      width:'28px',
+
+      height:'28px',
+
+      lineHeight:'28px',
+
+      padding:'0',
+
+      textAlign:'center',
+
+      fontSize:'16px',
+
+      boxShadow:
+        '0 2px 7px rgba(0,0,0,.15)',
+
       cursor:'pointer'
+
     });
+
+
+    /*
+     * 点击设施：
+     * 才显示具体名称和地址。
+     */
 
     lbl.addEventListener(
       'click',
       (function(fac){
+
         return function(){
 
-          var displayName=fac.name || fac.label;
+          showNavDetail(
+            fac
+          );
 
-          if (fac.address && fac.address!==displayName) {
-            showToast(
-              '📍 '+displayName+' · '+fac.address
-            );
-          } else {
-            showToast(
-              '📍 '+displayName
-            );
-          }
         };
+
       })(f)
     );
 
-    map3.addOverlay(lbl);
-    facilityMarkers.push(lbl);
+
+    map3.addOverlay(
+      lbl
+    );
+
+    facilityMarkers.push(
+      lbl
+    );
+
   }
+
+}
+
+
+/* =========================================================
+   导航设施详情
+========================================================= */
+
+function showNavDetail(
+  f
+){
+
+  if(!f){
+    return;
+  }
+
+  var drawer=
+    document.getElementById(
+      'navDetailDrawer'
+    );
+
+  document.getElementById(
+    'navDetailImg'
+  ).textContent=
+    f.icon ||
+    '📍';
+
+  document.getElementById(
+    'navDetailTitle'
+  ).textContent=
+    f.name ||
+    f.label ||
+    '亲子设施';
+
+  document.getElementById(
+    'navDetailDistance'
+  ).textContent=
+    f.address
+    ?
+    '📍 '+f.address
+    :
+    '📍 路线附近';
+
+  document.getElementById(
+    'navDetailTags'
+  ).innerHTML=
+    '<span>'+
+    (f.label||'亲子设施')+
+    '</span>'+
+    '<span>沿途可达</span>';
+
+  document.getElementById(
+    'navDetailDesc'
+  ).textContent=
+    f.address
+    ?
+    '位于'+
+    f.address+
+    '，可在当前导航路线附近查看。'
+    :
+    '该设施位于当前导航路线附近。';
+
+  drawer.classList.add(
+    'show'
+  );
+
+}
+
+
+function closeNavDetail(){
+
+  document.getElementById(
+    'navDetailDrawer'
+  ).classList.remove(
+    'show'
+  );
+
 }
 
 
@@ -5214,7 +6229,7 @@ function renderFacilityMarkers() {
    结束导航
 ========================================================= */
 
-function endNav() {
+function endNav(){
 
   stopNavLocationWatch();
 
@@ -5234,15 +6249,15 @@ function endNav() {
 window.onload=
   function(){
 
-    try {
+    try{
 
-      if (
+      if(
         typeof BMapGL===
         'undefined'
-      ) {
+      ){
 
         showToast(
-          '地图加载失败，请检查网络或百度地图AK白名单'
+          '地图加载失败，请检查网络或百度地图AK'
         );
 
         return;
@@ -5251,7 +6266,7 @@ window.onload=
 
       initMap1();
 
-    } catch(e) {
+    }catch(e){
 
       console.error(
         '初始化异常',
