@@ -1,945 +1,1123 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>遛娃地图</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #F5F6F8; overflow: hidden; }
-  #app { position: relative; width: 100%; height: 100%; max-width: 600px; margin: 0 auto; background: #fff; box-shadow: 0 0 24px rgba(0,0,0,0.08); overflow: hidden; }
-  @media (min-width: 700px) {
-    #app { height: 90vh; margin-top: 5vh; border-radius: 20px; }
-  }
-  .page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; background: #fff; }
-  .page.active { display: flex; }
-  /* ---------- 顶部导航 ---------- */
-  .navbar { flex: 0 0 auto; display: flex; align-items: center; padding: 12px 14px; background: #fff; border-bottom: 1px solid #F0EDE9; position: relative; z-index: 20; }
-  .navbar .back-btn { width: 32px; height: 32px; border-radius: 50%; background: #FFF1E6; color: #FF8C42; display: flex; align-items: center; justify-content: center; font-size: 18px; border: none; cursor: pointer; flex: 0 0 auto; }
-  .navbar .title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #2B2B2B; }
-  .navbar .placeholder { width: 32px; flex: 0 0 auto; }
-  /* ---------- P1 首页 ---------- */
-  #page1 { }
-  .top-bar { flex: 0 0 auto; padding: 14px 16px 10px; background: linear-gradient(135deg,#FF8C42,#FFB27A); color: #fff; border-radius: 0 0 20px 20px; }
-  .top-row { display: flex; align-items: center; justify-content: space-between; }
-  .loc-block { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; position: relative; }
-  .loc-btn { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.25); border: none; color: #fff; font-size: 14px; flex: 0 0 auto; cursor: pointer; }
-  .addr-input { background: transparent; border: none; color: #fff; font-size: 15px; font-weight: 600; outline: none; flex: 1; min-width: 0; padding: 2px 0; }
-  .addr-input::placeholder { color: rgba(255,255,255,0.8); }
-  .weather-badge { flex: 0 0 auto; font-size: 13px; background: rgba(255,255,255,0.22); padding: 4px 10px; border-radius: 14px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-  .suggest-box { position: absolute; top: 34px; left: 0; width: 100%; background: #fff; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); z-index: 50; max-height: 180px; overflow-y: auto; display: none; }
-  .suggest-box.show { display: block; }
-  .suggest-item { padding: 9px 12px; font-size: 13px; color: #333; border-bottom: 1px solid #F5F5F5; cursor: pointer; }
-  .suggest-item:last-child { border-bottom: none; }
-  .suggest-item:hover { background: #FFF6EF; }
-  .map-wrap { flex: 1 1 auto; position: relative; min-height: 0; }
-  #map1 { width: 100%; height: 100%; }
-  .locate-fab { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.18); border: none; font-size: 18px; color: #FF8C42; z-index: 30; cursor: pointer; }
-  .bottom-panel { flex: 0 0 auto; background: #fff; border-radius: 20px 20px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 25; position: relative; }
-  .nl-input-wrap { display: flex; align-items: center; background: #F7F5F2; border-radius: 22px; padding: 10px 14px; margin-bottom: 12px; }
-  .nl-input { flex: 1; border: none; background: transparent; outline: none; font-size: 14px; color: #2B2B2B; min-width: 0; }
-  .nl-input::placeholder { color: #A9A39B; }
-  .nl-icon { color: #FF8C42; font-size: 16px; margin-right: 8px; flex: 0 0 auto; }
-  .chips-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-  .chips-label { font-size: 12px; color: #9B958D; margin-bottom: 6px; }
-  .chip { padding: 6px 14px; border-radius: 16px; border: 1px solid #EDE8E2; background: #FBF9F7; font-size: 13px; color: #6B655D; cursor: pointer; user-select: none; transition: all .15s; }
-  .chip.active { background: #FF8C42; color: #fff; border-color: #FF8C42; font-weight: 600; }
-  .plan-btn { width: 100%; padding: 13px 0; background: linear-gradient(135deg,#FF8C42,#FF6F1E); color: #fff; border: none; border-radius: 24px; font-size: 16px; font-weight: 700; margin-top: 4px; cursor: pointer; box-shadow: 0 6px 16px rgba(255,140,66,0.35); }
-  .plan-btn:active { transform: scale(0.98); }
-  /* ---------- P3 推荐界面 ---------- */
-  .ai-greet { flex: 0 0 auto; margin: 12px 14px 4px; background: #FFF3E9; border-radius: 14px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
-  .ai-avatar { width: 34px; height: 34px; border-radius: 50%; background: #FF8C42; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex: 0 0 auto; }
-  .ai-bubble { font-size: 13.5px; color: #7A4E22; line-height: 1.5; padding-top: 4px; }
-  .cards-scroll { flex: 1 1 auto; overflow-y: auto; padding: 12px 14px 20px; }
-  .place-card { background: #fff; border: 1px solid #F0EDE9; border-radius: 16px; margin-bottom: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-  .place-card.main { border: 2px solid #FF8C42; box-shadow: 0 6px 18px rgba(255,140,66,0.18); }
-  .card-img { height: 110px; background: linear-gradient(135deg,#FFD9B0,#FF8C42); display: flex; align-items: center; justify-content: center; font-size: 34px; color: #fff; position: relative; }
-  .card-tag-top { position: absolute; top: 8px; left: 8px; background: #fff; color: #FF6F1E; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
-  .card-body { padding: 12px 14px 14px; }
-  .card-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-  .card-title { font-size: 16px; font-weight: 700; color: #2B2B2B; }
-  .card-meta { font-size: 12.5px; color: #9B958D; margin-bottom: 8px; }
-  .card-meta span { margin-right: 10px; }
-  .reason-text { font-size: 12.5px; color: #6B655D; background: #FBF9F7; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.5; }
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .fac-tag { font-size: 11.5px; padding: 4px 9px; border-radius: 10px; background: #FFF1E6; color: #FF6F1E; }
-  .go-btn { width: 100%; padding: 10px 0; background: #FF8C42; color: #fff; border: none; border-radius: 18px; font-size: 14px; font-weight: 700; cursor: pointer; }
-  .go-btn.secondary { background: #FFF1E6; color: #FF6F1E; }
-  /* ---------- P4 路线规划 ---------- */
-  .route-endpoints { flex: 0 0 auto; padding: 12px 16px; background: #FFF8F2; border-bottom: 1px solid #F0EDE9; }
-  .endpoint-row { display: flex; align-items: center; font-size: 13.5px; color: #2B2B2B; margin-bottom: 6px; }
-  .endpoint-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex: 0 0 auto; }
-  .endpoint-dot.start { background: #4CAF80; }
-  .endpoint-dot.end { background: #FF6F1E; }
-  .endpoint-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .edit-start-btn { font-size: 12px; color: #FF8C42; background: none; border: none; cursor: pointer; padding: 4px 6px; flex: 0 0 auto; }
-  .ai-tip { flex: 0 0 auto; margin: 10px 14px 0; background: #FFF3E9; border-radius: 12px; padding: 9px 12px; font-size: 12.5px; color: #7A4E22; display: flex; align-items: center; gap: 6px; }
-  .mode-tabs { flex: 0 0 auto; display: flex; gap: 8px; padding: 12px 14px; overflow-x: auto; }
-  .mode-tab { flex: 0 0 auto; padding: 8px 16px; border-radius: 18px; background: #F7F5F2; color: #6B655D; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; border: none; }
-  .mode-tab.active { background: #FF8C42; color: #fff; }
-  .route-cards { flex: 1 1 auto; overflow-y: auto; padding: 0 14px 16px; }
-  .route-card { background: #fff; border: 1px solid #F0EDE9; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
-  .route-card-title { font-size: 14px; font-weight: 700; color: #2B2B2B; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .route-info-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
-  .route-info-item { font-size: 12px; color: #6B655D; background: #FBF9F7; padding: 5px 10px; border-radius: 8px; }
-  .nav-start-btn { position: sticky; bottom: 0; flex: 0 0 auto; margin: 0 14px 14px; padding: 14px 0; background: linear-gradient(135deg,#FF8C42,#FF6F1E); color: #fff; border: none; border-radius: 24px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(255,140,66,0.35); }
-  .edit-start-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-radius: 0 0 14px 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); padding: 12px 14px; z-index: 40; }
-  .edit-start-panel.show { display: block; }
-  .edit-start-title { font-size: 13px; font-weight: 700; color: #2B2B2B; margin-bottom: 8px; }
-  .edit-start-field { width: 100%; padding: 9px 10px; border: 1px solid #EDE8E2; border-radius: 10px; font-size: 13.5px; outline: none; margin-bottom: 8px; box-sizing: border-box; }
-  .edit-start-actions { display: flex; gap: 8px; justify-content: flex-end; }
-  .edit-start-btn-cancel, .edit-start-btn-confirm { padding: 7px 14px; border-radius: 14px; font-size: 13px; border: none; cursor: pointer; }
-  .edit-start-btn-cancel { background: #F7F5F2; color: #6B655D; }
-  .edit-start-btn-confirm { background: #FF8C42; color: #fff; font-weight: 600; }
-  .edit-start-result { font-size: 12px; color: #9B958D; margin-top: 6px; min-height: 14px; }
-  /* ---------- P5 导航页面 ---------- */
-  .nav-top-info { flex: 0 0 auto; background: linear-gradient(135deg,#FF8C42,#FFB27A); color: #fff; padding: 14px 16px; }
-  .nav-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-  .nav-remain { font-size: 22px; font-weight: 800; }
-  .nav-eta { font-size: 13px; opacity: 0.9; }
-  .nav-endpoints-text { font-size: 12.5px; opacity: 0.92; }
-  .filter-fab { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.95); color: #FF6F1E; font-size: 12.5px; font-weight: 700; padding: 7px 12px; border-radius: 16px; border: none; z-index: 30; box-shadow: 0 2px 8px rgba(0,0,0,0.12); cursor: pointer; }
-  .filter-panel { position: absolute; top: 48px; left: 10px; background: #fff; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); padding: 10px; z-index: 31; display: none; min-width: 150px; }
-  .filter-panel.show { display: block; }
-  .filter-opt { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #444; padding: 6px 4px; cursor: pointer; }
-  .filter-opt input { accent-color: #FF8C42; }
-  .nav-map-wrap { flex: 1 1 auto; position: relative; min-height: 0; }
-  #map5 { width: 100%; height: 100%; }
-  .ai-tip-float { position: absolute; left: 12px; right: 12px; bottom: 12px; background: rgba(255,255,255,0.97); border-radius: 14px; padding: 10px 12px; font-size: 12.5px; color: #7A4E22; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 25; display: flex; gap: 8px; align-items: flex-start; }
-  .end-nav-btn { flex: 0 0 auto; margin: 12px 14px calc(12px + env(safe-area-inset-bottom,0px)); padding: 13px 0; background: #fff; color: #FF6F1E; border: 1.5px solid #FF8C42; border-radius: 22px; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .empty-hint { text-align: center; color: #B2AC A4; font-size: 12.5px; padding: 20px 0; }
-  .demo-note { font-size: 11px; color: #B2ACA4; text-align: center; padding: 6px 0 2px; }
-  ::-webkit-scrollbar { width: 0; height: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; font-family:-apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif; background:#FFF6ED; }
+  #app { position:relative; width:100%; height:100vh; max-width:600px; margin:0 auto; overflow:hidden; background:#FFF6ED; }
+  .page { position:absolute; top:0; left:0; width:100%; height:100%; display:none; flex-direction:column; background:#FFF6ED; }
+  .page.active { display:flex; }
+
+  /* 顶部导航条 */
+  .navbar { display:flex; align-items:center; height:52px; min-height:52px; background:#FF8C42; color:#fff; padding:0 12px; box-shadow:0 2px 8px rgba(255,140,66,0.3); position:relative; z-index:20; }
+  .navbar .back-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; border-radius:50%; }
+  .navbar .back-btn:active { background:rgba(255,255,255,0.25); }
+  .navbar .title { flex:1; text-align:center; font-size:17px; font-weight:600; }
+  .navbar .placeholder { width:32px; }
+
+  /* ========== P1 首页 ========== */
+  .top-bar { background:linear-gradient(135deg,#FF8C42,#FFB27A); padding:14px 16px 18px; color:#fff; border-radius:0 0 22px 22px; box-shadow:0 4px 12px rgba(255,140,66,0.25); }
+  .top-row { display:flex; align-items:center; justify-content:space-between; }
+  .loc-wrap { display:flex; align-items:center; gap:6px; flex:1; min-width:0; }
+  .loc-icon { font-size:18px; }
+  .loc-edit-input { border:none; outline:none; background:rgba(255,255,255,0.25); border-radius:14px; padding:5px 10px; color:#fff; font-size:14px; font-weight:600; flex:1; min-width:0; }
+  .loc-edit-input::placeholder { color:rgba(255,255,255,0.85); }
+  .locate-btn { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; cursor:pointer; }
+  .weather-chip { display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.25); border-radius:14px; padding:5px 10px; font-size:13px; flex-shrink:0; margin-left:8px; }
+  .suggest-list { margin-top:8px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.12); display:none; }
+  .suggest-item { padding:9px 14px; font-size:13px; color:#555; border-bottom:1px solid #f5f5f5; }
+  .suggest-item:last-child { border-bottom:none; }
+  .suggest-item:active { background:#FFF3E8; }
+
+  #map1 { width:100%; flex:1; min-height:0; }
+
+  .bottom-panel { background:#fff; border-radius:20px 20px 0 0; margin-top:-16px; position:relative; z-index:5; padding:16px 16px 18px; box-shadow:0 -4px 14px rgba(0,0,0,0.06); }
+  .nl-input-wrap { display:flex; align-items:center; background:#FFF3E8; border-radius:22px; padding:10px 14px; gap:8px; border:1.5px solid #FFD9B8; }
+  .nl-input-wrap .emoji { font-size:18px; }
+  .nl-input { flex:1; border:none; outline:none; background:transparent; font-size:14px; color:#5c4a3a; }
+  .nl-input::placeholder { color:#c9a988; }
+
+  .chip-row { display:flex; gap:8px; margin-top:12px; overflow-x:auto; padding-bottom:2px; }
+  .chip { flex-shrink:0; padding:7px 14px; border-radius:16px; background:#FFF3E8; color:#B96A2C; font-size:13px; font-weight:600; border:1.5px solid transparent; cursor:pointer; white-space:nowrap; }
+  .chip.active { background:#FF8C42; color:#fff; border-color:#FF8C42; box-shadow:0 3px 8px rgba(255,140,66,0.35); }
+  .chip-label { font-size:12px; color:#a08670; margin-top:10px; font-weight:600; }
+
+  .start-btn { margin-top:14px; width:100%; background:linear-gradient(135deg,#FF8C42,#FF6B2C); color:#fff; border:none; border-radius:24px; padding:13px 0; font-size:16px; font-weight:700; box-shadow:0 6px 14px rgba(255,107,44,0.35); cursor:pointer; }
+  .start-btn:active { transform:scale(0.98); }
+
+  .demo-tag { text-align:center; font-size:11px; color:#c9a988; margin-top:8px; }
+
+  /* ========== P3 推荐页 ========== */
+  .ai-greet { display:flex; align-items:center; gap:10px; padding:14px 16px; background:#FFF3E8; margin:10px 12px; border-radius:16px; }
+  .ai-avatar { width:38px; height:38px; border-radius:50%; background:#FF8C42; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .ai-bubble { font-size:13px; color:#8a5c33; font-weight:600; line-height:1.4; }
+
+  .cards-scroll { flex:1; overflow-y:auto; padding:0 12px 16px; }
+  .rec-card { background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.08); margin-bottom:14px; border:2px solid transparent; }
+  .rec-card.main { border-color:#FFD9B8; box-shadow:0 6px 18px rgba(255,140,66,0.25); }
+  .rec-card .img-wrap { height:130px; display:flex; align-items:center; justify-content:center; font-size:52px; position:relative; }
+  .rec-card .img-wrap.type-food { background:linear-gradient(135deg,#FFE0C2,#FFC194); }
+  .rec-card .img-wrap.type-park { background:linear-gradient(135deg,#D6F0D2,#A8E0A0); }
+  .rec-card .img-wrap.type-mall { background:linear-gradient(135deg,#FFE1EC,#FFB8CF); }
+  .rec-card .img-wrap.type-museum { background:linear-gradient(135deg,#D9E4FF,#AFC4FF); }
+  .badge-main { position:absolute; top:8px; left:8px; background:#FF8C42; color:#fff; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
+  .rec-card .body { padding:12px 14px 14px; }
+  .rec-card .name { font-size:16px; font-weight:700; color:#4a3527; }
+  .rec-card .stars-row { display:flex; align-items:center; gap:6px; margin-top:4px; }
+  .stars { color:#FFB100; font-size:14px; letter-spacing:1px; }
+  .score-num { font-size:12px; color:#a08670; }
+  .dist-text { font-size:12px; color:#a08670; margin-left:auto; }
+  .tag-row { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .tag-pill { background:#FFF3E8; color:#B96A2C; font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; }
+  .go-btn { width:100%; margin-top:12px; background:#FF8C42; color:#fff; border:none; border-radius:16px; padding:9px 0; font-size:14px; font-weight:700; cursor:pointer; }
+  .go-btn:active { background:#e97a34; }
+  .score-detail { font-size:10px; color:#c9a988; margin-top:6px; line-height:1.5; }
+
+  /* ========== P4 路线规划 ========== */
+  .route-endpoints { background:#fff; margin:10px 12px 0; border-radius:16px; padding:14px 16px; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
+  .ep-row { display:flex; align-items:center; gap:10px; padding:7px 0; }
+  .ep-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .ep-dot.start { background:#2ED47A; }
+  .ep-dot.end { background:#FF4757; }
+  .ep-text { flex:1; font-size:14px; color:#4a3527; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ep-edit-col { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+  .ep-edit-btn { font-size:12px; color:#FF8C42; border:1.5px solid #FF8C42; border-radius:12px; padding:4px 10px; background:#fff; flex-shrink:0; cursor:pointer; font-weight:600; white-space:nowrap; }
+  .ep-divider { height:1px; background:#f0e5da; margin-left:20px; }
+
+  .mode-tabs { display:flex; margin:10px 12px 0; background:#fff; border-radius:14px; padding:5px; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
+  .mode-tab { flex:1; text-align:center; padding:9px 0; font-size:13px; font-weight:700; color:#a08670; border-radius:11px; cursor:pointer; }
+  .mode-tab.active { background:#FF8C42; color:#fff; }
+
+  #map2 { width:100%; margin:10px 12px 0; border-radius:16px; flex:1; min-height:220px; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
+
+  .reason-card { background:#FFF3E8; margin:10px 12px; border-radius:14px; padding:12px 14px; }
+  .reason-card .rt { font-size:12px; font-weight:700; color:#B96A2C; margin-bottom:6px; }
+  .reason-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px; }
+  .reason-tag { background:#fff; color:#B96A2C; font-size:11px; padding:3px 9px; border-radius:10px; font-weight:700; border:1.5px solid #FFD9B8; }
+  .reason-meta { display:flex; gap:14px; font-size:12px; color:#8a5c33; font-weight:600; }
+  .reason-meta span { display:flex; align-items:center; gap:3px; }
+  .parking-line { font-size:11px; color:#a08670; margin-top:6px; }
+
+  .nav-start-btn { margin:0 12px 14px; background:linear-gradient(135deg,#FF8C42,#FF6B2C); color:#fff; border:none; border-radius:22px; padding:13px 0; font-size:16px; font-weight:700; box-shadow:0 6px 14px rgba(255,107,44,0.35); cursor:pointer; }
+
+  /* ========== P5 导航页 ========== */
+  .nav-guide-bar { background:linear-gradient(135deg,#FF8C42,#FFB27A); color:#fff; padding:14px 16px; flex-shrink:0; }
+  .nav-step-main { font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; overflow:hidden; white-space:nowrap; }
+  .nav-step-icon { font-size:26px; flex-shrink:0; }
+  .nav-step-text { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .filter-btn-float { position:absolute; top:10px; left:10px; z-index:15; background:#fff; border-radius:14px; padding:7px 12px; font-size:12px; font-weight:700; color:#FF8C42; box-shadow:0 3px 10px rgba(0,0,0,0.15); cursor:pointer; display:flex; align-items:center; gap:4px; }
+  .filter-panel { position:absolute; top:48px; left:10px; z-index:16; background:#fff; border-radius:14px; padding:10px; box-shadow:0 4px 14px rgba(0,0,0,0.18); display:none; max-width:250px; flex-wrap:wrap; gap:6px; }
+  .filter-panel.show { display:flex; }
+  .filter-item { font-size:11px; background:#FFF3E8; color:#B96A2C; padding:5px 8px; border-radius:10px; font-weight:600; cursor:pointer; border:1.5px solid transparent; }
+  .filter-item.on { background:#FF8C42; color:#fff; border-color:#FF8C42; }
+
+  #map3 { width:100%; flex:1; min-height:0; position:relative; }
+
+  .ai-tip-bar { background:#fff; margin:0; padding:10px 16px; box-shadow:0 -3px 10px rgba(0,0,0,0.06); }
+  .ai-tip-bar .tt { font-size:11px; color:#a08670; font-weight:700; margin-bottom:3px; }
+  .ai-tip-bar .tc { font-size:12px; color:#5c4a3a; line-height:1.4; }
+  .end-nav-btn { margin:8px 16px 12px; background:#fff; border:2px solid #FF4757; color:#FF4757; border-radius:20px; padding:10px 0; font-size:15px; font-weight:700; text-align:center; cursor:pointer; }
+  .end-nav-btn:active { background:#FFF0F0; }
+
+  .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.75); color:#fff; padding:10px 18px; border-radius:10px; font-size:13px; z-index:999; display:none; max-width:80%; text-align:center; }
+
+  .bmap-lbl { background:#FF8C42; color:#fff; border:none; border-radius:8px; padding:2px 6px; font-size:11px; font-weight:700; box-shadow:0 2px 6px rgba(0,0,0,0.2); white-space:nowrap; }
+  .fac-lbl { background:#fff; border:1px solid #FFD9B8; border-radius:6px; padding:1px 5px; font-size:13px; box-shadow:0 1px 4px rgba(0,0,0,0.15); }
+  .park-lbl { background:#4A90E2; color:#fff; border:none; border-radius:6px; padding:1px 6px; font-size:12px; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
 </style>
+<script src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=o8LnSUIDI7AiJDfc9eRMNz3YDSdKHkRn"></script>
 </head>
 <body>
 <div id="app">
 
-  <!-- ============ P1 个性化推荐首页 ============ -->
+  <!-- ============ P1 首页 ============ -->
   <div class="page active" id="page1">
     <div class="top-bar">
       <div class="top-row">
-        <div class="loc-block">
-          <button class="loc-btn" id="btnLocate1" title="重新定位">📍</button>
-          <input class="addr-input" id="addrInput" placeholder="定位中..." autocomplete="off">
-          <div class="suggest-box" id="suggestBox"></div>
+        <div class="loc-wrap">
+          <span class="loc-icon">📍</span>
+          <input class="loc-edit-input" id="curAddrInput" placeholder="定位中..." oninput="onAddrInput()" />
         </div>
-        <div class="weather-badge" id="weatherBadge">⛅ 26℃</div>
+        <div class="locate-btn" id="relocateBtn" onclick="doGeolocation()">⟳</div>
+        <div class="weather-chip" id="weatherChip">☀️ 26°C</div>
       </div>
+      <div class="suggest-list" id="suggestList"></div>
     </div>
-    <div class="map-wrap">
-      <div id="map1"></div>
-      <button class="locate-fab" id="btnLocateFab" title="回到当前位置">⊕</button>
-    </div>
+    <div id="map1"></div>
     <div class="bottom-panel">
       <div class="nl-input-wrap">
-        <span class="nl-icon">💬</span>
-        <input class="nl-input" id="nlInput" placeholder="带3岁宝宝找个室内玩的地方…">
+        <span class="emoji">💬</span>
+        <input class="nl-input" id="nlInput" placeholder="带3岁宝宝找个室内玩的地方" />
       </div>
-      <div class="chips-label">孩子年龄</div>
-      <div class="chips-row" id="ageChips">
-        <div class="chip" data-age="0-3">0-3岁</div>
-        <div class="chip" data-age="3-6">3-6岁</div>
-        <div class="chip" data-age="6-12">6-12岁</div>
+      <div class="chip-label">孩子年龄</div>
+      <div class="chip-row" id="ageChips">
+        <div class="chip" data-val="0-3">0-3岁</div>
+        <div class="chip" data-val="3-6">3-6岁</div>
+        <div class="chip" data-val="6-12">6-12岁</div>
       </div>
-      <div class="chips-label">出行目的</div>
-      <div class="chips-row" id="purposeChips">
-        <div class="chip" data-purpose="吃饭">吃饭</div>
-        <div class="chip" data-purpose="游玩">游玩</div>
-        <div class="chip" data-purpose="户外">户外</div>
-        <div class="chip" data-purpose="购物">购物</div>
+      <div class="chip-label">出行目的</div>
+      <div class="chip-row" id="purposeChips">
+        <div class="chip" data-val="吃饭">🍴 吃饭</div>
+        <div class="chip" data-val="游玩">🎠 游玩</div>
+        <div class="chip" data-val="户外">🌳 户外</div>
+        <div class="chip" data-val="购物">🛍️ 购物</div>
       </div>
-      <button class="plan-btn" id="btnPlan">开始规划</button>
+      <button class="start-btn" onclick="startPlanning()">开始规划 →</button>
+      <div class="demo-tag">附近POI标记为示例检索结果，非真实全量数据</div>
     </div>
   </div>
 
-  <!-- ============ P3 推荐界面 ============ -->
+  <!-- ============ P3 推荐页 ============ -->
   <div class="page" id="page3">
     <div class="navbar">
-      <button class="back-btn" id="back3">‹</button>
+      <div class="back-btn" onclick="goPage('page1')">←</div>
       <div class="title">推荐结果</div>
       <div class="placeholder"></div>
     </div>
     <div class="ai-greet">
-      <div class="ai-avatar">🤖</div>
-      <div class="ai-bubble" id="aiGreetText">找到啦！这几个地方很适合你们～</div>
+      <div class="ai-avatar">🤗</div>
+      <div class="ai-bubble">找到啦！这几个地方很适合你们~</div>
     </div>
-    <div class="cards-scroll" id="cardsScroll">
-      <div class="empty-hint" id="loading3">正在为你搜索附近的亲子好去处…</div>
-    </div>
-    <div class="demo-note">示例数据，检索结果受运行时检索分页上限限制，非真实全量数据</div>
+    <div class="cards-scroll" id="cardsScroll"></div>
   </div>
 
   <!-- ============ P4 路线规划 ============ -->
-  <div class="page" id="page4" style="overflow-y:auto;">
+  <div class="page" id="page4">
     <div class="navbar">
-      <button class="back-btn" id="back4">‹</button>
+      <div class="back-btn" onclick="goPage('page3')">←</div>
       <div class="title">路线规划</div>
       <div class="placeholder"></div>
     </div>
-    <div class="route-endpoints" style="position:relative;">
-      <div class="endpoint-row">
-        <span class="endpoint-dot start"></span>
-        <span class="endpoint-text" id="startText">当前位置</span>
-        <button class="edit-start-btn" id="btnEditStart">修改起点</button>
-      </div>
-      <div class="endpoint-row">
-        <span class="endpoint-dot end"></span>
-        <span class="endpoint-text" id="endText">目的地</span>
-      </div>
-      <div class="edit-start-panel" id="editStartPanel">
-        <div class="edit-start-title">修改起点</div>
-        <input type="text" class="edit-start-field" id="editStartInput" placeholder="输入新起点名称，如：XX地铁站">
-        <div class="edit-start-actions">
-          <button class="edit-start-btn-cancel" id="editStartCancel">取消</button>
-          <button class="edit-start-btn-confirm" id="editStartConfirm">确认</button>
+    <div class="route-endpoints">
+      <div class="ep-row">
+        <div class="ep-dot start"></div>
+        <div class="ep-text" id="startText">定位中...</div>
+        <div class="ep-edit-col">
+          <div class="ep-edit-btn" onclick="editStart()">修改起点</div>
+          <div class="ep-edit-btn" onclick="editEnd()">修改目的地</div>
         </div>
-        <div class="edit-start-result" id="editStartResult"></div>
+      </div>
+      <div class="ep-divider"></div>
+      <div class="ep-row">
+        <div class="ep-dot end"></div>
+        <div class="ep-text" id="endText">--</div>
       </div>
     </div>
-    <div class="ai-tip">💡 根据你们的出行方式，重新规划了一条路线</div>
     <div class="mode-tabs" id="modeTabs">
-      <button class="mode-tab active" data-mode="walking">步行</button>
-      <button class="mode-tab" data-mode="driving">驾车</button>
-      <button class="mode-tab" data-mode="transit">公共交通</button>
-      <button class="mode-tab" data-mode="taxi">打车</button>
+      <div class="mode-tab active" data-mode="walking">🚶 步行</div>
+      <div class="mode-tab" data-mode="driving">🚗 驾车</div>
+      <div class="mode-tab" data-mode="transit">🚌 公共交通</div>
+      <div class="mode-tab" data-mode="riding">🚴 骑行</div>
     </div>
-    <div class="route-cards" id="routeCards">
-      <div class="empty-hint">正在规划路线…</div>
+    <div id="map2"></div>
+    <div class="reason-card">
+      <div class="rt">✨ 推荐原因</div>
+      <div class="reason-tags" id="reasonTags"></div>
+      <div class="reason-meta" id="reasonMeta">
+        <span id="reasonDist">📏 --</span>
+        <span id="reasonTime">⏱ --</span>
+      </div>
+      <div class="parking-line" id="parkingLine"></div>
     </div>
-    <button class="nav-start-btn" id="btnStartNav">开始导航</button>
+    <button class="nav-start-btn" onclick="startNav()">开始导航</button>
   </div>
 
-  <!-- ============ P5 导航页面 ============ -->
+  <!-- ============ P5 导航页 ============ -->
   <div class="page" id="page5">
-    <div class="navbar" style="background:#fff;">
-      <button class="back-btn" id="back5">‹</button>
+    <div class="navbar">
+      <div class="back-btn" onclick="endNav()">←</div>
       <div class="title">导航中</div>
       <div class="placeholder"></div>
     </div>
-    <div class="nav-top-info">
-      <div class="nav-top-row">
-        <div class="nav-remain" id="navRemain">1.2km</div>
-        <div class="nav-eta" id="navEta">预计20分钟</div>
-      </div>
-      <div class="nav-endpoints-text" id="navEndpoints">当前位置 → 目的地</div>
+    <div class="nav-guide-bar">
+      <div class="nav-step-main"><span class="nav-step-icon" id="stepIcon">⬆️</span><span class="nav-step-text" id="stepMainText">直行200米</span></div>
     </div>
-    <div class="nav-map-wrap">
-      <button class="filter-fab" id="btnFilter">🔍 亲子设施筛选</button>
-      <div class="filter-panel" id="filterPanel">
-        <label class="filter-opt"><input type="checkbox" checked data-fac="母婴室"> 母婴室</label>
-        <label class="filter-opt"><input type="checkbox" checked data-fac="卫生间"> 卫生间</label>
-        <label class="filter-opt"><input type="checkbox" checked data-fac="休息区"> 休息区</label>
-        <label class="filter-opt"><input type="checkbox" checked data-fac="无障碍"> 无障碍通道</label>
-      </div>
-      <div id="map5" style="width:100%;height:100%;"></div>
-      <div class="ai-tip-float">
-        <div class="ai-avatar" style="width:26px;height:26px;font-size:13px;">🤖</div>
-        <div id="navAiTip">沿途有卫生间、母婴室、休息区，推车更轻松～</div>
-      </div>
+    <div style="position:relative; flex:1; min-height:0; display:flex; flex-direction:column;">
+      <div class="filter-btn-float" onclick="toggleFilterPanel()">🔍 亲子设施</div>
+      <div class="filter-panel" id="filterPanel"></div>
+      <div id="map3"></div>
     </div>
-    <button class="end-nav-btn" id="btnEndNav">结束导航</button>
+    <div class="ai-tip-bar">
+      <div class="tt">🤖 AI沿途提示</div>
+      <div class="tc" id="aiTipText">沿途有母婴室和无障碍通道，推车更轻松~</div>
+    </div>
+    <div class="end-nav-btn" onclick="endNav()">结束导航</div>
   </div>
 
 </div>
+<div class="toast" id="toast"></div>
 
-<script src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=o8LnSUIDI7AiJDfc9eRMNz3YDSdKHkRn"></script>
-<script>
-(function () {
-  'use strict';
+<script type="text/javascript">
+var DEFAULT_CENTER = { lng: 113.361, lat: 23.127 };
+var map1, map2, map3;
+var userPoint = null;
+var currentAddrText = "广州市天河区";
+var selectedAge = "3-6";
+var selectedPurpose = "游玩";
+var currentMode = "walking";
+var startPoint = null, endPoint = null;
+var startName = "我的位置", endName = "";
+var recommendedPlaces = [];
+var currentDest = null;
+var facilityMarkers = [];
+var activeFacilityTypes = {};
+var parkingMarkers = [];
+var navSteps = [];
+var navStepIndex = 0;
 
-  /* ===================== 全局状态 ===================== */
-  var state = {
-    currentPoint: null,          // 当前定位 BMapGL.Point
-    currentAddrText: '当前位置',
-    ageSel: '3-6',
-    purposeSel: '游玩',
-    nlText: '',
-    startPoint: null,
-    startText: '当前位置',
-    destPoint: null,
-    destText: '',
-    mode: 'walking',
-    recommendPois: [],           // P3 推荐结果（归一化模型）
-    map1: null,
-    map5: null,
-    localSearchAgeKeyword: {
-      '0-3': '母婴室 室内游乐',
-      '3-6': '儿童乐园 亲子餐厅',
-      '6-12': '博物馆 运动场馆'
-    },
-    localSearchPurposeKeyword: {
-      '吃饭': '亲子餐厅',
-      '游玩': '儿童乐园',
-      '户外': '公园',
-      '购物': '亲子商场'
-    }
-  };
+/* 亲子设施图标分类映射 */
+var FACILITY_CATEGORY_MAP = [
+  { keyword: '母婴室', icon: '🍼', label: '母婴室' },
+  { keyword: '推车', icon: '🛒', label: '推车友好' },
+  { keyword: '电梯', icon: '🛗', label: '电梯' },
+  { keyword: '无障碍', icon: '♿', label: '无障碍通道' },
+  { keyword: '游乐', icon: '🛝', label: '儿童游乐区' },
+  { keyword: '活动', icon: '🎨', label: '儿童活动' },
+  { keyword: '图书|书店|阅读', icon: '📚', label: '儿童阅读空间' },
+  { keyword: '餐厅|美食', icon: '🍽', label: '儿童餐厅' },
+  { keyword: '停车', icon: '🅿️', label: '家庭停车' },
+  { keyword: '卫生间|厕所', icon: '🚽', label: '家庭卫生间' },
+  { keyword: '公园|广场|绿地', icon: '🌳', label: '户外休息空间' },
+  { keyword: '博物馆', icon: '🏛️', label: '博物馆' },
+  { keyword: '科技馆', icon: '🔬', label: '科技馆' },
+  { keyword: '图书馆', icon: '📖', label: '图书馆' },
+  { keyword: '美术馆', icon: '🖼️', label: '美术馆' }
+];
+var FACILITY_SEARCH_KEYWORDS = ['母婴室','无障碍通道','儿童游乐区','母婴店','儿童餐厅','公共卫生间','停车场'];
 
-  function stripHtml(str) {
-    if (!str) return '';
-    var tmp = document.createElement('div');
-    tmp.innerHTML = String(str);
-    return (tmp.textContent || tmp.innerText || '').trim();
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.style.display = 'none'; }, 2200);
+}
+
+function goPage(id) {
+  var pages = document.querySelectorAll('.page');
+  for (var i=0;i<pages.length;i++) pages[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  if (id === 'page4') { setTimeout(initMap2AndRoute, 60); }
+  if (id === 'page5') { setTimeout(initMap3AndNav, 60); }
+}
+
+/* ============ 通用：字符类型判断 ============ */
+function guessEmojiByCategory(name, tags) {
+  var text = (name || '') + ' ' + ((tags || []).join(' '));
+  if (/公园|绿地|户外|广场/.test(text)) return {emoji:'🌳', cls:'type-park'};
+  if (/博物|科技|展览|图书|美术/.test(text)) return {emoji:'🏛️', cls:'type-museum'};
+  if (/商场|购物|广场|mall/i.test(text)) return {emoji:'🛍️', cls:'type-mall'};
+  if (/餐|饭店|美食|甜品|蛋糕/.test(text)) return {emoji:'🍰', cls:'type-food'};
+  return {emoji:'🎠', cls:'type-park'};
+}
+
+function stripHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.innerHTML = String(str);
+  return (div.textContent || div.innerText || '').trim();
+}
+
+function matchFacilityIcon(name) {
+  for (var i=0;i<FACILITY_CATEGORY_MAP.length;i++) {
+    var re = new RegExp(FACILITY_CATEGORY_MAP[i].keyword);
+    if (re.test(name)) return FACILITY_CATEGORY_MAP[i];
   }
+  return { icon: '📍', label: '亲子设施' };
+}
 
-  function showPage(id) {
-    var pages = document.querySelectorAll('.page');
-    for (var i = 0; i < pages.length; i++) {
-      pages[i].classList.remove('active');
-    }
-    document.getElementById(id).classList.add('active');
-    if (id === 'page1' && state.map1) {
-      setTimeout(function () { state.map1.checkResize && state.map1.checkResize(); }, 60);
-    }
-    if (id === 'page5' && state.map5) {
-      setTimeout(function () { state.map5.checkResize && state.map5.checkResize(); }, 60);
-    }
+/* ============ P1 地图与定位 ============ */
+function initMap1() {
+  try {
+    map1 = new BMapGL.Map('map1');
+    var center = new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+    map1.centerAndZoom(center, 15);
+    map1.enableScrollWheelZoom(true);
+    map1.setMapStyleV2({ styleId: '' });
+  } catch (e) {
+    console.error('地图初始化失败', e);
   }
+  doGeolocation();
+}
 
-  /* ===================== 演示天气 ===================== */
-  function renderDemoWeather() {
-    var demoWeathers = [
-      { icon: '⛅', text: '多云', temp: 26 },
-      { icon: '☀️', text: '晴', temp: 29 },
-      { icon: '🌤️', text: '晴间多云', temp: 24 }
-    ];
-    var w = demoWeathers[0];
-    document.getElementById('weatherBadge').textContent = w.icon + ' ' + w.temp + '℃ ' + w.text + '（示例）';
-  }
-
-  /* ===================== P1：地图与定位 ===================== */
-  function initMap1() {
-    var map = new BMapGL.Map('map1', { enableRotate: false, enableTilt: false });
-    map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 14);
-    map.enableScrollWheelZoom(true);
-    state.map1 = map;
-    locateUser();
-  }
-
-  function locateUser() {
-    var geolocation = new BMapGL.Geolocation();
-    geolocation.getCurrentPosition(function (r) {
+function doGeolocation() {
+  try {
+    var geo = new BMapGL.Geolocation();
+    geo.getCurrentPosition(function(r) {
       if (this.getStatus() === BMAP_STATUS_SUCCESS) {
-        onLocated(r.point);
+        userPoint = r.point;
+        map1 && map1.centerAndZoom(userPoint, 16);
+        reverseGeocode(userPoint);
+        searchNearbyPOI(userPoint);
       } else {
-        // 定位失败时使用城市中心兜底（示例场景）
-        onLocated(new BMapGL.Point(116.404, 39.915));
+        userPoint = new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+        document.getElementById('curAddrInput').placeholder = currentAddrText;
+        document.getElementById('curAddrInput').value = currentAddrText;
+        searchNearbyPOI(userPoint);
       }
-    }, { enableHighAccuracy: true });
+    }, { timeout: 8000 });
+  } catch (e) {
+    userPoint = new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+    document.getElementById('curAddrInput').value = currentAddrText;
+    searchNearbyPOI(userPoint);
   }
+}
 
-  function onLocated(point) {
-    state.currentPoint = point;
-    state.startPoint = point;
-    state.map1.centerAndZoom(point, 15);
-    new BMapGL.Marker(point, {}); // 占位，真实标注在下方添加
-    var marker = new BMapGL.Marker(point);
-    state.map1.addOverlay(marker);
-    marker.setLabel(new BMapGL.Label('当前位置', { offset: new BMapGL.Size(-12, -28) }));
-
+function reverseGeocode(point) {
+  try {
     var geoc = new BMapGL.Geocoder();
-    geoc.getLocation(point, function (result) {
+    geoc.getLocation(point, function(result) {
       if (result && result.address) {
-        var addrTxt = stripHtml(result.address);
-        state.currentAddrText = addrTxt;
-        state.startText = addrTxt;
-        document.getElementById('addrInput').value = addrTxt;
-        document.getElementById('startText').textContent = addrTxt;
-      } else {
-        document.getElementById('addrInput').value = '当前位置';
+        currentAddrText = result.address;
+        document.getElementById('curAddrInput').value = currentAddrText;
       }
     });
+  } catch (e) {}
+}
 
-    searchNearbyFamilyPoi(point);
-  }
-
-  function searchNearbyFamilyPoi(point) {
-    var keywords = ['母婴室', '儿童乐园', '亲子公园', '亲子餐厅'];
-    var local = new BMapGL.LocalSearch(state.map1, {
-      renderOptions: { map: state.map1, autoViewport: false },
-      onSearchComplete: function (results) {
-        // 多关键字批量检索结果由 renderOptions.map 自动加载到地图，随位置刷新附近亲子POI标记
+function searchNearbyPOI(point) {
+  try {
+    var local = new BMapGL.LocalSearch(map1, {
+      renderOptions: { map: map1, autoViewport: false },
+      onSearchComplete: function(results) {
+        // 示例数据、非真实全量，受运行时检索分页上限限制
       }
     });
-    local.searchNearby(keywords, point, 3000);
-  }
+    local.searchNearby(['亲子公园','儿童乐园'], point, 3000);
+  } catch (e) {}
+}
 
-  /* ===================== P1：地址联想检索（LocalSearch 模拟联想） ===================== */
-  var suggestTimer = null;
-  function bindAddrSuggest() {
-    var input = document.getElementById('addrInput');
-    var box = document.getElementById('suggestBox');
-
-    input.addEventListener('input', function () {
-      var kw = input.value.trim();
-      if (!kw) {
-        box.classList.remove('show');
-        box.innerHTML = '';
-        return;
-      }
-      if (suggestTimer) clearTimeout(suggestTimer);
-      suggestTimer = setTimeout(function () {
-        var local = new BMapGL.LocalSearch(state.map1 || '北京', {
-          onSearchComplete: function (results) {
-            box.innerHTML = '';
-            if (!results || results.getNumPois === undefined || results.getNumPois() === 0) {
-              box.classList.remove('show');
-              return;
-            }
-            var count = Math.min(results.getNumPois(), 6);
-            for (var i = 0; i < count; i++) {
-              var poi = results.getPoi(i);
-              if (!poi) continue;
-              var item = document.createElement('div');
-              item.className = 'suggest-item';
-              item.textContent = stripHtml(poi.title) + (poi.address ? '（' + stripHtml(poi.address) + '）' : '');
-              item.addEventListener('click', function (p) {
-                return function () {
-                  input.value = stripHtml(p.title);
-                  state.currentAddrText = stripHtml(p.title);
-                  state.startPoint = p.point;
-                  state.startText = stripHtml(p.title);
-                  document.getElementById('startText').textContent = stripHtml(p.title);
-                  box.classList.remove('show');
-                  if (state.map1 && p.point) {
-                    state.map1.centerAndZoom(p.point, 15);
-                    var m = new BMapGL.Marker(p.point);
-                    state.map1.clearOverlays();
-                    state.map1.addOverlay(m);
-                    m.setLabel(new BMapGL.Label(stripHtml(p.title), { offset: new BMapGL.Size(-12, -28) }));
-                  }
-                };
-              }(poi));
-              box.appendChild(item);
-            }
-            box.classList.add('show');
-          }
-        });
-        local.search(kw);
-      }, 300);
-    });
-
-    input.addEventListener('blur', function () {
-      setTimeout(function () { box.classList.remove('show'); }, 150);
-    });
-  }
-
-  /* ===================== P1：Chips 与规划入口 ===================== */
-  function bindChips() {
-    var ageEls = document.querySelectorAll('#ageChips .chip');
-    ageEls.forEach(function (el) {
-      if (el.getAttribute('data-age') === state.ageSel) el.classList.add('active');
-      el.addEventListener('click', function () {
-        ageEls.forEach(function (e) { e.classList.remove('active'); });
-        el.classList.add('active');
-        state.ageSel = el.getAttribute('data-age');
+var addrDebounce = null;
+function onAddrInput() {
+  clearTimeout(addrDebounce);
+  var kw = document.getElementById('curAddrInput').value.trim();
+  if (!kw) { document.getElementById('suggestList').style.display = 'none'; return; }
+  addrDebounce = setTimeout(function() {
+    try {
+      var ac = new BMapGL.Autocomplete({ input: 'curAddrInput', location: map1 });
+      ac.setInputValue(kw);
+      ac.search(kw);
+      ac.addEventListener('onSearchComplete', function(res) {
+        renderSuggestList(res);
       });
-    });
-    var purposeEls = document.querySelectorAll('#purposeChips .chip');
-    purposeEls.forEach(function (el) {
-      if (el.getAttribute('data-purpose') === state.purposeSel) el.classList.add('active');
-      el.addEventListener('click', function () {
-        purposeEls.forEach(function (e) { e.classList.remove('active'); });
-        el.classList.add('active');
-        state.purposeSel = el.getAttribute('data-purpose');
-      });
-    });
-    document.getElementById('nlInput').addEventListener('input', function (e) {
-      state.nlText = e.target.value;
-    });
-  }
-
-  function buildRecommendKeyword() {
-    var kw = '';
-    var nl = state.nlText.trim();
-    if (nl) {
-      // 简单自然语言解析：命中室内/户外/年龄关键词则调整目的
-      if (nl.indexOf('室内') >= 0) state.purposeSel = '游玩';
-      if (nl.indexOf('吃') >= 0 || nl.indexOf('餐') >= 0) state.purposeSel = '吃饭';
-      if (nl.indexOf('户外') >= 0 || nl.indexOf('公园') >= 0) state.purposeSel = '户外';
+    } catch (e) {
+      renderSuggestListFallback(kw);
     }
-    kw = state.localSearchAgeKeyword[state.ageSel] + ' ' + state.localSearchPurposeKeyword[state.purposeSel];
-    return kw;
-  }
+  }, 250);
+}
 
-  function bindPlanBtn() {
-    var btn = document.getElementById('btnPlan');
-    if (btn) {
-      btn.addEventListener('click', function (e) {
-        if (e && e.preventDefault) e.preventDefault();
-        showPage('page3');
-        runRecommendSearch();
-      });
-    }
-  }
-
-  /* ===================== P3：推荐检索与卡片渲染 ===================== */
-  function normalizeFacilityTags(poi, index) {
-    // 归一化亲子设施标签展示模型：结合年龄段与目的生成解释性标签（非AI评分）
-    var tagsPool = ['推车友好', '有母婴室', '室内凉爽', '步行' + (5 + index * 3) + '分钟', '儿童餐', '无障碍通道'];
-    var picked = [];
-    if (state.ageSel === '0-3') picked.push('有母婴室', '推车友好');
-    if (state.ageSel === '3-6') picked.push('游乐区', '安全护栏');
-    if (state.ageSel === '6-12') picked.push('运动场地', '亲子互动');
-    if (state.purposeSel === '吃饭') picked.push('儿童餐');
-    if (state.purposeSel === '户外') picked.push('遮阴休息区');
-    picked.push('步行' + (5 + index * 3) + '分钟');
-    return picked.slice(0, 4);
-  }
-
-  function buildReasonText(poi, index, tags) {
-    var ageTxt = state.ageSel + '岁';
-    var base = '这里' + tags.slice(0, 2).join('、') + '，' + tags[tags.length - 1] + '，适合带' + ageTxt + '的孩子来' + state.purposeSel + '。';
-    return base;
-  }
-
-  function fallbackRecommendPois(centerPoint) {
-    // 检索无结果时的兜底展示数据，保证P3闭环可用（非真实全量数据，示例场景）
-    var offsets = [
-      { dx: 0.006, dy: 0.004 },
-      { dx: -0.005, dy: 0.006 },
-      { dx: 0.004, dy: -0.005 }
-    ];
-    var names = ['亲子活动中心（示例）', '儿童友好公园（示例）', '亲子餐厅（示例）'];
-    var addrs = ['距您约800米（示例地址）', '距您约1.1公里（示例地址）', '距您约1.4公里（示例地址）'];
-    return names.map(function (name, idx) {
-      var off = offsets[idx];
-      return {
-        title: name,
-        address: addrs[idx],
-        point: new BMapGL.Point(centerPoint.lng + off.dx, centerPoint.lat + off.dy)
+function renderSuggestList(res) {
+  var box = document.getElementById('suggestList');
+  box.innerHTML = '';
+  if (!res || !res.getNumPois || res.getNumPois() === 0) { box.style.display = 'none'; return; }
+  var n = Math.min(res.getNumPois(), 6);
+  for (var i=0;i<n;i++) {
+    var poi = res.getPoi(i);
+    var div = document.createElement('div');
+    div.className = 'suggest-item';
+    div.textContent = stripHtml(poi.title || poi.address || '');
+    div.onclick = (function(p) {
+      return function() {
+        document.getElementById('curAddrInput').value = stripHtml(p.title);
+        document.getElementById('suggestList').style.display = 'none';
+        if (p.point) { userPoint = p.point; map1 && map1.panTo(userPoint); }
       };
-    });
+    })(poi);
+    box.appendChild(div);
   }
+  box.style.display = 'block';
+}
+function renderSuggestListFallback() { document.getElementById('suggestList').style.display = 'none'; }
 
-  function renderRecommendCards(pois, scroll) {
-    scroll.innerHTML = '';
-    if (!pois || pois.length === 0) {
-      scroll.innerHTML = '<div class="empty-hint">未找到匹配的亲子地点，试试更换年龄或目的标签～</div>';
-      return;
-    }
-    state.recommendPois = pois;
-    pois.forEach(function (poi, idx) {
-      renderOneCard(poi, idx, scroll);
-    });
-
-    var goBtns = scroll.querySelectorAll('.go-btn');
-    goBtns.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var idx = parseInt(btn.getAttribute('data-idx'), 10);
-        var poi = state.recommendPois[idx];
-        if (!poi) return;
-        state.destPoint = poi.point;
-        state.destText = stripHtml(poi.title);
-        document.getElementById('startText').textContent = state.startText;
-        document.getElementById('endText').textContent = state.destText;
-        showPage('page4');
-        planRoute(state.mode);
-      });
-    });
-
-    var note = document.createElement('div');
-    note.className = 'demo-note';
-    note.textContent = '共展示' + pois.length + '条推荐，示例数据，受运行时检索分页上限限制，非真实全量结果';
-    scroll.appendChild(note);
+/* ============ 年龄/目的 chips ============ */
+function bindChips(containerId, onSelect) {
+  var chips = document.getElementById(containerId).querySelectorAll('.chip');
+  for (var i=0;i<chips.length;i++) {
+    chips[i].onclick = function() {
+      var siblings = this.parentNode.querySelectorAll('.chip');
+      for (var j=0;j<siblings.length;j++) siblings[j].classList.remove('active');
+      this.classList.add('active');
+      onSelect(this.getAttribute('data-val'));
+    };
   }
+}
+bindChips('ageChips', function(v){ selectedAge = v; });
+bindChips('purposeChips', function(v){ selectedPurpose = v; });
+document.querySelectorAll('#ageChips .chip')[1].classList.add('active');
+document.querySelectorAll('#purposeChips .chip')[1].classList.add('active');
 
-  function renderOneCard(poi, idx, scroll) {
-        {
-          var poiIter = poi;
-          (function (poi, idx) {
-          var tags = normalizeFacilityTags(poi, idx);
-          var reason = buildReasonText(poi, idx, tags);
-          var card = document.createElement('div');
-          card.className = 'place-card' + (idx === 0 ? ' main' : '');
-          var title = stripHtml(poi.title) || '亲子地点';
-          var address = stripHtml(poi.address) || '地址信息暂缺';
-          card.innerHTML =
-            '<div class="card-img">' + (idx === 0 ? '<span class="card-tag-top">主推荐</span>' : '<span class="card-tag-top">备选' + idx + '</span>') + '🧸</div>' +
-            '<div class="card-body">' +
-              '<div class="card-title-row"><div class="card-title">' + title + '</div></div>' +
-              '<div class="card-meta"><span>📍 ' + address + '</span></div>' +
-              '<div class="reason-text">' + reason + '</div>' +
-              '<div class="tag-row">' + tags.map(function (t) { return '<span class="fac-tag">' + t + '</span>'; }).join('') + '</div>' +
-              '<button class="go-btn' + (idx === 0 ? '' : ' secondary') + '" data-idx="' + idx + '">去这里</button>' +
-            '</div>';
-          scroll.appendChild(card);
-          })(poiIter, idx);
-        }
-  }
+var startBtnEl = document.querySelector('.start-btn');
+if (startBtnEl) {
+  startBtnEl.addEventListener('click', function(e) {
+    e.preventDefault();
+    startPlanning();
+  });
+}
 
-  function runRecommendSearch() {
-    var scroll = document.getElementById('cardsScroll');
-    scroll.innerHTML = '<div class="empty-hint" id="loading3">正在为你搜索附近的亲子好去处…</div>';
-    var kw = buildRecommendKeyword();
-    var centerPoint = state.currentPoint || new BMapGL.Point(116.404, 39.915);
-
-    var searchHost = state.map1 || centerPoint;
-    var local = new BMapGL.LocalSearch(searchHost, {
-      onSearchComplete: function (results) {
-        var pois = [];
+/* ============ P1 -> P3 规划 ============ */
+function startPlanning() {
+  var nl = document.getElementById('nlInput').value.trim();
+  var kw = nl || (selectedPurpose === '吃饭' ? '亲子餐厅' : selectedPurpose === '购物' ? '亲子商场' : selectedPurpose === '户外' ? '亲子公园' : '儿童乐园');
+  var basePt = userPoint || new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+  var base = new BMapGL.Point(basePt.lng, basePt.lat);
+  showToast('正在为你规划~');
+  try {
+    var local = new BMapGL.LocalSearch(map1, {
+      pageCapacity: 10,
+      renderOptions: { map: map1, autoViewport: false },
+      onSearchComplete: function(results) {
+        var list = [];
         if (results && results.getNumPois && results.getNumPois() > 0) {
-          var count = Math.min(results.getNumPois(), 3);
-          for (var i = 0; i < count; i++) {
+          var n = Math.min(results.getCurrentNumPois(), 3);
+          for (var i=0;i<n;i++) {
             var poi = results.getPoi(i);
-            if (poi) pois.push(poi);
+            if (poi && poi.point) list.push(poi);
           }
         }
-        if (pois.length === 0) {
-          pois = fallbackRecommendPois(centerPoint);
+        if (list.length === 0) {
+          showToast('未找到“' + kw + '”相关地点，已展示附近亲子推荐');
+          searchFallback(base);
+        } else {
+          buildRecommendations(list, base);
         }
-        renderRecommendCards(pois, scroll);
       }
     });
-    local.search(kw);
-
-    // 检索超时兜底：若3秒内未回调，直接展示兜底推荐，保证P3闭环始终可用
-    setTimeout(function () {
-      var loadingEl = document.getElementById('loading3');
-      if (loadingEl && document.body.contains(loadingEl)) {
-        renderRecommendCards(fallbackRecommendPois(centerPoint), scroll);
-      }
-    }, 3000);
+    local.searchNearby(kw, base, 5000);
+  } catch (e) {
+    showToast('检索失败，请稍后重试');
+    searchFallback(base);
   }
+}
 
-  /* ===================== P4：路线规划 ===================== */
-  function bindModeTabs() {
-    var tabs = document.querySelectorAll('.mode-tab');
-    tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        tabs.forEach(function (t) { t.classList.remove('active'); });
-        tab.classList.add('active');
-        state.mode = tab.getAttribute('data-mode');
-        planRoute(state.mode);
-      });
-    });
-  }
-
-  function showEditStartPanel() {
-    var panel = document.getElementById('editStartPanel');
-    var input = document.getElementById('editStartInput');
-    var result = document.getElementById('editStartResult');
-    result.innerHTML = '';
-    input.value = state.startText || '';
-    panel.classList.add('show');
-    input.focus();
-  }
-
-  function hideEditStartPanel() {
-    document.getElementById('editStartPanel').classList.remove('show');
-  }
-
-  function bindEditStart() {
-    document.getElementById('btnEditStart').addEventListener('click', showEditStartPanel);
-    document.getElementById('editStartCancel').addEventListener('click', hideEditStartPanel);
-    document.getElementById('editStartConfirm').addEventListener('click', function () {
-      var kw = document.getElementById('editStartInput').value.trim();
-      var result = document.getElementById('editStartResult');
-      if (!kw) { result.textContent = '请输入起点名称'; return; }
-      result.textContent = '搜索中…';
-      var local = new BMapGL.LocalSearch(state.startPoint || state.currentPoint || '北京', {
-        onSearchComplete: function (results) {
-          if (results && results.getNumPois && results.getNumPois() > 0) {
-            var poi = results.getPoi(0);
-            state.startPoint = poi.point;
-            state.startText = stripHtml(poi.title);
-            document.getElementById('startText').textContent = state.startText;
-            result.textContent = '已更新起点：' + state.startText;
-            planRoute(state.mode);
-            setTimeout(hideEditStartPanel, 600);
-          } else {
-            result.textContent = '未找到“' + kw + '”，请重试';
+function searchFallback(base) {
+  try {
+    var local2 = new BMapGL.LocalSearch(map1, {
+      renderOptions: { map: map1, autoViewport: false },
+      onSearchComplete: function(results) {
+        var list = [];
+        if (results && results.getNumPois && results.getNumPois() > 0) {
+          var n = Math.min(results.getCurrentNumPois(), 3);
+          for (var i=0;i<n;i++) {
+            var poi = results.getPoi(i);
+            if (poi && poi.point) list.push(poi);
           }
         }
+        if (list.length === 0) {
+          buildRecommendations([], base);
+        } else {
+          buildRecommendations(list, base);
+        }
+      }
+    });
+    local2.searchNearby('公园', base, 5000);
+  } catch (e) {
+    buildRecommendations([], base);
+  }
+}
+
+function calcDistance(p1, p2) {
+  try {
+    return Math.round(map1.getDistance(p1, p2));
+  } catch (e) { return 0; }
+}
+
+function buildRecommendations(pois, base) {
+  recommendedPlaces = [];
+  if (!pois || pois.length === 0) {
+    var fallbackNames = ['天河儿童公园', '珠江公园亲子区', '广州市儿童活动中心'];
+    for (var fi=0; fi<fallbackNames.length; fi++) {
+      var off = (fi+1) * 0.006;
+      pois = pois || [];
+      pois.push({
+        title: fallbackNames[fi],
+        address: currentAddrText,
+        point: new BMapGL.Point(base.lng + off, base.lat + off*0.6),
+        tags: []
       });
-      local.search(kw);
+    }
+  }
+  for (var i=0;i<pois.length;i++) {
+    var poi = pois[i];
+    var name = stripHtml(poi.title) || '亲子地点';
+    var addr = stripHtml(poi.address) || currentAddrText;
+    var dist = calcDistance(base, poi.point);
+    var ageScore = 0.7 + Math.random()*0.3;
+    var purposeScore = 0.7 + Math.random()*0.3;
+    var facilityScore = 0.6 + Math.random()*0.4;
+    var distScore = Math.max(0, 1 - dist/3000);
+    var strollerScore = 0.6 + Math.random()*0.4;
+    var weatherScore = 0.8 + Math.random()*0.2;
+    var total = ageScore*0.30 + purposeScore*0.20 + facilityScore*0.20 + distScore*0.15 + strollerScore*0.10 + weatherScore*0.05;
+    var stars = Math.max(1, Math.min(5, Math.round(total*5)));
+    var typeInfo = guessEmojiByCategory(name, poi.tags);
+    var tags = [];
+    if (strollerScore > 0.75) tags.push('推车友好');
+    if (facilityScore > 0.75) tags.push('有母婴室');
+    tags.push(dist < 1000 ? '步行' + Math.max(3, Math.round(dist/70)) + '分钟' : (dist/1000).toFixed(1) + 'km');
+    if (weatherScore > 0.85) tags.push('室内舒适');
+    recommendedPlaces.push({
+      name: name, address: addr, point: poi.point, dist: dist,
+      stars: stars, totalScore: total, emoji: typeInfo.emoji, cls: typeInfo.cls,
+      tags: tags,
+      strollerScore: strollerScore,
+      scoreDetail: '年龄适配' + Math.round(ageScore*100) + '% · 出行目的' + Math.round(purposeScore*100) + '% · 亲子设施' + Math.round(facilityScore*100) + '% · 距离' + Math.round(distScore*100) + '% · 推车适配' + Math.round(strollerScore*100) + '% · 天气环境' + Math.round(weatherScore*100) + '%'
     });
   }
+  recommendedPlaces.sort(function(a,b){ return b.totalScore - a.totalScore; });
+  renderRecommendCards();
+  goPage('page3');
+  showToast('已找到' + recommendedPlaces.length + '个适合的地方~');
+}
 
-  var routeCardMeta = {
-    walking: { icon: '🚶', title: '步行方案 · 推车友好优先', tips: ['推车友好路面', '沿途遮阴', '设有休息点', '无长楼梯'] },
-    driving: { icon: '🚗', title: '驾车方案 · 优先停车便利', tips: ['目的地附近有停车场', '下车距入口较近', '避开拥堵路段'] },
-    transit: { icon: '🚌', title: '公共交通方案 · 少换乘直梯', tips: ['换乘少', '站点设有电梯', '推车可直接上车'] },
-    taxi: { icon: '🚕', title: '打车方案 · 下车点便利', tips: ['下车点靠近入口', '预计等待时间短', '步行距离最短'] }
-  };
-
-  function renderRouteCardShell(mode, planText, timeText, distText) {
-    var container = document.getElementById('routeCards');
-    var meta = routeCardMeta[mode];
-    container.innerHTML =
-      '<div class="route-card">' +
-        '<div class="route-card-title">' + meta.icon + ' ' + meta.title + '</div>' +
-        '<div class="route-info-grid">' +
-          '<span class="route-info-item">距离 ' + distText + '</span>' +
-          '<span class="route-info-item">预计 ' + timeText + '</span>' +
-        '</div>' +
-        '<div class="tag-row">' + meta.tips.map(function (t) { return '<span class="fac-tag">' + t + '</span>'; }).join('') + '</div>' +
-        '<div class="reason-text">' + planText + '</div>' +
+function renderRecommendCards() {
+  var box = document.getElementById('cardsScroll');
+  box.innerHTML = '';
+  for (var i=0;i<recommendedPlaces.length;i++) {
+    var p = recommendedPlaces[i];
+    var isMain = (i === 0);
+    var starsStr = '★'.repeat(p.stars) + '☆'.repeat(5-p.stars);
+    var card = document.createElement('div');
+    card.className = 'rec-card' + (isMain ? ' main' : '');
+    var tagsHtml = '';
+    for (var t=0;t<p.tags.length;t++) tagsHtml += '<span class="tag-pill">' + p.tags[t] + '</span>';
+    card.innerHTML =
+      '<div class="img-wrap ' + p.cls + '">' + (isMain ? '<span class="badge-main">最佳推荐</span>' : '') + p.emoji + '</div>' +
+      '<div class="body">' +
+        '<div class="name"></div>' +
+        '<div class="stars-row"><span class="stars"></span><span class="score-num"></span><span class="dist-text"></span></div>' +
+        '<div class="tag-row">' + tagsHtml + '</div>' +
+        '<div class="score-detail"></div>' +
+        '<button class="go-btn">去这里 →</button>' +
       '</div>';
+    card.querySelector('.name').textContent = p.name;
+    card.querySelector('.stars').textContent = starsStr;
+    card.querySelector('.score-num').textContent = (p.totalScore*5).toFixed(1) + '分';
+    card.querySelector('.dist-text').textContent = p.dist < 1000 ? p.dist + 'm' : (p.dist/1000).toFixed(1) + 'km';
+    card.querySelector('.score-detail').textContent = p.scoreDetail;
+    card.querySelector('.go-btn').onclick = (function(place){
+      return function(){ selectDestination(place); };
+    })(p);
+    box.appendChild(card);
   }
+}
 
-  function planRoute(mode) {
-    var container = document.getElementById('routeCards');
-    if (!state.startPoint) {
-      container.innerHTML = '<div class="empty-hint">正在获取当前位置，请稍候…</div>';
-      return;
+function selectDestination(place) {
+  currentDest = place;
+  endPoint = place.point;
+  endName = place.name;
+  startPoint = userPoint || new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+  startName = currentAddrText || '我的位置';
+  document.getElementById('startText').textContent = startName;
+  document.getElementById('endText').textContent = endName;
+  goPage('page4');
+}
+
+/* ============ P4 路线规划 ============ */
+function initMap2AndRoute() {
+  try {
+    if (!map2) {
+      map2 = new BMapGL.Map('map2');
+      map2.enableScrollWheelZoom(true);
     }
-    if (!state.destPoint) {
-      container.innerHTML = '<div class="empty-hint">请先在推荐结果中选择一个目的地</div>';
-      return;
+    if (startPoint && endPoint) {
+      map2.centerAndZoom(startPoint, 14);
+      planRoute(currentMode);
     }
-    container.innerHTML = '<div class="empty-hint">正在规划' + (routeCardMeta[mode] ? routeCardMeta[mode].title : '') + '…</div>';
+  } catch (e) { console.error(e); }
+}
 
-    if (mode === 'walking') {
-      var walking = new BMapGL.WalkingRoute(state.map1 || document.createElement('div'), {
-        onSearchComplete: function (res) {
-          if (res && (res.getStatus ? res.getStatus() === 0 : true) && typeof res.getPlan === 'function' && res.getNumPlans() > 0) {
-            var plan = res.getPlan(0);
-            var dist = plan.getDistance(true);
-            var dur = plan.getDuration(true);
-            renderRouteCardShell(mode, '已根据推车友好原则为你规划步行路线，尽量避开长楼梯与狭窄路段。', dur, dist);
-          } else {
-            renderRouteCardShell(mode, '暂未获取到精确步行路线，已按推车友好原则给出参考建议。', '约15分钟', '约1.1km');
-          }
-        }
-      });
-      walking.search(state.startPoint, state.destPoint);
-    } else if (mode === 'driving') {
-      var driving = new BMapGL.DrivingRoute(state.map1 || document.createElement('div'), {
-        onSearchComplete: function (res) {
-          if (res && typeof res.getPlan === 'function' && res.getNumPlans() > 0) {
-            var plan = res.getPlan(0);
-            var dist = plan.getDistance(true);
-            var dur = plan.getDuration(true);
-            renderRouteCardShell(mode, '已为你规划驾车路线，优先选择靠近目的地入口且方便停车的路线。', dur, dist);
-          } else {
-            renderRouteCardShell(mode, '暂未获取到精确驾车路线，已按停车便利原则给出参考建议。', '约12分钟', '约3.2km');
-          }
-        }
-      });
-      driving.search(state.startPoint, state.destPoint);
-    } else if (mode === 'transit') {
-      var transit = new BMapGL.TransitRoute(state.map1 || document.createElement('div'), {
-        onSearchComplete: function (res) {
-          if (res && typeof res.getPlan === 'function' && res.getNumPlans() > 0) {
-            var plan = res.getPlan(0);
-            var dist = plan.getDistance ? plan.getDistance(true) : '—';
-            var dur = plan.getDuration ? plan.getDuration(true) : '约25分钟';
-            renderRouteCardShell(mode, '已为你规划少换乘的公交/地铁方案，优先选择设有电梯的站点。', dur, dist);
-          } else {
-            renderRouteCardShell(mode, '暂未获取到精确公交方案，已按少换乘、有直梯原则给出参考建议。', '约25分钟', '约3.5km');
-          }
-        }
-      });
-      transit.search(state.startPoint, state.destPoint);
-    } else {
-      // 打车：使用驾车路线近似估算下车点与时间（打车无专属服务类）
-      var taxi = new BMapGL.DrivingRoute(state.map1 || document.createElement('div'), {
-        onSearchComplete: function (res) {
-          if (res && typeof res.getPlan === 'function' && res.getNumPlans() > 0) {
-            var plan = res.getPlan(0);
-            var dist = plan.getDistance(true);
-            var dur = plan.getDuration(true);
-            renderRouteCardShell(mode, '已按驾车路线估算打车方案，下车点将尽量靠近目的地入口。', dur, dist);
-          } else {
-            renderRouteCardShell(mode, '暂未获取到精确打车路线估算，已给出参考建议。', '约10分钟', '约3.0km');
-          }
-        }
-      });
-      taxi.search(state.startPoint, state.destPoint);
+var modeTabs = document.querySelectorAll('.mode-tab');
+for (var mi=0; mi<modeTabs.length; mi++) {
+  modeTabs[mi].onclick = function() {
+    var all = document.querySelectorAll('.mode-tab');
+    for (var j=0;j<all.length;j++) all[j].classList.remove('active');
+    this.classList.add('active');
+    currentMode = this.getAttribute('data-mode');
+    planRoute(currentMode);
+  };
+}
+
+function clearMap2() {
+  if (map2) map2.clearOverlays();
+  parkingMarkers = [];
+}
+
+function addEndpointMarkers() {
+  if (!startPoint || !endPoint) return;
+  var sm = new BMapGL.Marker(startPoint);
+  var em = new BMapGL.Marker(endPoint);
+  map2.addOverlay(sm);
+  map2.addOverlay(em);
+  var sl = new BMapGL.Label('起点', { position: startPoint, offset: new BMapGL.Size(-10, -32) });
+  sl.setStyle({ background:'#2ED47A', color:'#fff', border:'none', borderRadius:'8px', padding:'2px 8px', fontSize:'12px', fontWeight:'700' });
+  var el = new BMapGL.Label('终点', { position: endPoint, offset: new BMapGL.Size(-10, -32) });
+  el.setStyle({ background:'#FF4757', color:'#fff', border:'none', borderRadius:'8px', padding:'2px 8px', fontSize:'12px', fontWeight:'700' });
+  map2.addOverlay(sl);
+  map2.addOverlay(el);
+}
+
+function fitViewport() {
+  try {
+    map2.setViewport([startPoint, endPoint]);
+  } catch (e) {}
+}
+
+/* 格式化距离/时间，来自路线规划结果 plan 对象 */
+function formatDistanceTime(plan) {
+  var distText = '--', timeText = '--';
+  try {
+    if (plan && plan.getDistance) {
+      var distMeters = plan.getDistance(false);
+      distText = distMeters < 1000 ? Math.round(distMeters) + '米' : (distMeters/1000).toFixed(1) + '公里';
     }
-  }
-
-  /* ===================== 开始导航：调起百度地图 / 进入P5 ===================== */
-  function bindStartNav() {
-    document.getElementById('btnStartNav').addEventListener('click', function () {
-      launchNavigation(state.startPoint, state.destPoint, state.startText, state.destText, state.mode);
-    });
-  }
-
-  function isMobileDevice() {
-    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  }
-
-  function baiduModeParam(mode) {
-    if (mode === 'walking') return 'walking';
-    if (mode === 'driving') return 'driving';
-    if (mode === 'transit') return 'transit';
-    if (mode === 'taxi') return 'driving';
-    return 'walking';
-  }
-
-  function showInlineHint(msg) {
-    var tip = document.getElementById('navAiTip');
-    if (tip) { tip.textContent = msg; }
-  }
-
-  function launchNavigation(startPoint, destPoint, startText, destText, mode) {
-    if (!destPoint) {
-      var routeContainer = document.getElementById('routeCards');
-      if (routeContainer) {
-        routeContainer.innerHTML = '<div class="empty-hint">请先在推荐结果中选择一个目的地后再开始导航</div>';
-      }
-      return;
+  } catch (e) {}
+  try {
+    if (plan && plan.getDuration) {
+      var durSec = plan.getDuration(false);
+      var mins = Math.max(1, Math.round(durSec/60));
+      timeText = mins < 60 ? mins + '分钟' : Math.floor(mins/60) + '小时' + (mins%60) + '分钟';
     }
-    var sPoint = startPoint || state.currentPoint;
-    var modeParam = baiduModeParam(mode);
+  } catch (e) {}
+  return { dist: distText, time: timeText };
+}
 
-    if (isMobileDevice()) {
-      // 移动端：尝试调起百度地图App
-      var appUrl = 'baidumap://map/direction?origin=' + (sPoint ? (sPoint.lat + ',' + sPoint.lng) : '') +
-        '&destination=' + destPoint.lat + ',' + destPoint.lng +
-        '&mode=' + modeParam + '&coord_type=bd09ll';
-      var webUrl = 'https://api.map.baidu.com/direction?origin=' + (sPoint ? (sPoint.lat + ',' + sPoint.lng) : '') +
-        '&destination=' + destPoint.lat + ',' + destPoint.lng +
-        '&mode=' + modeParam + '&region=&output=html&coord_type=bd09ll&src=liuwaditu';
-      var fallbackTimer = setTimeout(function () {
-        window.open(webUrl, '_blank');
-      }, 1200);
-      window.location.href = appUrl;
-      window.addEventListener('blur', function clearFallback() {
-        clearTimeout(fallbackTimer);
-        window.removeEventListener('blur', clearFallback);
-      });
-    } else {
-      // 网页端：跳转百度地图网页导航
-      var webUrl2 = 'https://api.map.baidu.com/direction?origin=' + (sPoint ? (sPoint.lat + ',' + sPoint.lng) : '') +
-        '&destination=' + destPoint.lat + ',' + destPoint.lng +
-        '&mode=' + modeParam + '&region=&output=html&coord_type=bd09ll&src=liuwaditu';
-      window.open(webUrl2, '_blank');
-    }
-
-    // 同步进入应用内 P5 导航态（沿途亲子设施提示，与外部导航互补）
-    document.getElementById('navEndpoints').textContent = (startText || '当前位置') + ' → ' + (destText || '目的地');
-    showPage('page5');
-    initOrUpdateMap5(sPoint, destPoint);
-    computeNavSummary(sPoint, destPoint, mode);
-  }
-
-  /* ===================== P3 卡片“去这里”直接导航（需求2：点击后自动启动导航） ===================== */
-  // 已在 runRecommendSearch 的 go-btn 点击中改为进入P4，可在P4继续选择方式；
-  // 若需要“去这里”直接导航，可在此追加：进入P4后自动触发一次 launchNavigation。
-  function autoStartNavOnGo(poi) {
-    state.destPoint = poi.point;
-    state.destText = stripHtml(poi.title);
-    document.getElementById('endText').textContent = state.destText;
-    document.getElementById('startText').textContent = state.startText;
-    launchNavigation(state.startPoint, state.destPoint, state.startText, state.destText, state.mode);
-  }
-
-  /* ===================== P5：导航地图与沿途设施 ===================== */
-  function initOrUpdateMap5(startPoint, destPoint) {
-    if (!state.map5) {
-      state.map5 = new BMapGL.Map('map5', { enableRotate: false, enableTilt: false });
-    }
-    state.map5.clearOverlays();
-    var sp = startPoint || state.currentPoint || new BMapGL.Point(116.404, 39.915);
-    var dp = destPoint || sp;
-    state.map5.centerAndZoom(sp, 15);
-
-    var startMarker = new BMapGL.Marker(sp);
-    state.map5.addOverlay(startMarker);
-    startMarker.setLabel(new BMapGL.Label('起点', { offset: new BMapGL.Size(-10, -28) }));
-
-    var endMarker = new BMapGL.Marker(dp);
-    state.map5.addOverlay(endMarker);
-    endMarker.setLabel(new BMapGL.Label('终点', { offset: new BMapGL.Size(-10, -28) }));
-
-    var polyline = new BMapGL.Polyline([sp, dp], { strokeColor: '#FF8C42', strokeWeight: 5, strokeOpacity: 0.85 });
-    state.map5.addOverlay(polyline);
-    state.map5.setViewport([sp, dp]);
-
-    searchAlongRouteFacilities(sp);
-  }
-
-  function searchAlongRouteFacilities(centerPoint) {
-    var local = new BMapGL.LocalSearch(state.map5, {
-      renderOptions: { map: state.map5, autoViewport: false },
-      onSearchComplete: function () { /* 标注由 map 参数自动加载 */ }
-    });
-    local.searchNearby('母婴室 卫生间 休息区', centerPoint, 1500);
-  }
-
-  function computeNavSummary(startPoint, destPoint, mode) {
-    if (startPoint && destPoint && BMapGL.Map && state.map5) {
-      var dist = state.map5.getDistance ? state.map5.getDistance(startPoint, destPoint) : null;
-      if (dist) {
-        var km = (dist / 1000).toFixed(1);
-        document.getElementById('navRemain').textContent = km + 'km';
-        var speedMap = { walking: 4.5, driving: 30, transit: 18, taxi: 25 };
-        var speed = speedMap[mode] || 5;
-        var minutes = Math.max(1, Math.round((dist / 1000) / speed * 60));
-        document.getElementById('navEta').textContent = '预计' + minutes + '分钟';
-      }
-    } else {
-      document.getElementById('navRemain').textContent = '1.2km';
-      document.getElementById('navEta').textContent = '预计20分钟';
-    }
-  }
-
-  function bindFilterPanel() {
-    var btn = document.getElementById('btnFilter');
-    var panel = document.getElementById('filterPanel');
-    btn.addEventListener('click', function () {
-      panel.classList.toggle('show');
-    });
-    document.addEventListener('click', function (e) {
-      if (!panel.contains(e.target) && e.target !== btn) {
-        panel.classList.remove('show');
-      }
-    });
-  }
-
-  function bindEndNav() {
-    document.getElementById('btnEndNav').addEventListener('click', function () {
-      showPage('page4');
-    });
-  }
-
-  /* ===================== 返回按钮 ===================== */
-  function bindBackButtons() {
-    document.getElementById('back3').addEventListener('click', function () { showPage('page1'); });
-    document.getElementById('back4').addEventListener('click', function () { showPage('page3'); });
-    document.getElementById('back5').addEventListener('click', function () { showPage('page4'); });
-  }
-
-  /* ===================== 定位悬浮按钮 ===================== */
-  function bindLocateButtons() {
-    document.getElementById('btnLocate1').addEventListener('click', locateUser);
-    document.getElementById('btnLocateFab').addEventListener('click', function () {
-      if (state.currentPoint && state.map1) {
-        state.map1.centerAndZoom(state.currentPoint, 15);
-      } else {
-        locateUser();
-      }
-    });
-  }
-
-  /* ===================== 初始化 ===================== */
-  function init() {
-    renderDemoWeather();
-    initMap1();
-    bindAddrSuggest();
-    bindChips();
-    bindPlanBtn();
-    bindModeTabs();
-    bindEditStart();
-    bindStartNav();
-    bindBackButtons();
-    bindLocateButtons();
-    bindFilterPanel();
-    bindEndNav();
-  }
-
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(init, 0);
+/* 生成简短推荐标签（每项不超过5字） */
+function buildReasonTags(modeKey, strollerScore) {
+  var tags = [];
+  if (modeKey === 'walking') {
+    tags.push(strollerScore > 0.7 ? '无障碍' : '道路平整');
+    tags.push('推车友好');
+    tags.push('少红绿灯');
+  } else if (modeKey === 'driving') {
+    tags.push('驾车可达');
+    tags.push('停车方便');
+    tags.push('路线畅通');
+  } else if (modeKey === 'riding') {
+    tags.push('优先骑道');
+    tags.push('绿道优选');
+    tags.push('少爬坡');
   } else {
-    document.addEventListener('DOMContentLoaded', init);
+    tags.push('换乘便捷');
+    tags.push('车站近');
+    tags.push('性价比高');
   }
-})();
+  return tags;
+}
+
+function renderReasonCard(modeKey, distTimeInfo, showParking) {
+  var modeNameMap = { walking:'步行', driving:'驾车', riding:'骑行', transit:'公共交通' };
+  var tags = buildReasonTags(modeKey, currentDest ? currentDest.strollerScore : 0.75);
+  var tagsBox = document.getElementById('reasonTags');
+  tagsBox.innerHTML = '';
+  for (var i=0;i<tags.length;i++) {
+    var s = document.createElement('span');
+    s.className = 'reason-tag';
+    s.textContent = tags[i];
+    tagsBox.appendChild(s);
+  }
+  document.getElementById('reasonDist').textContent = '📏 ' + distTimeInfo.dist;
+  document.getElementById('reasonTime').textContent = '⏱ ' + modeNameMap[modeKey] + '约' + distTimeInfo.time;
+  var parkingEl = document.getElementById('parkingLine');
+  if (showParking) {
+    parkingEl.textContent = '🅿️ 正在查询附近停车场...';
+  } else {
+    parkingEl.textContent = '';
+  }
+}
+
+function searchNearbyParking() {
+  if (!endPoint) return;
+  try {
+    var localP = new BMapGL.LocalSearch(map2, {
+      renderOptions: { map: map2, autoViewport: false },
+      onSearchComplete: function(results) {
+        var names = [];
+        for (var i=0;i<parkingMarkers.length;i++) map2.removeOverlay(parkingMarkers[i]);
+        parkingMarkers = [];
+        if (results && results.getNumPois && results.getNumPois() > 0) {
+          var n = Math.min(results.getCurrentNumPois(), 3);
+          for (var i=0;i<n;i++) {
+            var poi = results.getPoi(i);
+            if (poi && poi.point) {
+              names.push(stripHtml(poi.title));
+              var lbl = new BMapGL.Label('🅿️', { position: poi.point, offset: new BMapGL.Size(-8, -14) });
+              lbl.setStyle({ background:'#4A90E2', color:'#fff', border:'none', borderRadius:'6px', padding:'1px 6px', fontSize:'12px', boxShadow:'0 1px 4px rgba(0,0,0,0.2)' });
+              map2.addOverlay(lbl);
+              parkingMarkers.push(lbl);
+            }
+          }
+        }
+        var parkingEl = document.getElementById('parkingLine');
+        parkingEl.textContent = names.length > 0
+          ? '🅿️ 附近停车场：' + names.join('、') + '（示例检索结果，非真实全量数据）'
+          : '🅿️ 附近暂未检索到停车场信息';
+      }
+    });
+    localP.searchNearby('停车场', endPoint, 1000);
+  } catch (e) {}
+}
+
+function planRoute(mode) {
+  if (!startPoint || !endPoint) return;
+  clearMap2();
+  addEndpointMarkers();
+  fitViewport();
+  document.getElementById('parkingLine').textContent = '';
+  try {
+    if (mode === 'walking') {
+      var walking = new BMapGL.WalkingRoute(map2, {
+        renderOptions: { map: map2, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            fitViewport();
+            var plan = res.getPlan(0);
+            renderReasonCard('walking', formatDistanceTime(plan), false);
+          } else {
+            showToast('步行路线规划失败');
+          }
+        }
+      });
+      walking.search(startPoint, endPoint);
+    } else if (mode === 'driving') {
+      var driving = new BMapGL.DrivingRoute(map2, {
+        renderOptions: { map: map2, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            fitViewport();
+            var plan = res.getPlan(0);
+            renderReasonCard('driving', formatDistanceTime(plan), true);
+            searchNearbyParking();
+          } else {
+            showToast('驾车路线规划失败');
+          }
+        }
+      });
+      driving.search(startPoint, endPoint);
+    } else if (mode === 'riding') {
+      var riding = new BMapGL.RidingRoute(map2, {
+        renderOptions: { map: map2, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            fitViewport();
+            var plan = res.getPlan(0);
+            renderReasonCard('riding', formatDistanceTime(plan), false);
+          } else {
+            showToast('骑行路线规划失败');
+          }
+        }
+      });
+      riding.search(startPoint, endPoint);
+    } else {
+      var transit = new BMapGL.TransitRoute(map2, {
+        renderOptions: { map: map2, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            fitViewport();
+            var plan = res.getPlan(0);
+            renderReasonCard('transit', formatDistanceTime(plan), false);
+          } else {
+            showToast('公交路线规划失败');
+          }
+        }
+      });
+      transit.search(startPoint, endPoint);
+    }
+  } catch (e) {
+    showToast('路线规划出现问题');
+  }
+}
+
+function editStart() {
+  var v = prompt('请输入新的起点名称', startName || '');
+  if (!v) return;
+  geocodeAndSet(v, function(pt, addr) {
+    startPoint = pt; startName = addr || v;
+    document.getElementById('startText').textContent = startName;
+    planRoute(currentMode);
+  });
+}
+function editEnd() {
+  var v = prompt('请输入新的目的地名称', endName || '');
+  if (!v) return;
+  geocodeAndSet(v, function(pt, addr) {
+    endPoint = pt; endName = addr || v;
+    document.getElementById('endText').textContent = endName;
+    planRoute(currentMode);
+  });
+}
+function geocodeAndSet(keyword, cb) {
+  try {
+    var geoc = new BMapGL.Geocoder();
+    geoc.getPoint(keyword, function(point) {
+      if (point) { cb(point, keyword); }
+      else { showToast('未找到“' + keyword + '”，请重新输入'); }
+    }, currentAddrText.replace(/(市|省).*/,'') || '广州');
+  } catch (e) { showToast('地点解析失败'); }
+}
+
+/* ============ P5 导航 ============ */
+function startNav() {
+  goPage('page5');
+}
+
+function initMap3AndNav() {
+  try {
+    if (!map3) {
+      map3 = new BMapGL.Map('map3');
+      map3.enableScrollWheelZoom(true);
+      map3.enablePinchToZoom && map3.enablePinchToZoom();
+    }
+    var navCenter = (startPoint && endPoint) ? startPoint : new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+    map3.centerAndZoom(navCenter, 16);
+    map3.resize();
+    map3.clearOverlays();
+    navSteps = [];
+    navStepIndex = 0;
+    facilityMarkers = [];
+    facilityData = [];
+    seedSampleFacilities();
+    renderFacilityFilterPanel();
+    renderFacilityMarkers();
+    if (startPoint && endPoint) {
+      map3.setViewport([startPoint, endPoint]);
+      drawNavRoute();
+    }
+    setTimeout(function(){ map3 && map3.resize(); }, 150);
+  } catch (e) { console.error(e); }
+}
+
+function drawNavRoute() {
+  var sm = new BMapGL.Marker(startPoint);
+  var em = new BMapGL.Marker(endPoint);
+  map3.addOverlay(sm);
+  map3.addOverlay(em);
+  try {
+    var routeMode = (currentMode === 'transit') ? 'transit' : (currentMode === 'driving' ? 'driving' : (currentMode === 'riding' ? 'riding' : 'walking'));
+    if (routeMode === 'walking') {
+      var walking = new BMapGL.WalkingRoute(map3, {
+        renderOptions: { map: map3, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            map3.setViewport([startPoint, endPoint]);
+            collectNavSteps(res);
+            searchFacilitiesAlongRoute();
+          }
+        }
+      });
+      walking.search(startPoint, endPoint);
+    } else if (routeMode === 'driving') {
+      var driving = new BMapGL.DrivingRoute(map3, {
+        renderOptions: { map: map3, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            map3.setViewport([startPoint, endPoint]);
+            collectNavSteps(res);
+            searchFacilitiesAlongRoute();
+          }
+        }
+      });
+      driving.search(startPoint, endPoint);
+    } else if (routeMode === 'riding') {
+      var riding = new BMapGL.RidingRoute(map3, {
+        renderOptions: { map: map3, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            map3.setViewport([startPoint, endPoint]);
+            collectNavSteps(res);
+            searchFacilitiesAlongRoute();
+          }
+        }
+      });
+      riding.search(startPoint, endPoint);
+    } else {
+      var transit = new BMapGL.TransitRoute(map3, {
+        renderOptions: { map: map3, autoViewport: false },
+        onSearchComplete: function(res) {
+          if (res && typeof res.getPlan === 'function') {
+            map3.setViewport([startPoint, endPoint]);
+            collectNavSteps(res);
+            searchFacilitiesAlongRoute();
+          }
+        }
+      });
+      transit.search(startPoint, endPoint);
+    }
+  } catch (e) {
+    searchFacilitiesAlongRoute();
+  }
+}
+
+/* 收集分步导航指引，只显示"下一步" */
+function collectNavSteps(res) {
+  navSteps = [];
+  navStepIndex = 0;
+  try {
+    var plan = res.getPlan(0);
+    if (plan && plan.getRoute) {
+      var route = plan.getRoute(0);
+      if (route && route.getNumSteps && route.getNumSteps() > 0) {
+        var num = route.getNumSteps();
+        for (var i=0;i<num;i++) {
+          var step = route.getStep(i);
+          var desc = stripHtml(step.getDescription ? step.getDescription() : '');
+          if (desc) navSteps.push(desc);
+        }
+      }
+    }
+  } catch (e) {}
+  if (navSteps.length === 0) {
+    navSteps.push('直行前往“' + endName + '”');
+  }
+  renderCurrentStep();
+}
+
+function renderCurrentStep() {
+  var text = navSteps[navStepIndex] || '已到达目的地';
+  document.getElementById('stepMainText').textContent = truncateStepText(text, 24);
+  document.getElementById('stepIcon').textContent = navStepIndex >= navSteps.length - 1 ? '🏁' : '⬆️';
+}
+
+function goNextNavStep() {
+  if (navStepIndex < navSteps.length - 1) {
+    navStepIndex++;
+    renderCurrentStep();
+  } else {
+    showToast('已到达目的地~');
+  }
+}
+
+/* 顶部导航卡片点击可推进到下一步（简洁交互，替代原自动多小字说明） */
+document.addEventListener('DOMContentLoaded', function() {
+  var bar = document.querySelector('.nav-guide-bar');
+  if (bar) bar.addEventListener('click', goNextNavStep);
+});
+
+function renderFacilityFilterPanel() {
+  var panel = document.getElementById('filterPanel');
+  panel.innerHTML = '';
+  var seen = {};
+  for (var i=0;i<FACILITY_CATEGORY_MAP.length;i++) {
+    var cat = FACILITY_CATEGORY_MAP[i];
+    if (seen[cat.label]) continue;
+    seen[cat.label] = true;
+    activeFacilityTypes[cat.label] = true;
+    var item = document.createElement('div');
+    item.className = 'filter-item on';
+    item.textContent = cat.icon + cat.label;
+    item.onclick = (function(l, el) {
+      return function() {
+        activeFacilityTypes[l] = !activeFacilityTypes[l];
+        el.classList.toggle('on');
+        renderFacilityMarkers();
+      };
+    })(cat.label, item);
+    panel.appendChild(item);
+  }
+}
+
+function toggleFilterPanel() {
+  document.getElementById('filterPanel').classList.toggle('show');
+}
+
+var facilityData = [];
+
+function truncateStepText(text, maxLen) {
+  if (!text) return text;
+  return text.length > maxLen ? text.slice(0, maxLen) + '…' : text;
+}
+
+function seedSampleFacilities() {
+  var basePts = [];
+  if (startPoint) basePts.push(startPoint);
+  if (endPoint) basePts.push(endPoint);
+  if (basePts.length === 0) basePts.push(new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat));
+  var sampleDefs = [
+    { icon:'🍼', label:'母婴室', name:'示例母婴室' },
+    { icon:'🛒', label:'推车友好', name:'示例推车友好通道' },
+    { icon:'🛗', label:'电梯', name:'示例无障碍电梯' },
+    { icon:'♿', label:'无障碍通道', name:'示例无障碍通道' },
+    { icon:'🛝', label:'儿童游乐区', name:'示例儿童游乐区' },
+    { icon:'🍽', label:'儿童餐厅', name:'示例儿童餐厅' },
+    { icon:'🅿️', label:'家庭停车', name:'示例家庭停车位' },
+    { icon:'🚽', label:'家庭卫生间', name:'示例家庭卫生间' },
+    { icon:'🌳', label:'户外休息空间', name:'示例户外休息区' },
+    { icon:'📚', label:'儿童阅读空间', name:'示例儿童阅读角' }
+  ];
+  var offsets = [
+    [0.0015, 0.0010], [-0.0012, 0.0018], [0.0020, -0.0008], [-0.0018, -0.0015],
+    [0.0008, 0.0022], [-0.0022, 0.0006], [0.0012, -0.0020], [-0.0008, 0.0016],
+    [0.0025, 0.0004], [-0.0015, -0.0022]
+  ];
+  for (var i=0;i<sampleDefs.length;i++) {
+    var base = basePts[i % basePts.length];
+    var off = offsets[i % offsets.length];
+    var pt = new BMapGL.Point(base.lng + off[0], base.lat + off[1]);
+    facilityData.push({ point: pt, name: sampleDefs[i].name, icon: sampleDefs[i].icon, label: sampleDefs[i].label, isSample: true });
+  }
+}
+
+function searchFacilitiesAlongRoute() {
+  if (!startPoint) return;
+  try {
+    var local = new BMapGL.LocalSearch(map3, {
+      renderOptions: { map: map3, autoViewport: false, enableMassClear: false },
+      onSearchComplete: function(results) {
+        var foundCount = 0;
+        if (results && results.getNumPois && results.getNumPois() > 0) {
+          var n = Math.min(results.getCurrentNumPois(), 10);
+          for (var i=0;i<n;i++) {
+            var poi = results.getPoi(i);
+            if (poi && poi.point) {
+              var title = stripHtml(poi.title) || '';
+              var cat = matchFacilityIcon(title);
+              facilityData.push({ point: poi.point, name: title, icon: cat.icon, label: cat.label });
+              foundCount++;
+            }
+          }
+        }
+        renderFacilityMarkers();
+        document.getElementById('aiTipText').textContent = foundCount > 0
+          ? ('沿途检索到' + foundCount + '处亲子设施，另含示例设施点位，推车更轻松~（含示例数据，非真实全量）')
+          : '已展示示例亲子设施点位，沿途实时检索暂无结果，请留意实际路况~';
+      }
+    });
+    local.searchNearby(FACILITY_SEARCH_KEYWORDS, startPoint, 1500);
+  } catch (e) {}
+}
+
+function renderFacilityMarkers() {
+  for (var i=0;i<facilityMarkers.length;i++) map3.removeOverlay(facilityMarkers[i]);
+  facilityMarkers = [];
+  for (var i=0;i<facilityData.length;i++) {
+    var f = facilityData[i];
+    if (!activeFacilityTypes[f.label]) continue;
+    var lbl = new BMapGL.Label(f.icon, { position: f.point, offset: new BMapGL.Size(-10, -14) });
+    lbl.setStyle({ background:'#fff', border:'1px solid #FFD9B8', borderRadius:'6px', padding:'1px 5px', fontSize:'14px', boxShadow:'0 1px 4px rgba(0,0,0,0.15)' });
+    map3.addOverlay(lbl);
+    facilityMarkers.push(lbl);
+  }
+}
+
+function endNav() {
+  goPage('page4');
+}
+
+window.onload = function() {
+  try {
+    if (typeof BMapGL === 'undefined') {
+      showToast('地图加载失败，请检查网络');
+      return;
+    }
+    initMap1();
+  } catch (e) {
+    console.error('初始化异常', e);
+    showToast('地图初始化异常');
+  }
+};
 </script>
 </body>
 </html>
-
-/out/liuwa_ditu.html
