@@ -11,14 +11,12 @@
   .page { position:absolute; top:0; left:0; width:100%; height:100%; display:none; flex-direction:column; background:#FFF6ED; }
   .page.active { display:flex; }
 
-  /* 顶部导航条 */
   .navbar { display:flex; align-items:center; height:52px; min-height:52px; background:#FF8C42; color:#fff; padding:0 12px; box-shadow:0 2px 8px rgba(255,140,66,0.3); position:relative; z-index:20; }
   .navbar .back-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; border-radius:50%; }
   .navbar .back-btn:active { background:rgba(255,255,255,0.25); }
   .navbar .title { flex:1; text-align:center; font-size:17px; font-weight:600; }
   .navbar .placeholder { width:32px; }
 
-  /* ========== P1 首页 ========== */
   .top-bar { background:linear-gradient(135deg,#FF8C42,#FFB27A); padding:14px 16px 18px; color:#fff; border-radius:0 0 28px 28px; box-shadow:0 4px 12px rgba(255,140,66,0.25); }
   .top-row { display:flex; align-items:center; justify-content:space-between; }
   .loc-wrap { display:flex; align-items:center; gap:6px; flex:1; min-width:0; }
@@ -50,7 +48,6 @@
 
   .demo-tag { text-align:center; font-size:11px; color:#c9a988; margin-top:8px; }
 
-  /* ========== P3 推荐页 ========== */
   .ai-greet { display:flex; align-items:center; gap:10px; padding:14px 16px; background:#FFF3E8; margin:10px 12px; border-radius:20px; }
   .ai-avatar { width:38px; height:38px; border-radius:50%; background:#FF8C42; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
   .ai-bubble { font-size:13px; color:#8a5c33; font-weight:600; line-height:1.4; }
@@ -76,7 +73,6 @@
   .go-btn:active { background:#e97a34; }
   .score-detail { font-size:10px; color:#c9a988; margin-top:6px; line-height:1.5; }
 
-  /* ========== P4 路线规划 ========== */
   .route-endpoints { background:#fff; margin:10px 12px 0; border-radius:20px; padding:14px 16px; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
   .ep-row { display:flex; align-items:center; gap:10px; padding:7px 0; }
   .ep-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
@@ -103,7 +99,6 @@
 
   .nav-start-btn { margin:0 12px 14px; background:linear-gradient(135deg,#FF8C42,#FF6B2C); color:#fff; border:none; border-radius:26px; padding:13px 0; font-size:16px; font-weight:700; box-shadow:0 6px 14px rgba(255,107,44,0.35); cursor:pointer; }
 
-  /* ========== P5 导航页 ========== */
   .nav-guide-bar { background:linear-gradient(135deg,#FF8C42,#FFB27A); color:#fff; padding:14px 16px; flex-shrink:0; }
   .nav-step-main { font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; overflow:hidden; white-space:nowrap; }
   .nav-step-icon { font-size:26px; flex-shrink:0; }
@@ -123,7 +118,7 @@
   .end-nav-btn { margin:8px 16px 12px; background:#fff; border:2px solid #FF4757; color:#FF4757; border-radius:24px; padding:10px 0; font-size:15px; font-weight:700; text-align:center; cursor:pointer; }
   .end-nav-btn:active { background:#FFF0F0; }
 
-  .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.75); color:#fff; padding:10px 18px; border-radius:14px; font-size:13px; z-index:999; display:none; max-width:80%; text-align:center; }
+  .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.78); color:#fff; padding:10px 18px; border-radius:14px; font-size:13px; z-index:999; display:none; max-width:80%; text-align:center; }
 </style>
 <script src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=o8LnSUIDI7AiJDfc9eRMNz3YDSdKHkRn&s=1"></script>
 </head>
@@ -175,7 +170,7 @@
       <div class="placeholder"></div>
     </div>
     <div class="ai-greet">
-      <div class="ai-avatar">🐼</div>
+      <div class="ai-avatar">🤗</div>
       <div class="ai-bubble">找到啦！这几个地方很适合你们~</div>
     </div>
     <div class="cards-scroll" id="cardsScroll"></div>
@@ -232,7 +227,7 @@
       <div class="placeholder"></div>
     </div>
     <div class="nav-guide-bar">
-      <div class="nav-step-main">🐻‍❄️<span class="nav-step-icon" id="stepIcon"></span><span class="nav-step-text" id="stepMainText">直行200米</span></div>
+      <div class="nav-step-main"><span class="nav-step-icon" id="stepIcon">⬆️</span><span class="nav-step-text" id="stepMainText">正在获取位置...</span></div>
     </div>
     <div style="position:relative; flex:1; min-height:0; display:flex; flex-direction:column;">
       <div class="filter-btn-float" onclick="toggleFilterPanel()">🔍 亲子设施</div>
@@ -240,8 +235,8 @@
       <div id="map3"></div>
     </div>
     <div class="ai-tip-bar">
-      <div class="tt">🐼 AI沿途提示</div>
-      <div class="tc" id="aiTipText">沿途有母婴室和无障碍通道，推车更轻松~</div>
+      <div class="tt">🤖 AI沿途提示</div>
+      <div class="tc" id="aiTipText">正在检索沿途亲子设施...</div>
     </div>
     <div class="end-nav-btn" onclick="endNav()">结束导航</div>
   </div>
@@ -270,26 +265,28 @@ var facilityData = [];
 var geoNav = null;
 var navWatchId = null;
 var navUserMarker = null;
+var navInitDone = false;
 
 /* 亲子设施图标分类映射 */
 var FACILITY_CATEGORY_MAP = [
-  { keyword: '母婴室', icon: '🍼', label: '母婴室' },
+  { keyword: '母婴室|母婴', icon: '🍼', label: '母婴室' },
   { keyword: '推车', icon: '🛒', label: '推车友好' },
   { keyword: '电梯', icon: '🛗', label: '电梯' },
   { keyword: '无障碍', icon: '♿', label: '无障碍通道' },
-  { keyword: '游乐', icon: '🛝', label: '儿童游乐区' },
+  { keyword: '游乐|儿童乐园', icon: '🛝', label: '儿童游乐区' },
   { keyword: '活动', icon: '🎨', label: '儿童活动' },
   { keyword: '图书|书店|阅读', icon: '📚', label: '儿童阅读空间' },
-  { keyword: '餐厅|美食', icon: '🍽', label: '儿童餐厅' },
+  { keyword: '餐厅|美食|餐饮', icon: '🍽', label: '儿童餐厅' },
   { keyword: '停车', icon: '🅿️', label: '家庭停车' },
-  { keyword: '卫生间|厕所', icon: '🚽', label: '家庭卫生间' },
+  { keyword: '卫生间|厕所|洗手间', icon: '🚽', label: '家庭卫生间' },
+  { keyword: '休息|座椅|长椅', icon: '🪑', label: '休息处' },
   { keyword: '公园|广场|绿地', icon: '🌳', label: '户外休息空间' },
   { keyword: '博物馆', icon: '🏛️', label: '博物馆' },
   { keyword: '科技馆', icon: '🔬', label: '科技馆' },
   { keyword: '图书馆', icon: '📖', label: '图书馆' },
   { keyword: '美术馆', icon: '🖼️', label: '美术馆' }
 ];
-var FACILITY_SEARCH_KEYWORDS = ['母婴室','无障碍通道','儿童游乐区','母婴店','儿童餐厅','公共卫生间','停车场'];
+var FACILITY_SEARCH_KEYWORDS = ['母婴室','休息区','卫生间','儿童游乐区','儿童餐厅','停车场','无障碍通道'];
 
 function showToast(msg) {
   var t = document.getElementById('toast');
@@ -300,11 +297,12 @@ function showToast(msg) {
 }
 
 function goPage(id) {
-  // 离开导航页时清除实时定位
+  // 离开导航页时停止实时定位
   if (id !== 'page5' && navWatchId) {
-    try { geoNav.clearWatch(navWatchId); } catch(e) {}
+    try { geoNav && geoNav.clearWatch(navWatchId); } catch(e) {}
     navWatchId = null;
   }
+  if (id !== 'page5') { navInitDone = false; }
   var pages = document.querySelectorAll('.page');
   for (var i=0;i<pages.length;i++) pages[i].classList.remove('active');
   document.getElementById(id).classList.add('active');
@@ -330,6 +328,7 @@ function stripHtml(str) {
 }
 
 function matchFacilityIcon(name) {
+  if (!name) return { icon: '📍', label: '亲子设施' };
   for (var i=0;i<FACILITY_CATEGORY_MAP.length;i++) {
     var re = new RegExp(FACILITY_CATEGORY_MAP[i].keyword);
     if (re.test(name)) return FACILITY_CATEGORY_MAP[i];
@@ -342,7 +341,7 @@ function initMap1() {
   try {
     map1 = new BMapGL.Map('map1');
     var center = new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
-    map1.centerAndZoom(center, 15);
+    map1.centerAndZoom(center, 14);
     map1.enableScrollWheelZoom(true);
   } catch (e) {
     console.error('地图初始化失败', e);
@@ -354,11 +353,11 @@ function doGeolocation() {
   try {
     var geo = new BMapGL.Geolocation();
     geo.getCurrentPosition(function(r) {
-      if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+      var status = (this && this.getStatus) ? this.getStatus() : (r && r.status);
+      if (status === BMAP_STATUS_SUCCESS && r && r.point) {
         userPoint = r.point;
         if (map1) {
           map1.centerAndZoom(userPoint, 16);
-          // 添加“我的位置”标记
           if (window.userMarker) map1.removeOverlay(window.userMarker);
           window.userMarker = new BMapGL.Marker(userPoint);
           map1.addOverlay(window.userMarker);
@@ -369,16 +368,17 @@ function doGeolocation() {
         reverseGeocode(userPoint);
         searchNearbyPOI(userPoint);
       } else {
+        // 定位失败，使用默认城市中心
         userPoint = new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
-        document.getElementById('curAddrInput').placeholder = currentAddrText;
         document.getElementById('curAddrInput').value = currentAddrText;
+        if (map1) map1.centerAndZoom(userPoint, 14);
         searchNearbyPOI(userPoint);
       }
-    }, { timeout: 8000 });
+    }, { enableHighAccuracy: true, timeout: 8000 });
   } catch (e) {
     userPoint = new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
     document.getElementById('curAddrInput').value = currentAddrText;
-    searchNearbyPOI(userPoint);
+    if (map1) map1.centerAndZoom(userPoint, 14);
   }
 }
 
@@ -399,7 +399,7 @@ function searchNearbyPOI(point) {
     var local = new BMapGL.LocalSearch(map1, {
       renderOptions: { map: map1, autoViewport: false },
       onSearchComplete: function(results) {
-        // 示例数据、非真实全量
+        // 展示附近亲子POI，不移动视野
       }
     });
     local.searchNearby(['亲子公园','儿童乐园'], point, 3000);
@@ -464,14 +464,6 @@ bindChips('ageChips', function(v){ selectedAge = v; });
 bindChips('purposeChips', function(v){ selectedPurpose = v; });
 document.querySelectorAll('#ageChips .chip')[1].classList.add('active');
 document.querySelectorAll('#purposeChips .chip')[1].classList.add('active');
-
-var startBtnEl = document.querySelector('.start-btn');
-if (startBtnEl) {
-  startBtnEl.addEventListener('click', function(e) {
-    e.preventDefault();
-    startPlanning();
-  });
-}
 
 /* ============ P1 -> P3 规划 ============ */
 function startPlanning() {
@@ -676,9 +668,7 @@ function addEndpointMarkers() {
 }
 
 function fitViewport() {
-  try {
-    map2.setViewport([startPoint, endPoint]);
-  } catch (e) {}
+  try { map2.setViewport([startPoint, endPoint]); } catch (e) {}
 }
 
 function formatDistanceTime(plan) {
@@ -766,7 +756,7 @@ function searchNearbyParking() {
         }
         var parkingEl = document.getElementById('parkingLine');
         parkingEl.textContent = names.length > 0
-          ? '🅿️ 附近停车场：' + names.join('、') + '（示例检索结果，非真实全量数据）'
+          ? '🅿️ 附近停车场：' + names.join('、')
           : '🅿️ 附近暂未检索到停车场信息';
       }
     });
@@ -787,11 +777,8 @@ function planRoute(mode) {
         onSearchComplete: function(res) {
           if (res && typeof res.getPlan === 'function') {
             fitViewport();
-            var plan = res.getPlan(0);
-            renderReasonCard('walking', formatDistanceTime(plan), false);
-          } else {
-            showToast('步行路线规划失败');
-          }
+            renderReasonCard('walking', formatDistanceTime(res.getPlan(0)), false);
+          } else { showToast('步行路线规划失败'); }
         }
       });
       walking.search(startPoint, endPoint);
@@ -801,12 +788,9 @@ function planRoute(mode) {
         onSearchComplete: function(res) {
           if (res && typeof res.getPlan === 'function') {
             fitViewport();
-            var plan = res.getPlan(0);
-            renderReasonCard('driving', formatDistanceTime(plan), true);
+            renderReasonCard('driving', formatDistanceTime(res.getPlan(0)), true);
             searchNearbyParking();
-          } else {
-            showToast('驾车路线规划失败');
-          }
+          } else { showToast('驾车路线规划失败'); }
         }
       });
       driving.search(startPoint, endPoint);
@@ -816,11 +800,8 @@ function planRoute(mode) {
         onSearchComplete: function(res) {
           if (res && typeof res.getPlan === 'function') {
             fitViewport();
-            var plan = res.getPlan(0);
-            renderReasonCard('riding', formatDistanceTime(plan), false);
-          } else {
-            showToast('骑行路线规划失败');
-          }
+            renderReasonCard('riding', formatDistanceTime(res.getPlan(0)), false);
+          } else { showToast('骑行路线规划失败'); }
         }
       });
       riding.search(startPoint, endPoint);
@@ -830,18 +811,13 @@ function planRoute(mode) {
         onSearchComplete: function(res) {
           if (res && typeof res.getPlan === 'function') {
             fitViewport();
-            var plan = res.getPlan(0);
-            renderReasonCard('transit', formatDistanceTime(plan), false);
-          } else {
-            showToast('公交路线规划失败');
-          }
+            renderReasonCard('transit', formatDistanceTime(res.getPlan(0)), false);
+          } else { showToast('公交路线规划失败'); }
         }
       });
       transit.search(startPoint, endPoint);
     }
-  } catch (e) {
-    showToast('路线规划出现问题');
-  }
+  } catch (e) { showToast('路线规划出现问题'); }
 }
 
 function editStart() {
@@ -873,9 +849,7 @@ function geocodeAndSet(keyword, cb) {
 }
 
 /* ============ P5 导航 ============ */
-function startNav() {
-  goPage('page5');
-}
+function startNav() { goPage('page5'); }
 
 function initMap3AndNav() {
   try {
@@ -884,45 +858,67 @@ function initMap3AndNav() {
       map3.enableScrollWheelZoom(true);
       map3.enablePinchToZoom && map3.enablePinchToZoom();
     }
-    var navCenter = (startPoint && endPoint) ? startPoint : new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
-    map3.centerAndZoom(navCenter, 17); // 放大到17级
+    var navCenter = userPoint || startPoint || new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat);
+    map3.centerAndZoom(navCenter, 17);
     map3.resize();
     map3.clearOverlays();
     navSteps = [];
     navStepIndex = 0;
     facilityMarkers = [];
     facilityData = [];
-    seedSampleFacilities();
     renderFacilityFilterPanel();
-    renderFacilityMarkers();
+
     if (startPoint && endPoint) {
-      map3.setViewport([startPoint, endPoint]);
       drawNavRoute();
     }
-    // 开启实时定位
+
+    // 立即定位一次，再持续监听
+    doNavGeolocationNow();
+    startNavWatch();
+
+    setTimeout(function(){ map3 && map3.resize(); }, 200);
+  } catch (e) { console.error(e); }
+}
+
+function doNavGeolocationNow() {
+  try {
+    var geo = new BMapGL.Geolocation();
+    geo.getCurrentPosition(function(r) {
+      var status = (this && this.getStatus) ? this.getStatus() : (r && r.status);
+      if (status === BMAP_STATUS_SUCCESS && r && r.point) {
+        updateNavUserPosition(r.point);
+      }
+    }, { enableHighAccuracy: true, timeout: 8000 });
+  } catch (e) {}
+}
+
+function startNavWatch() {
+  try {
     if (geoNav) { try { geoNav.clearWatch(navWatchId); } catch(e){} }
     geoNav = new BMapGL.Geolocation();
     navWatchId = geoNav.watchPosition(function(r) {
-      if (this.getStatus() === BMAP_STATUS_SUCCESS) {
-        var pt = r.point;
-        if (map3) {
-          map3.panTo(pt);
-          map3.setZoom(17);
-        }
-        // 更新“我的位置”标记
-        if (navUserMarker) map3.removeOverlay(navUserMarker);
-        navUserMarker = new BMapGL.Marker(pt);
-        map3.addOverlay(navUserMarker);
-        // 更新剩余距离
-        if (endPoint) {
-          var dist = map3.getDistance(pt, endPoint);
-          var remainText = dist < 1000 ? Math.round(dist) + '米' : (dist/1000).toFixed(1) + '公里';
-          document.getElementById('stepMainText').textContent = '距离终点 ' + remainText;
-        }
+      var status = (this && this.getStatus) ? this.getStatus() : (r && r.status);
+      if (status === BMAP_STATUS_SUCCESS && r && r.point) {
+        updateNavUserPosition(r.point);
       }
     }, { enableHighAccuracy: true });
-    setTimeout(function(){ map3 && map3.resize(); }, 150);
   } catch (e) { console.error(e); }
+}
+
+function updateNavUserPosition(pt) {
+  if (!pt || !map3) return;
+  userPoint = pt;
+  map3.panTo(pt);
+  if (navUserMarker) map3.removeOverlay(navUserMarker);
+  navUserMarker = new BMapGL.Marker(pt);
+  map3.addOverlay(navUserMarker);
+  if (endPoint) {
+    try {
+      var dist = map3.getDistance(pt, endPoint);
+      var remainText = dist < 1000 ? Math.round(dist) + '米' : (dist/1000).toFixed(1) + '公里';
+      document.getElementById('stepMainText').textContent = '距离终点 ' + remainText;
+    } catch (e) {}
+  }
 }
 
 function drawNavRoute() {
@@ -932,52 +928,35 @@ function drawNavRoute() {
   map3.addOverlay(em);
   try {
     var routeMode = (currentMode === 'transit') ? 'transit' : (currentMode === 'driving' ? 'driving' : (currentMode === 'riding' ? 'riding' : 'walking'));
+    var handleRes = function(res) {
+      if (res && typeof res.getPlan === 'function') {
+        map3.setViewport([startPoint, endPoint]);
+        collectNavSteps(res);
+        searchFacilitiesAlongRoute();
+      }
+    };
     if (routeMode === 'walking') {
       var walking = new BMapGL.WalkingRoute(map3, {
         renderOptions: { map: map3, autoViewport: false },
-        onSearchComplete: function(res) {
-          if (res && typeof res.getPlan === 'function') {
-            map3.setViewport([startPoint, endPoint]);
-            collectNavSteps(res);
-            searchFacilitiesAlongRoute();
-          }
-        }
+        onSearchComplete: handleRes
       });
       walking.search(startPoint, endPoint);
     } else if (routeMode === 'driving') {
       var driving = new BMapGL.DrivingRoute(map3, {
         renderOptions: { map: map3, autoViewport: false },
-        onSearchComplete: function(res) {
-          if (res && typeof res.getPlan === 'function') {
-            map3.setViewport([startPoint, endPoint]);
-            collectNavSteps(res);
-            searchFacilitiesAlongRoute();
-          }
-        }
+        onSearchComplete: handleRes
       });
       driving.search(startPoint, endPoint);
     } else if (routeMode === 'riding') {
       var riding = new BMapGL.RidingRoute(map3, {
         renderOptions: { map: map3, autoViewport: false },
-        onSearchComplete: function(res) {
-          if (res && typeof res.getPlan === 'function') {
-            map3.setViewport([startPoint, endPoint]);
-            collectNavSteps(res);
-            searchFacilitiesAlongRoute();
-          }
-        }
+        onSearchComplete: handleRes
       });
       riding.search(startPoint, endPoint);
     } else {
       var transit = new BMapGL.TransitRoute(map3, {
         renderOptions: { map: map3, autoViewport: false },
-        onSearchComplete: function(res) {
-          if (res && typeof res.getPlan === 'function') {
-            map3.setViewport([startPoint, endPoint]);
-            collectNavSteps(res);
-            searchFacilitiesAlongRoute();
-          }
-        }
+        onSearchComplete: handleRes
       });
       transit.search(startPoint, endPoint);
     }
@@ -1004,7 +983,7 @@ function collectNavSteps(res) {
     }
   } catch (e) {}
   if (navSteps.length === 0) {
-    navSteps.push('直行前往“' + endName + '”');
+    navSteps.push('直行前往“' + (endName || '目的地') + '”');
   }
   renderCurrentStep();
 }
@@ -1037,9 +1016,9 @@ function renderFacilityFilterPanel() {
     var cat = FACILITY_CATEGORY_MAP[i];
     if (seen[cat.label]) continue;
     seen[cat.label] = true;
-    activeFacilityTypes[cat.label] = true;
+    if (activeFacilityTypes[cat.label] === undefined) activeFacilityTypes[cat.label] = true;
     var item = document.createElement('div');
-    item.className = 'filter-item on';
+    item.className = 'filter-item' + (activeFacilityTypes[cat.label] ? ' on' : '');
     item.textContent = cat.icon + cat.label;
     item.onclick = (function(l, el) {
       return function() {
@@ -1061,89 +1040,103 @@ function truncateStepText(text, maxLen) {
   return text.length > maxLen ? text.slice(0, maxLen) + '…' : text;
 }
 
-function seedSampleFacilities() {
-  var basePts = [];
-  if (startPoint) basePts.push(startPoint);
-  if (endPoint) basePts.push(endPoint);
-  if (basePts.length === 0) basePts.push(new BMapGL.Point(DEFAULT_CENTER.lng, DEFAULT_CENTER.lat));
-  var sampleDefs = [
-    { icon:'🍼', label:'母婴室', name:'示例母婴室' },
-    { icon:'🛒', label:'推车友好', name:'示例推车友好通道' },
-    { icon:'🛗', label:'电梯', name:'示例无障碍电梯' },
-    { icon:'♿', label:'无障碍通道', name:'示例无障碍通道' },
-    { icon:'🛝', label:'儿童游乐区', name:'示例儿童游乐区' },
-    { icon:'🍽', label:'儿童餐厅', name:'示例儿童餐厅' },
-    { icon:'🅿️', label:'家庭停车', name:'示例家庭停车位' },
-    { icon:'🚽', label:'家庭卫生间', name:'示例家庭卫生间' },
-    { icon:'🌳', label:'户外休息空间', name:'示例户外休息区' },
-    { icon:'📚', label:'儿童阅读空间', name:'示例儿童阅读角' }
-  ];
-  var offsets = [
-    [0.0015, 0.0010], [-0.0012, 0.0018], [0.0020, -0.0008], [-0.0018, -0.0015],
-    [0.0008, 0.0022], [-0.0022, 0.0006], [0.0012, -0.0020], [-0.0008, 0.0016],
-    [0.0025, 0.0004], [-0.0015, -0.0022]
-  ];
-  for (var i=0;i<sampleDefs.length;i++) {
-    var base = basePts[i % basePts.length];
-    var off = offsets[i % offsets.length];
-    var pt = new BMapGL.Point(base.lng + off[0], base.lat + off[1]);
-    facilityData.push({ point: pt, name: sampleDefs[i].name, icon: sampleDefs[i].icon, label: sampleDefs[i].label, isSample: true });
-  }
-}
-
+/* 沿路线检索真实亲子设施：起点、中点、终点各检索一次 */
 function searchFacilitiesAlongRoute() {
-  if (!startPoint) return;
-  try {
-    var local = new BMapGL.LocalSearch(map3, {
-      renderOptions: { map: map3, autoViewport: false, enableMassClear: false },
-      onSearchComplete: function(results) {
-        var foundCount = 0;
-        if (results && results.getNumPois && results.getNumPois() > 0) {
-          var n = Math.min(results.getCurrentNumPois(), 10);
-          for (var i=0;i<n;i++) {
-            var poi = results.getPoi(i);
-            if (poi && poi.point) {
-              var title = stripHtml(poi.title) || '';
-              var cat = matchFacilityIcon(title);
-              facilityData.push({ point: poi.point, name: title, icon: cat.icon, label: cat.label });
-              foundCount++;
+  facilityData = [];
+  var base = userPoint || startPoint;
+  if (!base) { updateFacilityTip(0); return; }
+
+  var searchPoints = [base];
+  if (endPoint) {
+    var midLng = (base.lng + endPoint.lng) / 2;
+    var midLat = (base.lat + endPoint.lat) / 2;
+    searchPoints.push(new BMapGL.Point(midLng, midLat));
+    searchPoints.push(endPoint);
+  }
+
+  var completed = 0;
+  var totalFound = 0;
+  var seen = {};
+
+  function onOneDone() {
+    completed++;
+    if (completed >= searchPoints.length) {
+      renderFacilityMarkers();
+      updateFacilityTip(totalFound);
+    }
+  }
+
+  searchPoints.forEach(function(sp) {
+    try {
+      var local = new BMapGL.LocalSearch(null, {
+        pageCapacity: 10,
+        onSearchComplete: function(results) {
+          if (results && results.getNumPois && results.getNumPois() > 0) {
+            var n = Math.min(results.getCurrentNumPois(), 8);
+            for (var i=0;i<n;i++) {
+              var poi = results.getPoi(i);
+              if (poi && poi.point) {
+                var title = stripHtml(poi.title) || '';
+                var key = (title || '无') + '_' + poi.point.lng.toFixed(5) + '_' + poi.point.lat.toFixed(5);
+                if (seen[key]) continue;
+                seen[key] = true;
+                var cat = matchFacilityIcon(title);
+                if (cat.label === '亲子设施' && poi.type) {
+                  cat = matchFacilityIcon(poi.type);
+                }
+                var displayName = title || cat.label;
+                facilityData.push({
+                  point: poi.point,
+                  name: displayName,
+                  icon: cat.icon,
+                  label: cat.label
+                });
+                totalFound++;
+              }
             }
           }
+          onOneDone();
         }
-        renderFacilityMarkers();
-        document.getElementById('aiTipText').textContent = foundCount > 0
-          ? ('沿途检索到' + foundCount + '处亲子设施，另含示例设施点位，推车更轻松~（含示例数据，非真实全量）')
-          : '已展示示例亲子设施点位，沿途实时检索暂无结果，请留意实际路况~';
-      }
-    });
-    local.searchNearby(FACILITY_SEARCH_KEYWORDS, startPoint, 1500);
-  } catch (e) {}
+      });
+      local.searchNearby(FACILITY_SEARCH_KEYWORDS, sp, 1200);
+    } catch (e) {
+      onOneDone();
+    }
+  });
+}
+
+function updateFacilityTip(count) {
+  document.getElementById('aiTipText').textContent = count > 0
+    ? ('沿途共检索到 ' + count + ' 处亲子设施，点击图标可查看名称~')
+    : '当前路线附近暂未检索到具体亲子设施，可点击左上角筛选按钮调整显示类别~';
 }
 
 function renderFacilityMarkers() {
+  if (!map3) return;
   for (var i=0;i<facilityMarkers.length;i++) map3.removeOverlay(facilityMarkers[i]);
   facilityMarkers = [];
   for (var i=0;i<facilityData.length;i++) {
     var f = facilityData[i];
     if (!activeFacilityTypes[f.label]) continue;
     var lbl = new BMapGL.Label(f.icon, { position: f.point, offset: new BMapGL.Size(-10, -14) });
-    lbl.setStyle({ background:'#fff', border:'1px solid #FFD9B8', borderRadius:'12px', padding:'1px 5px', fontSize:'14px', boxShadow:'0 1px 4px rgba(0,0,0,0.15)' });
+    lbl.setStyle({ background:'#fff', border:'1px solid #FFD9B8', borderRadius:'12px', padding:'1px 5px', fontSize:'14px', boxShadow:'0 1px 4px rgba(0,0,0,0.15)', cursor:'pointer' });
     lbl.addEventListener('click', (function(fac) {
-      return function() { showToast(fac.name + '（' + fac.label + '）'); };
+      return function() {
+        var displayName = fac.name || fac.label;
+        showToast('📍 ' + displayName);
+      };
     })(f));
     map3.addOverlay(lbl);
     facilityMarkers.push(lbl);
   }
 }
 
-function endNav() {
-  goPage('page4');
-}
+function endNav() { goPage('page4'); }
 
 window.onload = function() {
   try {
     if (typeof BMapGL === 'undefined') {
-      showToast('地图加载失败，请检查网络');
+      showToast('地图加载失败，请检查网络或AK白名单');
       return;
     }
     initMap1();
