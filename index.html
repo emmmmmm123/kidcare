@@ -32,13 +32,13 @@
   --primary-soft:#FFF0C2;
 
   /* 起点 / 终点 */
-  --start:#C9A7E8;
-  --start-soft:#EEDDF6;
-  --end:#9BC9F5;
-  --end-soft:#DCEEFF;
+  --start:#62A8F5;
+  --start-soft:#DDEEFF;
+  --end:#62A8F5;
+  --end-soft:#DDEEFF;
 
   /* 路线 */
-  --route:#999999;
+  --route:#62A8F5;
 
   --blue:#348FDA;
   --green:#63B26E;
@@ -343,6 +343,165 @@ button{
   margin-top:8px;
 }
 
+
+/* =========================================================
+   首页宝宝信息卡
+========================================================= */
+
+.baby-panel{
+  background:#fff;
+  border:1px solid #F0EBE2;
+  border-radius:20px;
+  padding:12px 14px;
+  box-shadow:0 2px 9px rgba(80,60,30,.05);
+}
+
+.baby-panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.baby-title{
+  font-size:15px;
+  font-weight:800;
+  color:#333;
+}
+
+.baby-add-btn{
+  border:0;
+  background:transparent;
+  color:#62A8F5;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.baby-card{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:70px;
+  padding:9px 10px;
+  border:1.5px solid #DCEEFF;
+  border-radius:18px;
+  background:#F8FCFF;
+}
+
+.baby-avatar{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#E7F3FF;
+  color:#62A8F5;
+  font-size:17px;
+  font-weight:800;
+  flex-shrink:0;
+}
+
+.baby-info{
+  flex:1;
+  min-width:0;
+}
+
+.baby-name-row{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.baby-name{
+  font-size:15px;
+  font-weight:800;
+  color:#333;
+}
+
+.baby-gender{
+  font-size:10px;
+  padding:2px 7px;
+  border-radius:10px;
+  background:#E7F3FF;
+  color:#62A8F5;
+}
+
+.baby-age{
+  margin-top:4px;
+  font-size:12px;
+  color:#888;
+}
+
+.baby-edit-btn{
+  border:1px solid #DDE7EF;
+  background:#fff;
+  color:#666;
+  border-radius:12px;
+  padding:5px 8px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.baby-settings{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-top:9px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.baby-settings::-webkit-scrollbar{
+  display:none;
+}
+
+.baby-option{
+  flex:0 0 auto;
+  border:1px solid #EAE4D8;
+  background:#fff;
+  color:#777;
+  border-radius:14px;
+  padding:5px 9px;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.baby-option.active{
+  color:#62A8F5;
+  border-color:#62A8F5;
+  background:#EAF5FF;
+}
+
+/* 推荐卡片中的类型图标 */
+.rec-name-row{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+
+.rec-type-icon{
+  width:24px;
+  height:24px;
+  object-fit:contain;
+  flex-shrink:0;
+}
+
+.rec-type-label{
+  margin-left:2px;
+  padding:2px 7px;
+  border-radius:9px;
+  background:#F5F8FA;
+  color:#888;
+  font-size:10px;
+  font-weight:600;
+  flex-shrink:0;
+}
 
 /* =========================================================
    地图圆润起终点图标
@@ -1194,30 +1353,34 @@ button{
 
   <div class="bottom-panel">
 
-    <div class="nl-input-wrap">
-      <input
-        class="nl-input"
-        id="nlInput"
-        placeholder="带3岁宝宝找个室内玩的地方"
-      />
-    </div>
+    <div class="baby-panel">
 
-    <div class="chip-label">
-      孩子年龄
-    </div>
-
-    <div class="chip-row" id="ageChips">
-
-      <div class="chip" data-val="0-3">
-        0-3岁
+      <div class="baby-panel-head">
+        <div class="baby-title">我的宝宝</div>
+        <button class="baby-add-btn" type="button" onclick="addBabyProfile()">+ 添加宝宝</button>
       </div>
 
-      <div class="chip" data-val="3-6">
-        3-6岁
+      <div class="baby-card">
+        <div class="baby-avatar" id="babyAvatar">宝</div>
+
+        <div class="baby-info">
+          <div class="baby-name-row">
+            <span class="baby-name" id="babyNameText">宝宝</span>
+            <span class="baby-gender" id="babyGenderText">未设置</span>
+          </div>
+          <div class="baby-age" id="babyAgeText">3-6岁</div>
+        </div>
+
+        <button class="baby-edit-btn" type="button" onclick="editBabyProfile()">编辑</button>
       </div>
 
-      <div class="chip" data-val="6-12">
-        6-12岁
+      <div class="baby-settings">
+        <button class="baby-option" id="genderMale" type="button" onclick="setBabyGender('男')">男孩</button>
+        <button class="baby-option" id="genderFemale" type="button" onclick="setBabyGender('女')">女孩</button>
+        <button class="baby-option" id="genderUnset" type="button" onclick="setBabyGender('未设置')">未设置</button>
+        <button class="baby-option" data-age="0-3" type="button" onclick="setBabyAge('0-3')">0-3岁</button>
+        <button class="baby-option active" data-age="3-6" type="button" onclick="setBabyAge('3-6')">3-6岁</button>
+        <button class="baby-option" data-age="6-12" type="button" onclick="setBabyAge('6-12')">6-12岁</button>
       </div>
 
     </div>
@@ -1776,6 +1939,12 @@ var currentAddrText="";
 var selectedAge="3-6";
 var selectedPurpose="游玩";
 
+var babyProfile={
+  name:"宝宝",
+  gender:"未设置",
+  age:"3-6"
+};
+
 var currentMode="walking";
 
 var startPoint=null;
@@ -2180,13 +2349,13 @@ function createMapPointMarker(
           encodeURIComponent(
             type==='start'
             ?
-            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#C9A7E8" stroke="white" stroke-width="4"/></svg>'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#62A8F5" stroke="white" stroke-width="4"/></svg>'
             :
             type==='end'
             ?
-            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#9BC9F5" stroke="white" stroke-width="4"/></svg>'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#62A8F5" stroke="white" stroke-width="4"/></svg>'
             :
-            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#B7D9FF" stroke="white" stroke-width="4"/></svg>'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#62A8F5" stroke="white" stroke-width="4"/></svg>'
           ),
           new BMapGL.Size(28,28)
         )
@@ -3000,318 +3169,235 @@ function renderSuggestFromSearch(
 
 
 /* =========================================================
-   年龄 / 目的
+   宝宝信息 / 出行目的
 ========================================================= */
 
-function bindChips(
-  containerId,
-  onSelect
-){
+function updateBabyProfileUI(){
 
-  var container=
-    document.getElementById(
-      containerId
+  var nameEl=document.getElementById('babyNameText');
+  var genderEl=document.getElementById('babyGenderText');
+  var ageEl=document.getElementById('babyAgeText');
+  var avatarEl=document.getElementById('babyAvatar');
+
+  if(nameEl){
+    nameEl.textContent=babyProfile.name || '宝宝';
+  }
+
+  if(genderEl){
+    genderEl.textContent=babyProfile.gender || '未设置';
+  }
+
+  if(ageEl){
+    ageEl.textContent=(babyProfile.age || selectedAge)+'岁';
+  }
+
+  if(avatarEl){
+    avatarEl.textContent=(babyProfile.name || '宝宝').slice(0,1);
+  }
+
+  var ageButtons=document.querySelectorAll('.baby-option[data-age]');
+  for(var i=0;i<ageButtons.length;i++){
+    ageButtons[i].classList.toggle(
+      'active',
+      ageButtons[i].getAttribute('data-age')===selectedAge
     );
+  }
 
+  var genderMap={
+    '男':'genderMale',
+    '女':'genderFemale',
+    '未设置':'genderUnset'
+  };
+
+  for(var key in genderMap){
+    var el=document.getElementById(genderMap[key]);
+    if(el){
+      el.classList.toggle('active', babyProfile.gender===key);
+    }
+  }
+}
+
+function setBabyAge(age){
+  selectedAge=age;
+  babyProfile.age=age;
+  updateBabyProfileUI();
+}
+
+function setBabyGender(gender){
+  babyProfile.gender=gender;
+  updateBabyProfileUI();
+}
+
+function editBabyProfile(){
+
+  var name=prompt('请输入宝宝昵称',babyProfile.name||'宝宝');
+  if(name!==null && name.trim()){
+    babyProfile.name=name.trim();
+  }
+
+  var gender=prompt('请输入性别：男 / 女 / 未设置',babyProfile.gender||'未设置');
+  if(gender!==null){
+    gender=gender.trim();
+    if(gender==='男孩') gender='男';
+    if(gender==='女孩') gender='女';
+    if(gender==='男' || gender==='女' || gender==='未设置'){
+      babyProfile.gender=gender;
+    }
+  }
+
+  updateBabyProfileUI();
+}
+
+function addBabyProfile(){
+  showToast('当前原型先设置一个主要宝宝，可通过“编辑”修改信息');
+}
+
+function bindPurposeChips(){
+
+  var container=document.getElementById('purposeChips');
   if(!container){
     return;
   }
 
-  var chips=
-    container.querySelectorAll(
-      '.chip'
-    );
-
-  for(
-    var i=0;
-    i<chips.length;
-    i++
-  ){
-
-    chips[i].onclick=
-      function(){
-
-        var siblings=
-          this.parentNode.querySelectorAll(
-            '.chip'
-          );
-
-        for(
-          var j=0;
-          j<siblings.length;
-          j++
-        ){
-
-          siblings[j].classList.remove(
-            'active'
-          );
-
-        }
-
-        this.classList.add(
-          'active'
-        );
-
-        onSelect(
-          this.getAttribute(
-            'data-val'
-          )
-        );
-
-      };
-
+  var chips=container.querySelectorAll('.chip');
+  for(var i=0;i<chips.length;i++){
+    chips[i].onclick=function(){
+      var siblings=this.parentNode.querySelectorAll('.chip');
+      for(var j=0;j<siblings.length;j++){
+        siblings[j].classList.remove('active');
+      }
+      this.classList.add('active');
+      selectedPurpose=this.getAttribute('data-val');
+    };
   }
 
 }
 
+bindPurposeChips();
 
-bindChips(
-  'ageChips',
-  function(v){
-    selectedAge=v;
-  }
-);
-
-bindChips(
-  'purposeChips',
-  function(v){
-    selectedPurpose=v;
-  }
-);
-
-document
-  .querySelectorAll(
-    '#ageChips .chip'
-  )[1]
-  .classList
-  .add('active');
-
-document
-  .querySelectorAll(
-    '#purposeChips .chip'
-  )[1]
-  .classList
-  .add('active');
+document.querySelectorAll('#purposeChips .chip')[1].classList.add('active');
+updateBabyProfileUI();
 
 
 /* =========================================================
    开始规划
 ========================================================= */
 
-function startPlanning(){
+function getRecommendationKeywords(){
 
-  var nl=
-    document.getElementById(
-      'nlInput'
-    ).value.trim();
+  var map={
+    '吃饭':['亲子餐厅','儿童餐厅','亲子餐饮','餐厅'],
+    '游玩':['儿童乐园','亲子乐园','游乐园','室内儿童乐园'],
+    '户外':['亲子公园','儿童公园','公园','动物园'],
+    '购物':['亲子商场','商场','购物中心','大型商场']
+  };
 
-  var kw=
-    nl ||
-    (
-      selectedPurpose==='吃饭'
-      ? '亲子餐厅'
-      : selectedPurpose==='购物'
-      ? '亲子商场'
-      : selectedPurpose==='户外'
-      ? '亲子公园'
-      : '儿童乐园'
-    );
-
-  if(!userPoint){
-
-    showToast(
-      '还没有获取到当前位置，请先允许定位'
-    );
-
-    doGeolocation(true);
-
-    return;
-
-  }
-
-  var base=
-    new BMapGL.Point(
-      userPoint.lng,
-      userPoint.lat
-    );
-
-  showToast(
-    '正在为你规划~'
-  );
-
-  try{
-
-    var local=
-      new BMapGL.LocalSearch(
-        map1,
-        {
-
-          pageCapacity:10,
-
-          renderOptions:{
-            map:null,
-            autoViewport:false
-          },
-
-          onSearchComplete:
-            function(results){
-
-              var list=[];
-
-              if(
-                results &&
-                results.getNumPois &&
-                results.getNumPois()>0
-              ){
-
-                var n=
-                  Math.min(
-                    results.getNumPois(),
-                    3
-                  );
-
-                for(
-                  var i=0;
-                  i<n;
-                  i++
-                ){
-
-                  var poi=
-                    results.getPoi(i);
-
-                  if(
-                    poi &&
-                    poi.point
-                  ){
-
-                    list.push(
-                      poi
-                    );
-
-                  }
-
-                }
-
-              }
-
-              if(list.length===0){
-
-                searchFallback(
-                  base
-                );
-
-              }else{
-
-                buildRecommendations(
-                  list,
-                  base
-                );
-
-              }
-
-            }
-
-        }
-      );
-
-    local.searchNearby(
-      kw,
-      base,
-      5000
-    );
-
-  }catch(e){
-
-    searchFallback(
-      base
-    );
-
-  }
-
+  return map[selectedPurpose] || ['亲子地点','儿童乐园','公园'];
 }
 
+function collectRecommendationPois(results,base,list,seen){
 
-function searchFallback(
-  base
-){
+  if(!results || !results.getNumPois || results.getNumPois()<=0){
+    return;
+  }
+
+  var n=Math.min(results.getNumPois(),10);
+  for(var i=0;i<n;i++){
+    var poi=results.getPoi(i);
+    if(!poi || !poi.point){
+      continue;
+    }
+
+    var key=(poi.uid || stripHtml(poi.title||''))+'_'+
+      poi.point.lng.toFixed(5)+'_'+poi.point.lat.toFixed(5);
+
+    if(seen[key]){
+      continue;
+    }
+
+    seen[key]=true;
+    list.push(poi);
+  }
+}
+
+function searchRecommendationRange(base,keywords,keywordIndex,radii,radiusIndex,list,seen){
+
+  if(list.length>=5){
+    buildRecommendations(list.slice(0,8),base);
+    return;
+  }
+
+  if(keywordIndex>=keywords.length){
+    if(list.length>0){
+      buildRecommendations(list.slice(0,8),base);
+    }else{
+      showToast('附近暂未检索到相关地点');
+      goPage('page1');
+    }
+    return;
+  }
+
+  if(radiusIndex>=radii.length){
+    searchRecommendationRange(
+      base,keywords,keywordIndex+1,radii,0,list,seen
+    );
+    return;
+  }
+
+  var keyword=keywords[keywordIndex];
+  var radius=radii[radiusIndex];
 
   try{
+    var local=new BMapGL.LocalSearch(map1,{
+      pageCapacity:10,
+      renderOptions:{map:null,autoViewport:false},
+      onSearchComplete:function(results){
+        collectRecommendationPois(results,base,list,seen);
 
-    var local=
-      new BMapGL.LocalSearch(
-        map1,
-        {
-
-          renderOptions:{
-            map:null,
-            autoViewport:false
-          },
-
-          onSearchComplete:
-            function(results){
-
-              var list=[];
-
-              if(
-                results &&
-                results.getNumPois &&
-                results.getNumPois()>0
-              ){
-
-                var n=
-                  Math.min(
-                    results.getNumPois(),
-                    3
-                  );
-
-                for(
-                  var i=0;
-                  i<n;
-                  i++
-                ){
-
-                  var poi=
-                    results.getPoi(i);
-
-                  if(
-                    poi &&
-                    poi.point
-                  ){
-
-                    list.push(
-                      poi
-                    );
-
-                  }
-
-                }
-
-              }
-
-              buildRecommendations(
-                list,
-                base
-              );
-
-            }
-
+        /* 对应类型结果不足时，继续扩大半径；只有仍不足才换同类型近义词。 */
+        if(list.length>=5){
+          buildRecommendations(list.slice(0,8),base);
+        }else{
+          searchRecommendationRange(
+            base,keywords,keywordIndex,radii,radiusIndex+1,list,seen
+          );
         }
-      );
+      }
+    });
 
-    local.searchNearby(
-      '公园',
-      base,
-      5000
-    );
+    local.searchNearby(keyword,base,radius);
 
   }catch(e){
-
-    buildRecommendations(
-      [],
-      base
+    searchRecommendationRange(
+      base,keywords,keywordIndex,radii,radiusIndex+1,list,seen
     );
-
   }
+}
+
+function startPlanning(){
+
+  if(!userPoint){
+    showToast('还没有获取到当前位置，请先允许定位');
+    doGeolocation(true);
+    return;
+  }
+
+  var base=new BMapGL.Point(userPoint.lng,userPoint.lat);
+
+  showToast('正在为你规划~');
+
+  var keywords=getRecommendationKeywords();
+  var radii=[3000,6000,10000,15000,20000];
+
+  searchRecommendationRange(
+    base,
+    keywords,
+    0,
+    radii,
+    0,
+    [],
+    {}
+  );
 
 }
 
@@ -3349,91 +3435,54 @@ function calcDistance(
 
 function guessIconByCategory(
   name,
-  tags
+  tags,
+  purpose
 ){
 
-  var text=
-    (name||'')+
-    ' '+
-    ((tags||[]).join(' '));
+  var text=(name||'')+' '+((tags||[]).join(' '));
 
   if(/动物园|野生动物/.test(text)){
-    return {
-      iconFile:'zoo.svg',
-      cls:'type-park'
-    };
+    return {iconFile:'zoo.svg',cls:'type-park',label:'动物园'};
   }
-
   if(/体育场|体育馆|运动场|运动/.test(text)){
-    return {
-      iconFile:'stadium.svg',
-      cls:'type-park'
-    };
+    return {iconFile:'stadium.svg',cls:'type-park',label:'运动'};
   }
-
   if(/公园|绿地|户外|广场/.test(text)){
-    return {
-      iconFile:'park.svg',
-      cls:'type-park'
-    };
+    return {iconFile:'park.svg',cls:'type-park',label:'户外'};
   }
-
   if(/博物馆/.test(text)){
-    return {
-      iconFile:'museum.svg',
-      cls:'type-museum'
-    };
+    return {iconFile:'museum.svg',cls:'type-museum',label:'博物馆'};
   }
-
   if(/科技馆|科学馆|科技/.test(text)){
-    return {
-      iconFile:'technology.svg',
-      cls:'type-museum'
-    };
+    return {iconFile:'technology.svg',cls:'type-museum',label:'科技馆'};
   }
-
   if(/展览|美术馆/.test(text)){
-    return {
-      iconFile:'museum.svg',
-      cls:'type-museum'
-    };
+    return {iconFile:'museum.svg',cls:'type-museum',label:'展览'};
   }
-
   if(/图书馆|图书|书店|阅读/.test(text)){
-    return {
-      iconFile:'library.svg',
-      cls:'type-museum'
-    };
+    return {iconFile:'library.svg',cls:'type-museum',label:'阅读'};
   }
-
   if(/商场|购物|mall/i.test(text)){
-    return {
-      iconFile:'shoppingmall.svg',
-      cls:'type-mall'
-    };
+    return {iconFile:'shoppingmall.svg',cls:'type-mall',label:'商场'};
   }
-
   if(/商店|便利店|门店/.test(text)){
-    return {
-      iconFile:'store.svg',
-      cls:'type-mall'
-    };
+    return {iconFile:'store.svg',cls:'type-mall',label:'商店'};
   }
-
   if(/餐|饭店|美食|甜品|蛋糕/.test(text)){
-    return {
-      iconFile:'restaurant.svg',
-      cls:'type-food'
-    };
+    return {iconFile:'restaurant.svg',cls:'type-food',label:'餐饮'};
+  }
+  if(/游乐|乐园|儿童活动/.test(text)){
+    return {iconFile:'playcentre.svg',cls:'type-park',label:'游玩'};
   }
 
-  /* 没有对应 SVG 时，不再使用 Emoji。 */
-  return {
-    iconFile:'',
-    cls:'type-park'
-  };
-}
+  /* POI名称不一定直接包含类别词，因此用用户选择的出行目的兜底。 */
+  if(purpose==='吃饭') return {iconFile:'restaurant.svg',cls:'type-food',label:'餐饮'};
+  if(purpose==='游玩') return {iconFile:'playcentre.svg',cls:'type-park',label:'游玩'};
+  if(purpose==='户外') return {iconFile:'park.svg',cls:'type-park',label:'户外'};
+  if(purpose==='购物') return {iconFile:'shoppingmall.svg',cls:'type-mall',label:'商场'};
 
+  return {iconFile:'',cls:'type-park',label:''};
+}
 
 
 function buildRecommendations(
@@ -3492,8 +3541,11 @@ function buildRecommendations(
      */
 
     var ageScore=
-      .7+
-      Math.random()*.3;
+      selectedAge==='0-3'
+      ? .92
+      : selectedAge==='3-6'
+      ? .88
+      : .84;
 
     var purposeScore=
       .7+
@@ -3537,7 +3589,8 @@ function buildRecommendations(
     var typeInfo=
       guessIconByCategory(
         name,
-        poi.tags
+        poi.tags,
+        selectedPurpose
       );
 
     var tags=[];
@@ -3576,6 +3629,7 @@ function buildRecommendations(
       stars:stars,
       totalScore:total,
       iconFile:typeInfo.iconFile,
+      typeLabel:typeInfo.label || '',
       cls:typeInfo.cls,
       photoUrl:'',
       tags:tags,
@@ -3822,7 +3876,11 @@ function renderRecommendCards(){
 
       '<div class="body">'+
 
-        '<div class="name"></div>'+
+        '<div class="rec-name-row">'+
+          (p.iconFile ? '<img class="rec-type-icon" src="'+ICON_BASE+p.iconFile+'" alt="" aria-hidden="true">' : '')+
+          '<div class="name"></div>'+
+          (p.typeLabel ? '<span class="rec-type-label">'+p.typeLabel+'</span>' : '')+
+        '</div>'+
 
         '<div class="stars-row">'+
 
@@ -4136,7 +4194,7 @@ function drawDashedRoute(
     new BMapGL.Polyline(
       points,
       {
-        strokeColor:'#999999',
+        strokeColor:'#62A8F5',
         strokeWeight:5,
         strokeOpacity:.9,
         strokeStyle:'dashed'
