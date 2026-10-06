@@ -145,6 +145,26 @@ button{
   font-size:18px;
 }
 
+/* 本地 SVG 图标 */
+.asset-icon{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  display:block;
+  flex-shrink:0;
+}
+
+.asset-icon.small{
+  width:18px;
+  height:18px;
+}
+
+.asset-icon.place-icon{
+  width:72px;
+  height:72px;
+  object-fit:contain;
+}
+
 .loc-edit-input{
   border:none;
   outline:none;
@@ -283,6 +303,9 @@ button{
 
 .chip{
   flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:5px;
   padding:7px 16px;
   border-radius:20px;
   background:#fff;
@@ -783,6 +806,23 @@ button{
   flex-shrink:0;
 }
 
+.nav-live-icon:empty{
+  display:none;
+}
+
+.nav-detail-img img{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+}
+
+.map-facility-icon{
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  display:block;
+}
+
 .nav-live-text{
   flex:1;
   min-width:0;
@@ -834,8 +874,22 @@ button{
 }
 
 .nav-category .cat-icon{
-  font-size:23px;
+  width:23px;
+  height:23px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   line-height:23px;
+}
+
+.nav-category .cat-icon:empty{
+  display:none;
+}
+
+.nav-category .cat-icon img{
+  width:23px;
+  height:23px;
+  object-fit:contain;
 }
 
 .nav-category.active{
@@ -1084,8 +1138,6 @@ button{
     <div class="top-row">
 
       <div class="loc-wrap">
-        <span class="loc-icon">📍</span>
-
         <input
           class="loc-edit-input"
           id="curAddrInput"
@@ -1103,7 +1155,7 @@ button{
       </div>
 
       <div class="weather-chip" id="weatherChip">
-        ☀️ 26°C
+        26°C
       </div>
 
     </div>
@@ -1120,8 +1172,6 @@ button{
   <div class="bottom-panel">
 
     <div class="nl-input-wrap">
-      <span class="emoji">💬</span>
-
       <input
         class="nl-input"
         id="nlInput"
@@ -1156,19 +1206,19 @@ button{
     <div class="chip-row" id="purposeChips">
 
       <div class="chip" data-val="吃饭">
-        🍴 吃饭
+        <img class="asset-icon small" src="icons/restaurant.svg" alt="" aria-hidden="true"> 吃饭
       </div>
 
       <div class="chip" data-val="游玩">
-        🎠 游玩
+        <img class="asset-icon small" src="icons/playcentre.svg" alt="" aria-hidden="true"> 游玩
       </div>
 
       <div class="chip" data-val="户外">
-        🌳 户外
+        <img class="asset-icon small" src="icons/park.svg" alt="" aria-hidden="true"> 户外
       </div>
 
       <div class="chip" data-val="购物">
-        🛍️ 购物
+        <img class="asset-icon small" src="icons/shoppingmall.svg" alt="" aria-hidden="true"> 购物
       </div>
 
     </div>
@@ -1215,7 +1265,6 @@ button{
   <div class="ai-greet">
 
     <div class="ai-avatar">
-      🤗
     </div>
 
     <div class="ai-bubble">
@@ -1344,28 +1393,28 @@ button{
       class="mode-tab active"
       data-mode="walking"
     >
-      🚶 步行
+      步行
     </div>
 
     <div
       class="mode-tab"
       data-mode="driving"
     >
-      🚗 驾车
+      驾车
     </div>
 
     <div
       class="mode-tab"
       data-mode="transit"
     >
-      🚌 公共交通
+      公共交通
     </div>
 
     <div
       class="mode-tab"
       data-mode="riding"
     >
-      🚴 骑行
+      骑行
     </div>
 
   </div>
@@ -1377,7 +1426,7 @@ button{
   <div class="reason-card">
 
     <div class="rt">
-      ✨ 推荐原因
+      推荐原因
     </div>
 
     <div
@@ -1391,11 +1440,11 @@ button{
     >
 
       <span id="reasonDist">
-        📏 --
+        --
       </span>
 
       <span id="reasonTime">
-        ⏱ --
+        --
       </span>
 
     </div>
@@ -1434,7 +1483,7 @@ button{
       class="nav-live-icon"
       id="stepIcon"
     >
-      ⬆️
+      
     </div>
 
     <div
@@ -1460,7 +1509,7 @@ button{
       data-tone="yellow"
       onclick="selectNavCategory(this,'全部')"
     >
-      <span class="cat-icon">🗺️</span>
+      <span class="cat-icon"></span>
       <span>全部</span>
     </div>
 
@@ -1471,7 +1520,7 @@ button{
       data-tone="purple"
       onclick="selectNavCategory(this,'母婴室')"
     >
-      <span class="cat-icon">🍼</span>
+      <span class="cat-icon"><img src="icons/motherbabyroom.svg" alt="" aria-hidden="true"></span>
       <span>母婴室</span>
     </div>
 
@@ -1482,7 +1531,7 @@ button{
       data-tone="blue"
       onclick="selectNavCategory(this,'停车场')"
     >
-      <span class="cat-icon">🅿️</span>
+      <span class="cat-icon"><img src="icons/parking.svg" alt="" aria-hidden="true"></span>
       <span>停车场</span>
     </div>
 
@@ -1493,7 +1542,7 @@ button{
       data-tone="green"
       onclick="selectNavCategory(this,'休息处')"
     >
-      <span class="cat-icon">🪑</span>
+      <span class="cat-icon"></span>
       <span>休息处</span>
     </div>
 
@@ -1504,7 +1553,7 @@ button{
       data-tone="orange"
       onclick="selectNavCategory(this,'儿童乐园')"
     >
-      <span class="cat-icon">🛝</span>
+      <span class="cat-icon"><img src="icons/playcentre.svg" alt="" aria-hidden="true"></span>
       <span>游乐区</span>
     </div>
 
@@ -1515,7 +1564,7 @@ button{
       data-tone="orange"
       onclick="selectNavCategory(this,'儿童餐厅')"
     >
-      <span class="cat-icon">🍽️</span>
+      <span class="cat-icon"><img src="icons/restaurant.svg" alt="" aria-hidden="true"></span>
       <span>儿童餐厅</span>
     </div>
 
@@ -1526,7 +1575,7 @@ button{
       data-tone="orange"
       onclick="selectNavCategory(this,'儿童活动')"
     >
-      <span class="cat-icon">🎨</span>
+      <span class="cat-icon"></span>
       <span>儿童活动</span>
     </div>
 
@@ -1537,7 +1586,7 @@ button{
       data-tone="purple"
       onclick="selectNavCategory(this,'家庭卫生间')"
     >
-      <span class="cat-icon">🚽</span>
+      <span class="cat-icon"><img src="icons/toilet.svg" alt="" aria-hidden="true"></span>
       <span>卫生间</span>
     </div>
 
@@ -1548,7 +1597,7 @@ button{
       data-tone="blue"
       onclick="selectNavCategory(this,'无障碍通道')"
     >
-      <span class="cat-icon">♿</span>
+      <span class="cat-icon"></span>
       <span>无障碍</span>
     </div>
 
@@ -1559,7 +1608,7 @@ button{
       data-tone="blue"
       onclick="selectNavCategory(this,'博物馆')"
     >
-      <span class="cat-icon">🏛️</span>
+      <span class="cat-icon"><img src="icons/museum.svg" alt="" aria-hidden="true"></span>
       <span>博物馆</span>
     </div>
 
@@ -1570,7 +1619,7 @@ button{
       data-tone="blue"
       onclick="selectNavCategory(this,'科技馆')"
     >
-      <span class="cat-icon">🔬</span>
+      <span class="cat-icon"><img src="icons/technology.svg" alt="" aria-hidden="true"></span>
       <span>科技馆</span>
     </div>
 
@@ -1589,7 +1638,7 @@ button{
     <div class="nav-bottom-info">
 
       <div class="tt">
-        🤖 AI 沿途提示
+        AI 沿途提示
       </div>
 
       <div
@@ -1613,7 +1662,6 @@ button{
         class="nav-detail-img"
         id="navDetailImg"
       >
-        🧸
       </div>
 
       <div class="nav-detail-content">
@@ -1628,11 +1676,11 @@ button{
         <div class="nav-detail-meta">
 
           <span>
-            ⭐ 亲子友好
+             亲子友好
           </span>
 
           <span id="navDetailDistance">
-            📍 附近
+            附近
           </span>
 
         </div>
@@ -1741,6 +1789,29 @@ var isNavPage=false;
 
 
 /* =========================================================
+   本地 SVG 图标
+   index.html 与 icons 文件夹保持同级
+========================================================= */
+
+var ICON_BASE='icons/';
+
+function iconHtml(file, className, alt){
+
+  if(!file){
+    return '';
+  }
+
+  return
+    '<img'+
+    ' class="'+(className||'asset-icon')+'"'+
+    ' src="'+ICON_BASE+file+'"'+
+    ' alt="'+(alt||'')+'"'+
+    ' aria-hidden="true">';
+
+}
+
+
+/* =========================================================
    设施分类
 ========================================================= */
 
@@ -1748,101 +1819,102 @@ var FACILITY_CATEGORY_MAP=[
 
   {
     keyword:'母婴室|母婴|哺乳室|育婴',
-    icon:'🍼',
+    iconFile:'motherbabyroom.svg',
     label:'母婴室'
   },
 
   {
     keyword:'停车|停车场',
-    icon:'🅿️',
+    iconFile:'parking.svg',
     label:'停车场'
   },
 
   {
     keyword:'推车',
-    icon:'🛒',
+    iconFile:'',
     label:'推车友好'
   },
 
   {
     keyword:'电梯',
-    icon:'🛗',
+    iconFile:'',
     label:'电梯'
   },
 
   {
     keyword:'无障碍',
-    icon:'♿',
+    iconFile:'',
     label:'无障碍通道'
   },
 
   {
     keyword:'游乐|儿童乐园|儿童游乐',
-    icon:'🛝',
+    iconFile:'playcentre.svg',
     label:'儿童乐园'
   },
 
   {
     keyword:'活动|亲子活动|儿童活动',
-    icon:'🎨',
+    iconFile:'',
     label:'儿童活动'
   },
 
   {
     keyword:'图书|书店|阅读',
-    icon:'📚',
+    iconFile:'library.svg',
     label:'儿童阅读空间'
   },
 
   {
     keyword:'餐厅|美食|餐饮|亲子餐',
-    icon:'🍽️',
+    iconFile:'restaurant.svg',
     label:'儿童餐厅'
   },
 
   {
     keyword:'卫生间|厕所|洗手间|卫生',
-    icon:'🚽',
+    iconFile:'toilet.svg',
     label:'家庭卫生间'
   },
 
   {
     keyword:'休息|座椅|长椅|休息区|休息处',
-    icon:'🪑',
+    iconFile:'',
     label:'休息处'
   },
 
   {
     keyword:'公园|广场|绿地',
-    icon:'🌳',
+    iconFile:'park.svg',
     label:'户外休息空间'
   },
 
   {
     keyword:'博物馆',
-    icon:'🏛️',
+    iconFile:'museum.svg',
     label:'博物馆'
   },
 
   {
     keyword:'科技馆',
-    icon:'🔬',
+    iconFile:'technology.svg',
     label:'科技馆'
   },
 
   {
     keyword:'图书馆',
-    icon:'📖',
+    iconFile:'library.svg',
     label:'图书馆'
   },
 
   {
     keyword:'美术馆',
-    icon:'🖼️',
+    iconFile:'',
     label:'美术馆'
   }
 
 ];
+
 
 
 /*
@@ -1856,94 +1928,95 @@ var FACILITY_SEARCH_KEYWORDS=[
   {
     keyword:'母婴室',
     fallbackLabel:'母婴室',
-    icon:'🍼'
+    iconFile:'motherbabyroom.svg'
   },
 
   {
     keyword:'哺乳室',
     fallbackLabel:'母婴室',
-    icon:'🍼'
+    iconFile:'motherbabyroom.svg'
   },
 
   {
     keyword:'停车场',
     fallbackLabel:'停车场',
-    icon:'🅿️'
+    iconFile:'parking.svg'
   },
 
   {
     keyword:'休息区',
     fallbackLabel:'休息处',
-    icon:'🪑'
+    iconFile:''
   },
 
   {
     keyword:'休息处',
     fallbackLabel:'休息处',
-    icon:'🪑'
+    iconFile:''
   },
 
   {
     keyword:'儿童卫生间',
     fallbackLabel:'家庭卫生间',
-    icon:'🚽'
+    iconFile:'toilet.svg'
   },
 
   {
     keyword:'卫生间',
     fallbackLabel:'家庭卫生间',
-    icon:'🚽'
+    iconFile:'toilet.svg'
   },
 
   {
     keyword:'儿童乐园',
     fallbackLabel:'儿童乐园',
-    icon:'🛝'
+    iconFile:'playcentre.svg'
   },
 
   {
     keyword:'儿童活动',
     fallbackLabel:'儿童活动',
-    icon:'🎨'
+    iconFile:''
   },
 
   {
     keyword:'儿童餐厅',
     fallbackLabel:'儿童餐厅',
-    icon:'🍽️'
+    iconFile:'restaurant.svg'
   },
 
   {
     keyword:'无障碍卫生间',
     fallbackLabel:'家庭卫生间',
-    icon:'🚽'
+    iconFile:'toilet.svg'
   },
 
   {
     keyword:'博物馆',
     fallbackLabel:'博物馆',
-    icon:'🏛️'
+    iconFile:'museum.svg'
   },
 
   {
     keyword:'科技馆',
     fallbackLabel:'科技馆',
-    icon:'🔬'
+    iconFile:'technology.svg'
   },
 
   {
     keyword:'图书馆',
     fallbackLabel:'图书馆',
-    icon:'📖'
+    iconFile:'library.svg'
   },
 
   {
     keyword:'美术馆',
     fallbackLabel:'美术馆',
-    icon:'🖼️'
+    iconFile:''
   }
 
 ];
+
 
 
 /* =========================================================
@@ -2199,7 +2272,7 @@ function detectFacilityCategory(
   }
 
   return {
-    icon:fallback.icon,
+    iconFile:fallback.iconFile || '',
     label:fallback.fallbackLabel
   };
 
@@ -3225,7 +3298,7 @@ function calcDistance(
    推荐
 ========================================================= */
 
-function guessEmojiByCategory(
+function guessIconByCategory(
   name,
   tags
 ){
@@ -3235,56 +3308,69 @@ function guessEmojiByCategory(
     ' '+
     ((tags||[]).join(' '));
 
-  if(
-    /公园|绿地|户外|广场/.test(text)
-  ){
-
+  if(/动物园|野生动物/.test(text)){
     return {
-      emoji:'🌳',
+      iconFile:'zoo.svg',
       cls:'type-park'
     };
-
   }
 
-  if(
-    /博物|科技|展览|图书|美术/.test(text)
-  ){
-
+  if(/体育场|体育馆|运动场|运动/.test(text)){
     return {
-      emoji:'🏛️',
+      iconFile:'stadium.svg',
+      cls:'type-park'
+    };
+  }
+
+  if(/公园|绿地|户外|广场/.test(text)){
+    return {
+      iconFile:'park.svg',
+      cls:'type-park'
+    };
+  }
+
+  if(/博物|科技|展览/.test(text)){
+    return {
+      iconFile:'museum.svg',
       cls:'type-museum'
     };
-
   }
 
-  if(
-    /商场|购物|mall/i.test(text)
-  ){
-
+  if(/图书馆|图书|书店|阅读/.test(text)){
     return {
-      emoji:'🛍️',
+      iconFile:'library.svg',
+      cls:'type-museum'
+    };
+  }
+
+  if(/商场|购物|mall/i.test(text)){
+    return {
+      iconFile:'shoppingmall.svg',
       cls:'type-mall'
     };
-
   }
 
-  if(
-    /餐|饭店|美食|甜品|蛋糕/.test(text)
-  ){
-
+  if(/商店|便利店|门店/.test(text)){
     return {
-      emoji:'🍰',
+      iconFile:'store.svg',
+      cls:'type-mall'
+    };
+  }
+
+  if(/餐|饭店|美食|甜品|蛋糕/.test(text)){
+    return {
+      iconFile:'restaurant.svg',
       cls:'type-food'
     };
-
   }
 
+  /* 没有对应 SVG 时，不再使用 Emoji。 */
   return {
-    emoji:'🎠',
+    iconFile:'',
     cls:'type-park'
   };
-
 }
+
 
 
 function buildRecommendations(
@@ -3386,7 +3472,7 @@ function buildRecommendations(
       );
 
     var typeInfo=
-      guessEmojiByCategory(
+      guessIconByCategory(
         name,
         poi.tags
       );
@@ -3426,7 +3512,7 @@ function buildRecommendations(
       dist:dist,
       stars:stars,
       totalScore:total,
-      emoji:typeInfo.emoji,
+      iconFile:typeInfo.iconFile,
       cls:typeInfo.cls,
       tags:tags,
       strollerScore:strollerScore,
@@ -3529,7 +3615,11 @@ function renderRecommendCards(){
           ''
         )+
 
-        p.emoji+
+        iconHtml(
+          p.iconFile,
+          'asset-icon place-icon',
+          ''
+        )+
 
       '</div>'+
 
@@ -4173,7 +4263,7 @@ function renderReasonCard(
   document.getElementById(
     'reasonDist'
   ).textContent=
-    '📏 '+distTimeInfo.dist;
+    distTimeInfo.dist;
 
   var modeName={
     walking:'步行',
@@ -4185,7 +4275,6 @@ function renderReasonCard(
   document.getElementById(
     'reasonTime'
   ).textContent=
-    '⏱ '+
     modeName[modeKey]+
     '约'+
     distTimeInfo.time;
@@ -4194,7 +4283,7 @@ function renderReasonCard(
     'parkingLine'
   ).textContent=
     showParking
-    ? '🅿️ 正在查询附近停车场...'
+    ? ' 正在查询附近停车场...'
     : '';
 
 }
@@ -4279,7 +4368,7 @@ function searchNearbyParking(){
 
                   var marker=
                     new BMapGL.Label(
-                      '🅿️',
+                      iconHtml('parking.svg','map-facility-icon','停车场'),
                       {
                         position:poi.point,
                         offset:
@@ -4320,10 +4409,10 @@ function searchNearbyParking(){
               ).textContent=
                 names.length
                 ?
-                '🅿️ 附近停车场：'+
+                '附近停车场：'+
                 names.join('、')
                 :
-                '🅿️ 附近暂未检索到停车场信息';
+                '附近暂未检索到停车场信息';
 
             }
 
@@ -5246,7 +5335,7 @@ function updateLiveNavigationGuide(
         textEl.textContent=
           '已到达目的地';
 
-        iconEl.textContent='🏁';
+        iconEl.textContent='';
 
       }else{
 
@@ -5254,7 +5343,7 @@ function updateLiveNavigationGuide(
           '沿当前路线继续前进，距目的地'+
           distText;
 
-        iconEl.textContent='⬆️';
+        iconEl.textContent='';
 
       }
 
@@ -5270,7 +5359,7 @@ function getDirectionIcon(
 ){
 
   if(!text){
-    return '⬆️';
+    return '';
   }
 
   if(
@@ -5294,16 +5383,16 @@ function getDirectionIcon(
   if(
     /到达|终点/.test(text)
   ){
-    return '🏁';
+    return '';
   }
 
   if(
     /直行|继续|前行/.test(text)
   ){
-    return '⬆️';
+    return '';
   }
 
-  return '🧭';
+  return '';
 
 }
 
@@ -5930,7 +6019,7 @@ function searchSingleFacilityKeyword(
 
                   sourceType:type,
 
-                  icon:category.icon,
+                  iconFile:category.iconFile || '',
 
                   label:category.label,
 
@@ -6072,14 +6161,23 @@ function renderFacilityMarkers(){
      * 点击后才显示名称。
      */
 
+    /* 没有对应 SVG 的分类不再显示 Emoji，也不生成空白地图点。 */
+    if(!f.iconFile){
+      continue;
+    }
+
     var lbl=
       new BMapGL.Label(
-        f.icon,
+        iconHtml(
+          f.iconFile,
+          'map-facility-icon',
+          f.label || ''
+        ),
         {
           position:f.point,
           offset:new BMapGL.Size(
-            -13,
-            -13
+            -11,
+            -11
           )
         }
       );
@@ -6105,7 +6203,7 @@ function renderFacilityMarkers(){
 
       textAlign:'center',
 
-      fontSize:'16px',
+      fontSize:'0',
 
       boxShadow:
         '0 2px 7px rgba(0,0,0,.15)',
@@ -6168,9 +6266,12 @@ function showNavDetail(
 
   document.getElementById(
     'navDetailImg'
-  ).textContent=
-    f.icon ||
-    '📍';
+  ).innerHTML=
+    iconHtml(
+      f.iconFile || '',
+      'asset-icon',
+      f.label || ''
+    );
 
   document.getElementById(
     'navDetailTitle'
@@ -6184,9 +6285,9 @@ function showNavDetail(
   ).textContent=
     f.address
     ?
-    '📍 '+f.address
+    f.address
     :
-    '📍 路线附近';
+    '路线附近';
 
   document.getElementById(
     'navDetailTags'
