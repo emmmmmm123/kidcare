@@ -24,7 +24,7 @@
 }
 
 :root{
-  --bg:#FFF6E0;
+  --bg:#EAF6FF;
   --card:#FFFFFF;
 
   /* 主色：淡黄色 */
@@ -86,6 +86,16 @@ body{
   background:var(--bg);
 }
 
+#page1{
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none;
+}
+
+#page1::-webkit-scrollbar{
+  display:none;
+}
+
 .page.active{
   display:flex;
 }
@@ -117,84 +127,86 @@ button{
    页面1：首页
 ========================================================= */
 
+/* =========================================================
+   首页顶部 / Banner / 宝宝 / 出行目的
+========================================================= */
+
 .top-bar{
   flex-shrink:0;
   background:#fff;
-  padding:14px 16px 18px;
+  padding:12px 16px 12px;
   color:var(--text);
-  border-radius:0 0 22px 22px;
-  box-shadow:0 2px 10px rgba(80,60,30,.07);
+  border-radius:0 0 20px 20px;
+  box-shadow:0 2px 10px rgba(80,60,30,.06);
   z-index:20;
 }
 
 .top-row{
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  gap:10px;
+  margin-top:0;
+  min-width:0;
 }
 
 .loc-wrap{
   display:flex;
   align-items:center;
-  gap:6px;
-  flex:1;
+  gap:7px;
   min-width:0;
+  flex:1 1 auto;
+  overflow:hidden;
 }
 
-.loc-icon{
-  font-size:18px;
-}
-
-/* 本地 SVG 图标 */
-.asset-icon{
-  width:22px;
-  height:22px;
-  object-fit:contain;
-  display:block;
-  flex-shrink:0;
-}
-
-.asset-icon.small{
+.loc-pin{
   width:18px;
-  height:18px;
+  height:22px;
+  flex:0 0 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.asset-icon.place-icon{
-  width:72px;
-  height:72px;
-  object-fit:contain;
+.loc-pin svg{
+  width:18px;
+  height:22px;
+  display:block;
 }
 
 .loc-edit-input{
   border:none;
   outline:none;
-  background:#fff;
-  border-radius:18px;
-  padding:6px 10px;
-  color:var(--text2);
-  font-size:14px;
-  font-weight:600;
-  flex:1;
+  background:transparent;
+  padding:0;
+  width:16ch;
+  max-width:16ch;
   min-width:0;
+  flex:0 1 16ch;
+  color:#333333;
+  font-size:14px;
+  font-weight:500;
+  line-height:22px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .loc-edit-input::placeholder{
-  color:var(--muted);
+  color:#777777;
 }
 
 .locate-btn{
-  width:30px;
-  height:30px;
+  width:24px;
+  height:24px;
   border-radius:50%;
-  background:var(--bg);
-  color:var(--text2);
+  background:#EAF4FF;
+  color:#4096FF;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:15px;
-  flex-shrink:0;
+  font-size:14px;
+  flex:0 0 24px;
   cursor:pointer;
-  margin-left:6px;
 }
 
 .locate-btn:active{
@@ -202,16 +214,44 @@ button{
 }
 
 .weather-chip{
+  height:40px;
+  min-width:76px;
   display:flex;
   align-items:center;
-  gap:4px;
-  background:var(--bg);
-  color:var(--text2);
-  border-radius:18px;
-  padding:5px 12px;
-  font-size:13px;
-  flex-shrink:0;
-  margin-left:8px;
+  justify-content:center;
+  gap:7px;
+  background:#FFF7EA;
+  border-radius:20px;
+  padding:0 10px;
+  flex:0 0 auto;
+}
+
+.weather-icon{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#FFD66B;
+  box-shadow:0 0 0 3px #FFF0C2;
+  flex:0 0 18px;
+}
+
+.weather-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  line-height:1;
+}
+
+.weather-temp{
+  font-size:16px;
+  color:#222222;
+  font-weight:700;
+}
+
+.weather-desc{
+  margin-top:4px;
+  font-size:12px;
+  color:#666666;
 }
 
 .suggest-list{
@@ -235,7 +275,407 @@ button{
 }
 
 .suggest-item:active{
-  background:var(--primary-soft);
+  background:#F5F9FF;
+}
+
+.banner-home{
+  position:relative;
+  flex-shrink:0;
+  height:174px;
+  margin:4px 16px 8px;
+  padding:22px 12px 16px 18px;
+  overflow:hidden;
+  border-radius:0;
+  background:transparent;
+}
+
+.banner-title{
+  position:relative;
+  z-index:2;
+  max-width:62%;
+  font-size:32px;
+  line-height:1.18;
+  font-weight:800;
+  letter-spacing:-1px;
+  color:#62A8F5;
+}
+
+.banner-subtitle{
+  position:relative;
+  z-index:2;
+  margin-top:9px;
+  max-width:64%;
+  font-size:16px;
+  line-height:1.5;
+  color:#62A8F5;
+}
+
+
+.home-content{
+  flex-shrink:0;
+  padding:0 16px 24px;
+}
+
+#map1{
+  width:calc(100% - 32px);
+  height:220px;
+  flex:0 0 220px;
+  margin:0 16px 18px;
+  border-radius:20px;
+  overflow:hidden;
+  background:#EAF4FF;
+  box-shadow:0 2px 12px rgba(70,120,170,.10);
+}
+
+.home-card{
+  background:#FFFFFF;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 2px 12px rgba(30,60,90,.05);
+}
+
+.home-card-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.home-card-title-wrap{
+  min-width:0;
+}
+
+.home-card-title{
+  font-size:20px;
+  line-height:1.25;
+  font-weight:800;
+  color:#222222;
+}
+
+.home-card-subtitle{
+  margin-top:4px;
+  font-size:13px;
+  line-height:1.4;
+  color:#777777;
+}
+
+.home-add{
+  border:none;
+  background:transparent;
+  color:#4096FF;
+  font-size:14px;
+  line-height:22px;
+  white-space:nowrap;
+  cursor:pointer;
+  padding:0;
+}
+
+.baby-list{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+.baby-card{
+  position:relative;
+  min-width:0;
+  min-height:92px;
+  padding:12px 10px;
+  border:1px solid #E9EDF2;
+  border-radius:16px;
+  background:#FFFFFF;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.baby-card.pink{
+  background:#FFF2F6;
+  border-color:#FFF2F6;
+}
+
+.baby-card.green{
+  background:#F2FBF8;
+  border-color:#F2FBF8;
+}
+
+.baby-card.selected{
+  border:1.5px solid #FFE7A3;
+  background:#FFE7A3;
+  box-shadow:0 2px 8px rgba(255,231,163,.24);
+}
+
+.baby-info-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+.baby-avatar{
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#E8F2FF;
+  overflow:hidden;
+}
+
+.baby-avatar .baby-gender-icon{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+  display:block;
+}
+
+.baby-card.pink .baby-avatar{
+  background:#FFE0EA;
+}
+
+.baby-card.green .baby-avatar{
+  background:#DDF4EA;
+}
+
+.baby-detail{
+  min-width:0;
+  flex:1 1 auto;
+}
+
+.baby-name{
+  display:block;
+  font-size:18px;
+  line-height:1.2;
+  font-weight:800;
+  color:#222222;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.baby-age{
+  margin-top:5px;
+  font-size:14px;
+  line-height:1.2;
+  color:#666666;
+  white-space:nowrap;
+}
+
+.baby-edit-btn{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:24px;
+  height:24px;
+  padding:0;
+  border:none;
+  border-radius:50%;
+  background:rgba(255,255,255,.72);
+  color:#4096FF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:2;
+}
+
+.baby-edit-btn svg{
+  width:14px;
+  height:14px;
+}
+
+/* 宝宝编辑弹窗 */
+.baby-modal-mask{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(25,35,50,.34);
+}
+
+.baby-modal-mask.show{
+  display:flex;
+}
+
+.baby-modal{
+  width:min(100%,600px);
+  background:#FFFFFF;
+  border-radius:24px 24px 0 0;
+  padding:20px 18px 24px;
+  box-shadow:0 -8px 30px rgba(30,60,90,.12);
+}
+
+.baby-modal-title{
+  font-size:20px;
+  font-weight:800;
+  color:#222222;
+  text-align:center;
+  margin-bottom:18px;
+}
+
+.baby-form-row{
+  margin-bottom:14px;
+}
+
+.baby-form-label{
+  display:block;
+  margin-bottom:7px;
+  font-size:13px;
+  color:#666666;
+}
+
+.baby-form-input{
+  width:100%;
+  height:44px;
+  border:1px solid #E6EAF0;
+  border-radius:12px;
+  outline:none;
+  padding:0 12px;
+  font-size:15px;
+  color:#222222;
+  background:#FAFBFD;
+}
+
+.baby-gender-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.baby-gender-option{
+  height:52px;
+  border:1px solid #E6EAF0;
+  border-radius:14px;
+  background:#FFFFFF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:15px;
+  color:#444444;
+  cursor:pointer;
+}
+
+.baby-gender-option.selected.boy{
+  border-color:#62A8F5;
+  background:#EAF4FF;
+  color:#348FDA;
+}
+
+.baby-gender-option.selected.girl{
+  border-color:#E98BA8;
+  background:#FFF2F6;
+  color:#C66C8B;
+}
+
+.baby-gender-option svg{
+  width:28px;
+  height:28px;
+}
+
+.baby-modal-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+.baby-modal-btn{
+  height:44px;
+  border-radius:22px;
+  border:none;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.baby-modal-btn.cancel{
+  background:#F3F5F7;
+  color:#666666;
+}
+
+.baby-modal-btn.save{
+  background:#4096FF;
+  color:#FFFFFF;
+}
+
+.purpose-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px 8px;
+}
+
+.purpose-item{
+  min-width:0;
+  border:none;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  text-align:center;
+}
+
+.purpose-icon-box{
+  width:54px;
+  height:54px;
+  margin:0 auto 6px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.purpose-icon-box.food{background:#FFF5E0;}
+.purpose-icon-box.play{background:#E8F2FF;}
+.purpose-icon-box.outdoor{background:#EDF9EF;}
+.purpose-icon-box.shop{background:#FCEEF6;}
+.purpose-icon-box.medical{background:#E8F2FF;}
+.purpose-icon-box.culture{background:#FFF5E0;}
+.purpose-icon-box.sport{background:#FFF0E8;}
+
+.purpose-icon-box img{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+}
+
+.purpose-label{
+  display:block;
+  font-size:13px;
+  line-height:1.3;
+  color:#444444;
+  white-space:nowrap;
+}
+
+.purpose-item.active .purpose-icon-box{
+  background:#FFE7A3!important;
+  box-shadow:inset 0 0 0 2px #FFE7A3;
+}
+
+.start-btn{
+  width:100%;
+  margin:4px 0 0;
+  border:none!important;
+  border-radius:24px!important;
+  padding:13px 0;
+  background:#FFE7A3!important;
+  color:#222222!important;
+  font-size:18px;
+  line-height:24px;
+  font-weight:700;
+  box-shadow:0 6px 14px rgba(255,231,163,.28);
+  cursor:pointer;
+}
+
+.start-btn:active{
+  transform:scale(.985);
+}
+
+.demo-tag{
+  display:none;
 }
 
 #map1{
@@ -244,238 +684,7 @@ button{
   min-height:0;
 }
 
-.bottom-panel{
-  background:#fff;
-  border-radius:28px 28px 0 0;
-  margin-top:-16px;
-  position:relative;
-  z-index:5;
-  padding:16px 16px 18px;
-  box-shadow:0 -4px 14px rgba(0,0,0,.06);
-}
-
-.nl-input-wrap{
-  display:flex;
-  align-items:center;
-  background:#FFF8E9;
-  border-radius:26px;
-  padding:10px 14px;
-  gap:8px;
-  border:1.5px solid var(--line);
-}
-
-.nl-input-wrap .emoji{
-  font-size:18px;
-}
-
-.nl-input{
-  flex:1;
-  border:none;
-  outline:none;
-  background:transparent;
-  font-size:14px;
-  color:var(--text2);
-}
-
-.nl-input::placeholder{
-  color:#b7aa98;
-}
-
-.chip-label{
-  font-size:12px;
-  color:#888;
-  margin-top:10px;
-  font-weight:600;
-}
-
-.chip-row{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-  overflow-x:auto;
-  padding-bottom:2px;
-  scrollbar-width:none;
-}
-
-.chip-row::-webkit-scrollbar{
-  display:none;
-}
-
-.chip{
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  gap:5px;
-  padding:7px 16px;
-  border-radius:20px;
-  background:#fff;
-  color:var(--text2);
-  font-size:13px;
-  font-weight:600;
-  border:1.5px solid var(--line);
-  cursor:pointer;
-  white-space:nowrap;
-}
-
-.chip.active{
-  background:var(--primary-soft)!important;
-  color:#444!important;
-  border-color:var(--primary)!important;
-  box-shadow:none;
-}
-
-.start-btn{
-  margin-top:14px;
-  width:100%;
-  border:none;
-  border-radius:28px;
-  padding:13px 0;
-  font-size:16px;
-  font-weight:700;
-  box-shadow:0 5px 12px rgba(180,140,50,.16);
-  cursor:pointer;
-}
-
-.demo-tag{
-  text-align:center;
-  font-size:11px;
-  color:#b7aa98;
-  margin-top:8px;
-}
-
-
-/* =========================================================
-   首页宝宝信息卡
-========================================================= */
-
-.baby-panel{
-  background:#fff;
-  border:1px solid #F0EBE2;
-  border-radius:20px;
-  padding:12px 14px;
-  box-shadow:0 2px 9px rgba(80,60,30,.05);
-}
-
-.baby-panel-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
-
-.baby-title{
-  font-size:15px;
-  font-weight:800;
-  color:#333;
-}
-
-.baby-add-btn{
-  border:0;
-  background:transparent;
-  color:#62A8F5;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.baby-card{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-height:70px;
-  padding:9px 10px;
-  border:1.5px solid #DCEEFF;
-  border-radius:18px;
-  background:#F8FCFF;
-}
-
-.baby-avatar{
-  width:46px;
-  height:46px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#E7F3FF;
-  color:#62A8F5;
-  font-size:17px;
-  font-weight:800;
-  flex-shrink:0;
-}
-
-.baby-info{
-  flex:1;
-  min-width:0;
-}
-
-.baby-name-row{
-  display:flex;
-  align-items:center;
-  gap:7px;
-}
-
-.baby-name{
-  font-size:15px;
-  font-weight:800;
-  color:#333;
-}
-
-.baby-gender{
-  font-size:10px;
-  padding:2px 7px;
-  border-radius:10px;
-  background:#E7F3FF;
-  color:#62A8F5;
-}
-
-.baby-age{
-  margin-top:4px;
-  font-size:12px;
-  color:#888;
-}
-
-.baby-edit-btn{
-  border:1px solid #DDE7EF;
-  background:#fff;
-  color:#666;
-  border-radius:12px;
-  padding:5px 8px;
-  font-size:11px;
-  font-weight:700;
-  cursor:pointer;
-  flex-shrink:0;
-}
-
-.baby-settings{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  margin-top:9px;
-  overflow-x:auto;
-  scrollbar-width:none;
-}
-
-.baby-settings::-webkit-scrollbar{
-  display:none;
-}
-
-.baby-option{
-  flex:0 0 auto;
-  border:1px solid #EAE4D8;
-  background:#fff;
-  color:#777;
-  border-radius:14px;
-  padding:5px 9px;
-  font-size:11px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.baby-option.active{
-  color:#62A8F5;
-  border-color:#62A8F5;
-  background:#EAF5FF;
-}
+/* 旧首页底部面板样式已移除：首页改为卡片式滚动布局。 */
 
 /* 推荐卡片中的类型图标 */
 .rec-name-row{
@@ -1318,11 +1527,17 @@ button{
   <div class="top-bar">
 
     <div class="top-row">
-
       <div class="loc-wrap">
+        <span class="loc-pin" aria-hidden="true">
+          <svg viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1.8C6.8 1.8 2.6 6 2.6 11.2c0 7.1 9.4 15 9.4 15s9.4-7.9 9.4-15C21.4 6 17.2 1.8 12 1.8Z" fill="#4096FF"/>
+            <circle cx="12" cy="11.2" r="3.4" fill="#fff"/>
+          </svg>
+        </span>
         <input
           class="loc-edit-input"
           id="curAddrInput"
+          value="广州市天河区 天河北路123号"
           placeholder="正在获取我的位置..."
           oninput="onAddrInput()"
         />
@@ -1332,95 +1547,88 @@ button{
         class="locate-btn"
         id="relocateBtn"
         onclick="doGeolocation(true)"
+        aria-label="重新定位"
       >
-        ⟳
+        ↻
       </div>
 
       <div class="weather-chip" id="weatherChip">
-        26°C
+        <span class="weather-icon" aria-hidden="true"></span>
+        <span class="weather-copy">
+          <span class="weather-temp">28℃</span>
+          <span class="weather-desc">多云</span>
+        </span>
       </div>
-
     </div>
 
-    <div
-      class="suggest-list"
-      id="suggestList"
-    ></div>
+    <div class="suggest-list" id="suggestList"></div>
+
+  </div>
+
+  <div class="banner-home">
+    <div class="banner-title">今天想带娃去哪？</div>
+    <div class="banner-subtitle">AI 为你推荐最适合的亲子目的地</div>
+  </div>
+
+  <div class="home-content">
+
+    <div class="home-card">
+      <div class="home-card-head">
+        <div class="home-card-title-wrap">
+          <div class="home-card-title">我的宝宝</div>
+          <div class="home-card-subtitle">添加宝宝信息，获取更精准的推荐</div>
+        </div>
+        <button class="home-add" type="button" onclick="addBabyProfile()">＋ 添加宝宝</button>
+      </div>
+
+      <div class="baby-list" id="babyList"></div>
+    </div>
+
+    <div class="home-card">
+      <div class="home-card-head">
+        <div class="home-card-title-wrap">
+          <div class="home-card-title">出行目的</div>
+          <div class="home-card-subtitle">选择出行目的，获取专属推荐</div>
+        </div>
+      </div>
+
+      <div class="purpose-grid" id="purposeChips">
+        <button class="purpose-item" data-val="吃饭" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box food"><img src="icons/restaurant.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">美食</span>
+        </button>
+        <button class="purpose-item active" data-val="游玩" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box play"><img src="icons/playcentre.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">游玩</span>
+        </button>
+        <button class="purpose-item" data-val="户外" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box outdoor"><img src="icons/park.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">户外活动</span>
+        </button>
+        <button class="purpose-item" data-val="购物" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box shop"><img src="icons/shoppingmall.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">购物</span>
+        </button>
+        <button class="purpose-item" data-val="就医" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box medical"><img src="icons/motherbabyroom.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">就医</span>
+        </button>
+        <button class="purpose-item" data-val="文化场馆" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box culture"><img src="icons/library.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">文化场馆</span>
+        </button>
+        <button class="purpose-item" data-val="运动健身" onclick="selectPurposeCard(this)">
+          <span class="purpose-icon-box sport"><img src="icons/stadium.svg" alt="" aria-hidden="true"></span>
+          <span class="purpose-label">运动健身</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startPlanning()">✨ 开启探索 →</button>
 
   </div>
 
   <div id="map1"></div>
-
-  <div class="bottom-panel">
-
-    <div class="baby-panel">
-
-      <div class="baby-panel-head">
-        <div class="baby-title">我的宝宝</div>
-        <button class="baby-add-btn" type="button" onclick="addBabyProfile()">+ 添加宝宝</button>
-      </div>
-
-      <div class="baby-card">
-        <div class="baby-avatar" id="babyAvatar">宝</div>
-
-        <div class="baby-info">
-          <div class="baby-name-row">
-            <span class="baby-name" id="babyNameText">宝宝</span>
-            <span class="baby-gender" id="babyGenderText">未设置</span>
-          </div>
-          <div class="baby-age" id="babyAgeText">3-6岁</div>
-        </div>
-
-        <button class="baby-edit-btn" type="button" onclick="editBabyProfile()">编辑</button>
-      </div>
-
-      <div class="baby-settings">
-        <button class="baby-option" id="genderMale" type="button" onclick="setBabyGender('男')">男孩</button>
-        <button class="baby-option" id="genderFemale" type="button" onclick="setBabyGender('女')">女孩</button>
-        <button class="baby-option" id="genderUnset" type="button" onclick="setBabyGender('未设置')">未设置</button>
-        <button class="baby-option" data-age="0-3" type="button" onclick="setBabyAge('0-3')">0-3岁</button>
-        <button class="baby-option active" data-age="3-6" type="button" onclick="setBabyAge('3-6')">3-6岁</button>
-        <button class="baby-option" data-age="6-12" type="button" onclick="setBabyAge('6-12')">6-12岁</button>
-      </div>
-
-    </div>
-
-    <div class="chip-label">
-      出行目的
-    </div>
-
-    <div class="chip-row" id="purposeChips">
-
-      <div class="chip" data-val="吃饭">
-        <img class="asset-icon small" src="icons/restaurant.svg" alt="" aria-hidden="true"> 吃饭
-      </div>
-
-      <div class="chip" data-val="游玩">
-        <img class="asset-icon small" src="icons/playcentre.svg" alt="" aria-hidden="true"> 游玩
-      </div>
-
-      <div class="chip" data-val="户外">
-        <img class="asset-icon small" src="icons/park.svg" alt="" aria-hidden="true"> 户外
-      </div>
-
-      <div class="chip" data-val="购物">
-        <img class="asset-icon small" src="icons/shoppingmall.svg" alt="" aria-hidden="true"> 购物
-      </div>
-
-    </div>
-
-    <button
-      class="start-btn"
-      onclick="startPlanning()"
-    >
-      开始规划 →
-    </button>
-
-    <div class="demo-tag">
-      位置与设施信息来自实时地图检索
-    </div>
-
-  </div>
 
 </div>
 
@@ -1451,6 +1659,7 @@ button{
   <div class="ai-greet">
 
     <div class="ai-avatar">
+      <img src="icons/bear.svg" alt="" aria-hidden="true">
     </div>
 
     <div class="ai-bubble">
@@ -1911,6 +2120,39 @@ button{
 </div>
 
 
+<div class="baby-modal-mask" id="babyModalMask" onclick="closeBabyEditor(event)">
+  <div class="baby-modal" onclick="event.stopPropagation()">
+    <div class="baby-modal-title" id="babyModalTitle">编辑宝宝信息</div>
+
+    <div class="baby-form-row">
+      <label class="baby-form-label" for="babyNameInput">宝宝昵称</label>
+      <input class="baby-form-input" id="babyNameInput" type="text" maxlength="8" placeholder="例如：大宝"/>
+    </div>
+
+    <div class="baby-form-row">
+      <label class="baby-form-label" for="babyBirthYearInput">出生年份</label>
+      <input class="baby-form-input" id="babyBirthYearInput" type="number" inputmode="numeric" min="2010" max="2026" placeholder="例如：2023"/>
+    </div>
+
+    <div class="baby-form-row">
+      <span class="baby-form-label">性别</span>
+      <div class="baby-gender-options">
+        <button type="button" class="baby-gender-option boy" id="babyGenderBoy" onclick="chooseBabyGender('男')">
+          <span id="babyGenderBoyIcon"></span><span>男孩</span>
+        </button>
+        <button type="button" class="baby-gender-option girl" id="babyGenderGirl" onclick="chooseBabyGender('女')">
+          <span id="babyGenderGirlIcon"></span><span>女孩</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="baby-modal-actions">
+      <button type="button" class="baby-modal-btn cancel" onclick="closeBabyEditor()">取消</button>
+      <button type="button" class="baby-modal-btn save" onclick="saveBabyEditor()">保存</button>
+    </div>
+  </div>
+</div>
+
 <div
   class="toast"
   id="toast"
@@ -1939,10 +2181,19 @@ var currentAddrText="";
 var selectedAge="3-6";
 var selectedPurpose="游玩";
 
+var babyProfiles=[
+  {name:"大宝",gender:"男",birthYear:2023},
+  {name:"二宝",gender:"女",birthYear:2025},
+  {name:"三宝",gender:"男",birthYear:2026}
+];
+
+var selectedBabyIndex=0;
+var editingBabyIndex=null;
+var editingBabyGender="男";
 var babyProfile={
-  name:"宝宝",
-  gender:"未设置",
-  age:"3-6"
+  name:babyProfiles[0].name,
+  gender:babyProfiles[0].gender,
+  age:getBabyAgeRange(babyProfiles[0].birthYear)
 };
 
 var currentMode="walking";
@@ -2347,17 +2598,15 @@ function createMapPointMarker(
         icon:new BMapGL.Icon(
           'data:image/svg+xml;charset=utf-8,'+
           encodeURIComponent(
-            type==='start'
-            ?
-            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#62A8F5" stroke="white" stroke-width="4"/></svg>'
-            :
-            type==='end'
-            ?
-            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#62A8F5" stroke="white" stroke-width="4"/></svg>'
-            :
-            '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="9" fill="#62A8F5" stroke="white" stroke-width="4"/></svg>'
+            '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42">'+
+              '<path d="M17 40 C15.8 38.2 4 25.2 4 16.8 C4 9.2 9.8 3 17 3 C24.2 3 30 9.2 30 16.8 C30 25.2 18.2 38.2 17 40 Z" fill="#62A8F5" stroke="#FFFFFF" stroke-width="2"/>'+
+              '<circle cx="17" cy="16.5" r="6" fill="#FFFFFF"/>'+ 
+            '</svg>'
           ),
-          new BMapGL.Size(28,28)
+          new BMapGL.Size(34,42),
+          {
+            anchor:new BMapGL.Size(17,40)
+          }
         )
       }
     );
@@ -2958,7 +3207,7 @@ function reverseGeocode(
         ){
 
           currentAddrText=
-            result.address;
+            truncateHomeAddress(result.address,16);
 
           var input=
             document.getElementById(
@@ -2991,6 +3240,11 @@ function reverseGeocode(
 
 var addrDebounce=null;
 
+
+function truncateHomeAddress(text,maxLen){
+  text=String(text||'');
+  return text.length>maxLen ? text.slice(0,maxLen)+'…' : text;
+}
 
 function onAddrInput(){
 
@@ -3125,10 +3379,9 @@ function renderSuggestFromSearch(
             p.point;
 
           currentAddrText=
-            stripHtml(
-              p.title ||
-              p.address ||
-              ''
+            truncateHomeAddress(
+              stripHtml(p.title || p.address || ''),
+              16
             );
 
           document.getElementById(
@@ -3172,116 +3425,199 @@ function renderSuggestFromSearch(
    宝宝信息 / 出行目的
 ========================================================= */
 
-function updateBabyProfileUI(){
+function getBabyAgeYears(birthYear){
+  var y=parseInt(birthYear,10);
+  if(!y) return null;
+  var now=new Date();
+  var age=now.getFullYear()-y;
+  if(age<0) age=0;
+  return age;
+}
 
-  var nameEl=document.getElementById('babyNameText');
-  var genderEl=document.getElementById('babyGenderText');
-  var ageEl=document.getElementById('babyAgeText');
-  var avatarEl=document.getElementById('babyAvatar');
+function getBabyAgeText(birthYear){
+  var age=getBabyAgeYears(birthYear);
+  if(age===null) return '未填写年龄';
+  if(age===0) return '0岁';
+  return age+'岁';
+}
 
-  if(nameEl){
-    nameEl.textContent=babyProfile.name || '宝宝';
+function getBabyAgeRange(birthYear){
+  var age=getBabyAgeYears(birthYear);
+  if(age===null) return '0-3';
+  if(age<3) return '0-3';
+  if(age<6) return '3-6';
+  return '6-12';
+}
+
+function escapeHtml(value){
+  return String(value==null?'':value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function genderIconSvg(gender){
+  var file=gender==='女'?'girl.svg':(gender==='男'?'boy.svg':'baby.svg');
+  return '<img class="baby-gender-icon" src="icons/'+file+'" alt="" aria-hidden="true">';
+}
+
+function editIconSvg(){
+  return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="m14.7 5.3 4 4L8 20H4v-4L14.7 5.3Z" fill="none" stroke="#4096FF" stroke-width="1.8" stroke-linejoin="round"/><path d="m13.4 6.6 4 4" fill="none" stroke="#4096FF" stroke-width="1.8"/></svg>';
+}
+
+function renderBabyProfiles(){
+  var list=document.getElementById('babyList');
+  if(!list) return;
+  list.innerHTML='';
+
+  for(var i=0;i<babyProfiles.length;i++){
+    var b=babyProfiles[i];
+    var card=document.createElement('div');
+    var tone=i%3===1?'pink':(i%3===2?'green':'');
+    card.className='baby-card '+tone+(i===selectedBabyIndex?' selected':'');
+    card.setAttribute('data-index',i);
+    card.onclick=(function(index){
+      return function(){ selectBabyCard(index); };
+    })(i);
+
+    card.innerHTML=
+      '<div class="baby-info-row">'+
+        '<div class="baby-avatar">'+genderIconSvg(b.gender)+'</div>'+
+        '<div class="baby-detail">'+
+          '<span class="baby-name">'+escapeHtml(b.name)+'</span>'+
+          '<div class="baby-age">'+escapeHtml(getBabyAgeText(b.birthYear))+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<button type="button" class="baby-edit-btn" aria-label="编辑宝宝信息">'+editIconSvg()+'</button>';
+
+    var edit=card.querySelector('.baby-edit-btn');
+    edit.onclick=(function(index){
+      return function(ev){
+        ev.stopPropagation();
+        openBabyEditor(index);
+      };
+    })(i);
+
+    list.appendChild(card);
   }
+}
 
-  if(genderEl){
-    genderEl.textContent=babyProfile.gender || '未设置';
-  }
+function selectBabyCard(index){
+  if(!babyProfiles[index]) return;
 
-  if(ageEl){
-    ageEl.textContent=(babyProfile.age || selectedAge)+'岁';
-  }
-
-  if(avatarEl){
-    avatarEl.textContent=(babyProfile.name || '宝宝').slice(0,1);
-  }
-
-  var ageButtons=document.querySelectorAll('.baby-option[data-age]');
-  for(var i=0;i<ageButtons.length;i++){
-    ageButtons[i].classList.toggle(
-      'active',
-      ageButtons[i].getAttribute('data-age')===selectedAge
-    );
-  }
-
-  var genderMap={
-    '男':'genderMale',
-    '女':'genderFemale',
-    '未设置':'genderUnset'
+  selectedBabyIndex=index;
+  babyProfile={
+    name:babyProfiles[index].name,
+    gender:babyProfiles[index].gender,
+    age:getBabyAgeRange(babyProfiles[index].birthYear)
   };
+  selectedAge=babyProfile.age;
 
-  for(var key in genderMap){
-    var el=document.getElementById(genderMap[key]);
-    if(el){
-      el.classList.toggle('active', babyProfile.gender===key);
-    }
+  var cards=document.querySelectorAll('#babyList .baby-card');
+  for(var i=0;i<cards.length;i++){
+    cards[i].classList.toggle('selected',i===index);
   }
-}
-
-function setBabyAge(age){
-  selectedAge=age;
-  babyProfile.age=age;
-  updateBabyProfileUI();
-}
-
-function setBabyGender(gender){
-  babyProfile.gender=gender;
-  updateBabyProfileUI();
-}
-
-function editBabyProfile(){
-
-  var name=prompt('请输入宝宝昵称',babyProfile.name||'宝宝');
-  if(name!==null && name.trim()){
-    babyProfile.name=name.trim();
-  }
-
-  var gender=prompt('请输入性别：男 / 女 / 未设置',babyProfile.gender||'未设置');
-  if(gender!==null){
-    gender=gender.trim();
-    if(gender==='男孩') gender='男';
-    if(gender==='女孩') gender='女';
-    if(gender==='男' || gender==='女' || gender==='未设置'){
-      babyProfile.gender=gender;
-    }
-  }
-
-  updateBabyProfileUI();
 }
 
 function addBabyProfile(){
-  showToast('当前原型先设置一个主要宝宝，可通过“编辑”修改信息');
+  editingBabyIndex=null;
+  editingBabyGender='男';
+  document.getElementById('babyModalTitle').textContent='添加宝宝信息';
+  document.getElementById('babyNameInput').value='';
+  document.getElementById('babyBirthYearInput').value='';
+  updateBabyGenderButtons();
+  document.getElementById('babyModalMask').classList.add('show');
+  setTimeout(function(){ document.getElementById('babyNameInput').focus(); },50);
 }
 
-function bindPurposeChips(){
+function openBabyEditor(index){
+  var current=babyProfiles[index];
+  if(!current) return;
+  editingBabyIndex=index;
+  editingBabyGender=current.gender||'男';
+  document.getElementById('babyModalTitle').textContent='编辑宝宝信息';
+  document.getElementById('babyNameInput').value=current.name||'';
+  document.getElementById('babyBirthYearInput').value=current.birthYear||'';
+  updateBabyGenderButtons();
+  document.getElementById('babyModalMask').classList.add('show');
+}
 
-  var container=document.getElementById('purposeChips');
-  if(!container){
+function chooseBabyGender(gender){
+  editingBabyGender=gender;
+  updateBabyGenderButtons();
+}
+
+function updateBabyGenderButtons(){
+  var boy=document.getElementById('babyGenderBoy');
+  var girl=document.getElementById('babyGenderGirl');
+  var boyIcon=document.getElementById('babyGenderBoyIcon');
+  var girlIcon=document.getElementById('babyGenderGirlIcon');
+  if(boy) boy.classList.toggle('selected',editingBabyGender==='男');
+  if(girl) girl.classList.toggle('selected',editingBabyGender==='女');
+  if(boyIcon) boyIcon.innerHTML=genderIconSvg('男');
+  if(girlIcon) girlIcon.innerHTML=genderIconSvg('女');
+}
+
+function closeBabyEditor(event){
+  if(event && event.target!==event.currentTarget) return;
+  var mask=document.getElementById('babyModalMask');
+  if(mask) mask.classList.remove('show');
+}
+
+function saveBabyEditor(){
+  var name=(document.getElementById('babyNameInput').value||'').trim();
+  var year=parseInt(document.getElementById('babyBirthYearInput').value,10);
+  var currentYear=new Date().getFullYear();
+
+  if(!name){
+    showToast('请填写宝宝昵称');
+    return;
+  }
+  if(!year || year<2010 || year>currentYear){
+    showToast('请输入正确的出生年份');
     return;
   }
 
-  var chips=container.querySelectorAll('.chip');
-  for(var i=0;i<chips.length;i++){
-    chips[i].onclick=function(){
-      var siblings=this.parentNode.querySelectorAll('.chip');
-      for(var j=0;j<siblings.length;j++){
-        siblings[j].classList.remove('active');
-      }
-      this.classList.add('active');
-      selectedPurpose=this.getAttribute('data-val');
+  if(editingBabyIndex===null){
+    var newIndex=babyProfiles.length;
+    babyProfiles.push({name:name,gender:editingBabyGender,birthYear:year});
+    selectedBabyIndex=newIndex;
+  }else{
+    babyProfiles[editingBabyIndex]={
+      name:name,
+      gender:editingBabyGender,
+      birthYear:year
     };
+    selectedBabyIndex=editingBabyIndex;
   }
 
+  selectBabyCard(selectedBabyIndex);
+  renderBabyProfiles();
+  document.getElementById('babyModalMask').classList.remove('show');
 }
 
-bindPurposeChips();
+function selectPurposeCard(el){
+  var container=document.getElementById('purposeChips');
+  if(!container) return;
 
-document.querySelectorAll('#purposeChips .chip')[1].classList.add('active');
-updateBabyProfileUI();
+  var items=container.querySelectorAll('.purpose-item');
+  for(var i=0;i<items.length;i++){
+    items[i].classList.remove('active');
+  }
 
+  el.classList.add('active');
+  selectedPurpose=el.getAttribute('data-val');
+}
+
+renderBabyProfiles();
+selectBabyCard(0);
 
 /* =========================================================
    开始规划
 ========================================================= */
+
 
 function getRecommendationKeywords(){
 
@@ -3289,7 +3625,10 @@ function getRecommendationKeywords(){
     '吃饭':['亲子餐厅','儿童餐厅','亲子餐饮','餐厅'],
     '游玩':['儿童乐园','亲子乐园','游乐园','室内儿童乐园'],
     '户外':['亲子公园','儿童公园','公园','动物园'],
-    '购物':['亲子商场','商场','购物中心','大型商场']
+    '购物':['亲子商场','商场','购物中心','大型商场'],
+    '就医':['儿童医院','儿科医院','妇幼保健院','医院'],
+    '文化场馆':['少年宫','青少年宫','图书馆','文化馆','博物馆'],
+    '运动健身':['游泳馆','体育场','体育馆','运动中心','健身房']
   };
 
   return map[selectedPurpose] || ['亲子地点','儿童乐园','公园'];
@@ -3444,8 +3783,8 @@ function guessIconByCategory(
   if(/动物园|野生动物/.test(text)){
     return {iconFile:'zoo.svg',cls:'type-park',label:'动物园'};
   }
-  if(/体育场|体育馆|运动场|运动/.test(text)){
-    return {iconFile:'stadium.svg',cls:'type-park',label:'运动'};
+  if(/体育场|体育馆|运动场|运动|游泳馆|健身/.test(text)){
+    return {iconFile:'stadium.svg',cls:'type-park',label:'运动健身'};
   }
   if(/公园|绿地|户外|广场/.test(text)){
     return {iconFile:'park.svg',cls:'type-park',label:'户外'};
@@ -3459,8 +3798,8 @@ function guessIconByCategory(
   if(/展览|美术馆/.test(text)){
     return {iconFile:'museum.svg',cls:'type-museum',label:'展览'};
   }
-  if(/图书馆|图书|书店|阅读/.test(text)){
-    return {iconFile:'library.svg',cls:'type-museum',label:'阅读'};
+  if(/图书馆|图书|书店|阅读|少年宫|青少年宫|文化馆/.test(text)){
+    return {iconFile:'library.svg',cls:'type-museum',label:'文化场馆'};
   }
   if(/商场|购物|mall/i.test(text)){
     return {iconFile:'shoppingmall.svg',cls:'type-mall',label:'商场'};
@@ -3480,6 +3819,9 @@ function guessIconByCategory(
   if(purpose==='游玩') return {iconFile:'playcentre.svg',cls:'type-park',label:'游玩'};
   if(purpose==='户外') return {iconFile:'park.svg',cls:'type-park',label:'户外'};
   if(purpose==='购物') return {iconFile:'shoppingmall.svg',cls:'type-mall',label:'商场'};
+  if(purpose==='就医') return {iconFile:'motherbabyroom.svg',cls:'type-museum',label:'就医'};
+  if(purpose==='文化场馆') return {iconFile:'library.svg',cls:'type-museum',label:'文化场馆'};
+  if(purpose==='运动健身') return {iconFile:'stadium.svg',cls:'type-park',label:'运动健身'};
 
   return {iconFile:'',cls:'type-park',label:''};
 }
