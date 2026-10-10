@@ -390,7 +390,7 @@ button{
   position:relative;
   min-width:0;
   min-height:92px;
-  padding:12px 30px 12px 10px;
+  padding:12px 30px 12px 8px;
   border:1px solid #E9EDF2;
   border-radius:16px;
   background:#FFFFFF;
@@ -422,10 +422,9 @@ button{
 }
 
 .baby-avatar{
-  display:none;
-  width:42px;
-  height:42px;
-  flex:0 0 42px;
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -435,8 +434,8 @@ button{
 }
 
 .baby-avatar .baby-gender-icon{
-  width:30px;
-  height:30px;
+  width:22px;
+  height:22px;
   object-fit:contain;
   display:block;
 }
@@ -456,7 +455,7 @@ button{
 
 .baby-name{
   display:block;
-  font-size:17px;
+  font-size:15px;
   line-height:1.2;
   font-weight:800;
   color:#222222;
@@ -467,8 +466,8 @@ button{
 }
 
 .baby-age{
-  margin-top:5px;
-  font-size:14px;
+  margin-top:4px;
+  font-size:12px;
   line-height:1.2;
   color:#666666;
   white-space:nowrap;
@@ -476,10 +475,10 @@ button{
 
 .baby-edit-btn{
   position:absolute;
-  top:8px;
-  right:8px;
-  width:24px;
-  height:24px;
+  top:6px;
+  right:6px;
+  width:20px;
+  height:20px;
   padding:0;
   border:none;
   border-radius:50%;
@@ -493,16 +492,16 @@ button{
 }
 
 .baby-edit-btn svg{
-  width:14px;
-  height:14px;
+  width:12px;
+  height:12px;
 }
 
 .baby-delete-btn{
   position:absolute;
-  right:8px;
-  bottom:8px;
-  width:22px;
-  height:22px;
+  right:6px;
+  bottom:6px;
+  width:18px;
+  height:18px;
   padding:0;
   border:none;
   border-radius:50%;
@@ -516,8 +515,8 @@ button{
 }
 
 .baby-delete-btn svg{
-  width:13px;
-  height:13px;
+  width:11px;
+  height:11px;
 }
 
 /* 宝宝编辑弹窗 */
@@ -609,6 +608,13 @@ button{
 .baby-gender-option svg{
   width:28px;
   height:28px;
+}
+
+.baby-gender-option .baby-gender-icon{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+  display:block;
 }
 
 .baby-modal-actions{
@@ -786,7 +792,7 @@ button{
   box-shadow:0 3px 10px rgba(50,40,20,.15)!important;
   font-size:12px!important;
   font-weight:700!important;
-  white-space:nowrap;
+  white-space:nowrap!important;
 }
 
 
@@ -1807,7 +1813,6 @@ button{
       </div>
 
     </div>
-
   </div>
 
 
@@ -3506,7 +3511,7 @@ function escapeHtml(value){
 }
 
 function genderIconSvg(gender){
-  var file=gender==='女'?'girl.svg':(gender==='男'?'boy.svg':'baby.svg');
+  var file=gender==='女'?'girl.png':(gender==='男'?'boy.png':'baby.png');
   return '<img class="baby-gender-icon" src="icons/'+file+'" alt="" aria-hidden="true">';
 }
 
