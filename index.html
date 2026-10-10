@@ -3385,17 +3385,21 @@ function reverseGeocode(
           var district=String(comp.district||'').trim();
           var street=String(comp.street||'').trim();
           var streetNumber=String(comp.streetNumber||'').trim();
+          var rawAddress=String(result.address||'').replace(/\s+/g,'');
+          var districtIndex=district ? rawAddress.indexOf(district) : -1;
           var districtAddress='';
-          if(district){
-            districtAddress=district;
-            if(street) districtAddress+=' '+street;
-            if(streetNumber) districtAddress+=streetNumber;
+
+          // 从完整地址中定位“区”的实际位置，去掉前面的省市等信息。
+          // 例如“广州市天河区天河北路123号”显示为“天河区天河北路123号”。
+          if(districtIndex>=0){
+            districtAddress=rawAddress.slice(districtIndex);
+          }else if(district){
+            districtAddress=district+street+streetNumber;
           }else{
-            districtAddress=result.address||'';
+            districtAddress=rawAddress;
           }
 
-          currentAddrText=
-            truncateHomeAddress(districtAddress,16);
+          currentAddrText=districtAddress;
 
           var input=
             document.getElementById(
@@ -3650,15 +3654,15 @@ function genderIconSvg(gender,birthYear){
   var age=getBabyAgeYears(birthYear);
   var file;
   if(age!==null && age<3){
-    file='baby.png';
+    file='icons/baby.png';
   }else if(gender==='女'){
-    file='girl.png';
+    file='icons/girl.png';
   }else if(gender==='男'){
-    file='boy.png';
+    file='icons/boy.png';
   }else{
-    file='baby.png';
+    file='icons/baby.png';
   }
-  return '<img class="baby-gender-icon" src="icons/'+file+'" alt="" aria-hidden="true">';
+  return '<img class="baby-gender-icon" src="'+file+'" alt="" aria-hidden="true">';
 }
 
 function editIconSvg(){
@@ -6295,3 +6299,904 @@ function drawNavRoute(){
     :
     'walking';
 
+
+  var options={
+
+    renderOptions:{
+      map:null,
+      autoViewport:false
+    },
+
+    onSearchComplete:
+      function(res){
+
+        if(
+          !res ||
+          typeof res.getPlan!=='function'
+        ){
+
+          searchFacilitiesAlongRoute();
+
+          return;
+
+        }
+
+        var plan=
+          res.getPlan(0);
+
+        /*
+         * 提取真实路线点
+         */
+
+        var path=
+          getRoutePathFromResult(
+            res
+          );
+
+        if(path){
+
+          drawDashedRoute(
+            map3,
+            path
+          );
+
+        }
+
+        /*
+         * 设置地图视野
+         */
+
+        try{
+
+          map3.setViewport(
+            [
+              startPoint,
+              endPoint
+            ]
+          );
+
+        }catch(e){}
+
+
+        /*
+         * 获取路线步骤
+         */
+
+        collectNavSteps(
+          res
+        );
+
+
+        /*
+         * 路线完成后检索设施
+         */
+
+        searchFacilitiesAlongRoute();
+
+      }
+
+  };
+
+
+  try{
+
+    if(routeMode==='walking'){
+
+      var walking=
+        new BMapGL.WalkingRoute(
+          map3,
+          options
+        );
+
+      walking.search(
+        startPoint,
+        endPoint
+      );
+
+    }
+
+    else if(routeMode==='driving'){
+
+      var driving=
+        new BMapGL.DrivingRoute(
+          map3,
+          options
+        );
+
+      driving.search(
+        startPoint,
+        endPoint
+      );
+
+    }
+
+    else if(routeMode==='riding'){
+
+      var riding=
+        new BMapGL.RidingRoute(
+          map3,
+          options
+        );
+
+      riding.search(
+        startPoint,
+        endPoint
+      );
+
+    }
+
+    else{
+
+      var transit=
+        new BMapGL.TransitRoute(
+          map3,
+          options
+        );
+
+      transit.search(
+        startPoint,
+        endPoint
+      );
+
+    }
+
+  }catch(e){
+
+    console.error(
+      '导航路线失败',
+      e
+    );
+
+    searchFacilitiesAlongRoute();
+
+  }
+
+}
+
+
+/* =========================================================
+   获取导航步骤
+========================================================= */
+
+function collectNavSteps(
+  res
+){
+
+  navSteps=[];
+  navStepIndex=0;
+
+  try{
+
+    var plan=
+      res.getPlan(0);
+
+    if(
+      plan &&
+      plan.getRoute
+    ){
+
+      var route=
+        plan.getRoute(0);
+
+      if(
+        route &&
+        route.getNumSteps &&
+        route.getNumSteps()>0
+      ){
+
+        var num=
+          route.getNumSteps();
+
+        for(
+          var i=0;
+          i<num;
+          i++
+        ){
+
+          var step=
+            route.getStep(i);
+
+          var desc=
+            stripHtml(
+              step.getDescription
+              ?
+              step.getDescription()
+              :
+              ''
+            );
+
+          if(desc){
+            navSteps.push(
+              desc
+            );
+          }
+
+        }
+
+      }
+
+    }
+
+  }catch(e){
+
+    console.warn(
+      '导航步骤读取失败',
+      e
+    );
+
+  }
+
+
+  if(!navSteps.length){
+
+    navSteps.push(
+      '沿路线直行前往'+
+      (
+        endName||
+        '目的地'
+      )
+    );
+
+  }
+
+  renderCurrentStep();
+
+}
+
+
+function renderCurrentStep(){
+
+  var text=
+    navSteps[
+      navStepIndex
+    ] ||
+    '已到达目的地';
+
+  document.getElementById(
+    'stepMainText'
+  ).textContent=
+    truncateStepText(
+      text,
+      30
+    );
+
+  document.getElementById(
+    'stepIcon'
+  ).textContent=
+    getDirectionIcon(
+      text
+    );
+
+}
+
+
+/* 点击顶部路线提示可模拟下一步 */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  function(){
+
+    var guide=
+      document.querySelector(
+        '.nav-live-guide'
+      );
+
+    if(guide){
+
+      guide.addEventListener(
+        'click',
+        function(){
+
+          if(
+            navStepIndex<
+            navSteps.length-1
+          ){
+
+            navStepIndex++;
+
+            renderCurrentStep();
+
+          }
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   沿路线搜索设施
+========================================================= */
+
+function searchFacilitiesAlongRoute(){
+
+  facilityData=[];
+
+  var base=
+    userPoint ||
+    startPoint;
+
+  if(!base){
+
+    updateFacilityTip(
+      0
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * 搜索点：
+   * 当前所在位置
+   * 路线中点
+   * 目的地
+   */
+
+  var searchPoints=[
+    base
+  ];
+
+  if(endPoint){
+
+    var midLng=
+      (
+        base.lng+
+        endPoint.lng
+      )/2;
+
+    var midLat=
+      (
+        base.lat+
+        endPoint.lat
+      )/2;
+
+    searchPoints.push(
+      new BMapGL.Point(
+        midLng,
+        midLat
+      )
+    );
+
+    searchPoints.push(
+      endPoint
+    );
+
+  }
+
+
+  var totalFound=0;
+  var finishedTasks=0;
+
+  var seen={};
+
+  var totalTasks=
+    searchPoints.length*
+    FACILITY_SEARCH_KEYWORDS.length;
+
+
+  function taskDone(
+    count
+  ){
+
+    totalFound+=count;
+
+    finishedTasks++;
+
+    if(
+      finishedTasks>=totalTasks
+    ){
+
+      renderFacilityMarkers();
+
+      updateFacilityTip(
+        totalFound
+      );
+
+    }
+
+  }
+
+
+  for(
+    var pi=0;
+    pi<searchPoints.length;
+    pi++
+  ){
+
+    for(
+      var ki=0;
+      ki<FACILITY_SEARCH_KEYWORDS.length;
+      ki++
+    ){
+
+      searchSingleFacilityKeyword(
+        searchPoints[pi],
+        FACILITY_SEARCH_KEYWORDS[ki],
+        seen,
+        taskDone
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   单关键词设施搜索
+========================================================= */
+
+function searchSingleFacilityKeyword(
+  point,
+  searchConfig,
+  seen,
+  callback
+){
+
+  if(
+    !point ||
+    !map3
+  ){
+
+    callback(0);
+
+    return;
+
+  }
+
+  try{
+
+    var local=
+      new BMapGL.LocalSearch(
+        map3,
+        {
+
+          pageCapacity:10,
+
+          renderOptions:{
+            map:null,
+            autoViewport:false
+          },
+
+          onSearchComplete:
+            function(results){
+
+              var found=0;
+
+              if(
+                !results ||
+                !results.getNumPois ||
+                results.getNumPois()<=0
+              ){
+
+                callback(0);
+
+                return;
+
+              }
+
+              var n=
+                Math.min(
+                  results.getNumPois(),
+                  10
+                );
+
+              for(
+                var i=0;
+                i<n;
+                i++
+              ){
+
+                var poi=
+                  results.getPoi(i);
+
+                if(
+                  !poi ||
+                  !poi.point
+                ){
+                  continue;
+                }
+
+                var title=
+                  stripHtml(
+                    poi.title
+                  );
+
+                var address=
+                  stripHtml(
+                    poi.address
+                  );
+
+                var type=
+                  stripHtml(
+                    poi.type
+                  );
+
+                var category=
+                  detectFacilityCategory(
+                    poi,
+                    searchConfig
+                  );
+
+                var displayName=
+                  getFacilityDisplayName(
+                    poi,
+                    category
+                  );
+
+
+                var key=
+                  poi.point.lng.toFixed(5)+
+                  '_'+
+                  poi.point.lat.toFixed(5)+
+                  '_'+
+                  category.label;
+
+                if(seen[key]){
+                  continue;
+                }
+
+                seen[key]=true;
+
+
+                facilityData.push({
+
+                  point:poi.point,
+
+                  name:displayName,
+
+                  address:address,
+
+                  sourceTitle:title,
+
+                  sourceType:type,
+
+                  iconFile:category.iconFile || '',
+
+                  label:category.label,
+
+                  keyword:
+                    searchConfig.keyword
+
+                });
+
+                found++;
+
+              }
+
+              callback(
+                found
+              );
+
+            }
+
+        }
+      );
+
+
+    local.searchNearby(
+      searchConfig.keyword,
+      point,
+      1800
+    );
+
+  }catch(e){
+
+    console.warn(
+      '设施搜索失败',
+      searchConfig.keyword,
+      e
+    );
+
+    callback(0);
+
+  }
+
+}
+
+
+/* =========================================================
+   设施提示
+========================================================= */
+
+function updateFacilityTip(
+  count
+){
+
+  var el=
+    document.getElementById(
+      'aiTipText'
+    );
+
+  if(!el){
+    return;
+  }
+
+  if(count>0){
+
+    el.textContent=
+      '沿途检索到'+
+      count+
+      '处亲子设施，点击地图图标查看详情。';
+
+  }else{
+
+    el.textContent=
+      '当前路线附近暂未检索到亲子设施。';
+
+  }
+
+}
+
+
+/* =========================================================
+   设施地图图标
+========================================================= */
+
+function renderFacilityMarkers(){
+
+  if(!map3){
+    return;
+  }
+
+
+  /*
+   * 删除旧设施
+   */
+
+  for(
+    var i=0;
+    i<facilityMarkers.length;
+    i++
+  ){
+
+    try{
+
+      map3.removeOverlay(
+        facilityMarkers[i]
+      );
+
+    }catch(e){}
+
+  }
+
+  facilityMarkers=[];
+
+
+  /*
+   * 根据当前分类显示设施
+   */
+
+  for(
+    var i=0;
+    i<facilityData.length;
+    i++
+  ){
+
+    var f=
+      facilityData[i];
+
+    if(
+      !activeFacilityTypes[f.label]
+    ){
+      continue;
+    }
+
+
+    /*
+     * 地图上只显示图标。
+     *
+     * 不显示：
+     * “广州某某母婴室”
+     * “停车场”
+     *
+     * 点击后才显示名称。
+     */
+
+    /* 没有对应 SVG 的分类不再显示 Emoji，也不生成空白地图点。 */
+    if(!f.iconFile){
+      continue;
+    }
+
+    /*
+     * 使用 BMapGL.Marker + 本地 SVG，避免 Label 对 HTML/SVG 的兼容问题。
+     * 这样地图上的设施点直接使用 icons 文件夹里的真实图标。
+     */
+    var markerIcon=
+      new BMapGL.Icon(
+        ICON_BASE+f.iconFile,
+        new BMapGL.Size(30,30),
+        {
+          anchor:new BMapGL.Size(15,15)
+        }
+      );
+
+    var lbl=
+      new BMapGL.Marker(
+        f.point,
+        {
+          icon:markerIcon,
+          enableMassClear:true
+        }
+      );
+
+
+    /*
+     * 点击设施：
+     * 才显示具体名称和地址。
+     */
+
+    lbl.addEventListener(
+      'click',
+      (function(fac){
+
+        return function(){
+
+          showNavDetail(
+            fac
+          );
+
+        };
+
+      })(f)
+    );
+
+
+    map3.addOverlay(
+      lbl
+    );
+
+    facilityMarkers.push(
+      lbl
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   导航设施详情
+========================================================= */
+
+function showNavDetail(
+  f
+){
+
+  if(!f){
+    return;
+  }
+
+  var drawer=
+    document.getElementById(
+      'navDetailDrawer'
+    );
+
+  document.getElementById(
+    'navDetailImg'
+  ).innerHTML=
+    iconHtml(
+      f.iconFile || '',
+      'asset-icon',
+      f.label || ''
+    );
+
+  document.getElementById(
+    'navDetailTitle'
+  ).textContent=
+    f.name ||
+    f.label ||
+    '亲子设施';
+
+  document.getElementById(
+    'navDetailDistance'
+  ).textContent=
+    f.address
+    ?
+    f.address
+    :
+    '路线附近';
+
+  document.getElementById(
+    'navDetailTags'
+  ).innerHTML=
+    '<span>'+
+    (f.label||'亲子设施')+
+    '</span>'+
+    '<span>沿途可达</span>';
+
+  document.getElementById(
+    'navDetailDesc'
+  ).textContent=
+    f.address
+    ?
+    '位于'+
+    f.address+
+    '，可在当前导航路线附近查看。'
+    :
+    '该设施位于当前导航路线附近。';
+
+  drawer.classList.add(
+    'show'
+  );
+
+}
+
+
+function closeNavDetail(){
+
+  document.getElementById(
+    'navDetailDrawer'
+  ).classList.remove(
+    'show'
+  );
+
+}
+
+
+/* =========================================================
+   结束导航
+========================================================= */
+
+function endNav(){
+
+  stopNavLocationWatch();
+
+  isNavPage=false;
+
+  goPage(
+    'page4'
+  );
+
+}
+
+
+/* =========================================================
+   页面加载
+========================================================= */
+
+window.onload=
+  function(){
+
+    try{
+
+      if(
+        typeof BMapGL===
+        'undefined'
+      ){
+
+        showToast(
+          '地图加载失败，请检查网络或百度地图AK'
+        );
+
+        return;
+
+      }
+
+      initMap1();
+
+    }catch(e){
+
+      console.error(
+        '初始化异常',
+        e
+      );
+
+      showToast(
+        '地图初始化异常'
+      );
+
+    }
+
+  };
+
+</script>
+
+</body>
+</html>
