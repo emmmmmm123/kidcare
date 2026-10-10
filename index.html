@@ -348,6 +348,52 @@ button{
   min-width:0;
 }
 
+.home-title-line{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.memory-book-btn{
+  border:0;
+  background:transparent;
+  border-radius:8px;
+  width:32px;
+  height:32px;
+  padding:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:23px;
+  box-shadow:none;
+}
+.memory-mask{
+  position:fixed;inset:0;z-index:3000;background:rgba(43,65,88,.38);
+  display:none;align-items:flex-end;justify-content:center;padding:14px;
+}
+.memory-mask.show{display:flex;}
+.memory-panel{
+  width:100%;max-width:520px;max-height:82vh;overflow:auto;background:#FFFDF7;
+  border-radius:26px 26px 22px 22px;padding:20px 16px 24px;
+  box-shadow:0 12px 40px rgba(30,50,80,.2);
+  border:3px solid #FFF0C8;
+}
+.memory-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.memory-title{font-size:21px;font-weight:800;color:#473A2B;}
+.memory-close{border:0;background:#F4E8D5;border-radius:50%;width:32px;height:32px;font-size:18px;color:#775F40;}
+.memory-tabs{display:flex;gap:8px;margin-bottom:14px;}
+.memory-tab{flex:1;border:0;border-radius:12px;padding:10px;background:#FFFFFF;color:#786B59;font-size:14px;font-weight:700;}
+.memory-tab.active{background:#FFFFFF;color:#604B24;box-shadow:inset 0 -2px 0 #E8D8B8;}
+.memory-list{display:flex;flex-direction:column;gap:9px;}
+.memory-item{background:#FFFFFF;border:1px solid #F5E8CF;border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center;}
+.memory-item-emoji{width:38px;height:38px;border-radius:13px;background:#EAF4FF;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.memory-item-main{min-width:0;flex:1;}
+.memory-item-name{font-size:14px;font-weight:800;color:#333;overflow-wrap:anywhere;}
+.memory-item-meta{font-size:12px;color:#888;margin-top:4px;}
+.memory-item-action{border:0;background:#FFF2F6;border-radius:12px;padding:7px 9px;color:#C66C8B;font-size:12px;white-space:nowrap;}
+.memory-empty{text-align:center;padding:28px 12px;color:#9A8D7C;font-size:13px;background:#FFF8E9;border-radius:18px;}
+
 .home-card-title{
   font-size:20px;
   line-height:1.25;
@@ -390,7 +436,7 @@ button{
   position:relative;
   min-width:0;
   min-height:92px;
-  padding:12px 30px 12px 8px;
+  padding:12px 30px 12px 10px;
   border:1px solid #E9EDF2;
   border-radius:16px;
   background:#FFFFFF;
@@ -422,9 +468,10 @@ button{
 }
 
 .baby-avatar{
-  width:34px;
-  height:34px;
-  flex:0 0 34px;
+  display:none;
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -434,8 +481,8 @@ button{
 }
 
 .baby-avatar .baby-gender-icon{
-  width:22px;
-  height:22px;
+  width:30px;
+  height:30px;
   object-fit:contain;
   display:block;
 }
@@ -455,7 +502,7 @@ button{
 
 .baby-name{
   display:block;
-  font-size:15px;
+  font-size:17px;
   line-height:1.2;
   font-weight:800;
   color:#222222;
@@ -466,8 +513,8 @@ button{
 }
 
 .baby-age{
-  margin-top:4px;
-  font-size:12px;
+  margin-top:5px;
+  font-size:14px;
   line-height:1.2;
   color:#666666;
   white-space:nowrap;
@@ -475,10 +522,10 @@ button{
 
 .baby-edit-btn{
   position:absolute;
-  top:6px;
-  right:6px;
-  width:20px;
-  height:20px;
+  top:8px;
+  right:8px;
+  width:24px;
+  height:24px;
   padding:0;
   border:none;
   border-radius:50%;
@@ -492,16 +539,16 @@ button{
 }
 
 .baby-edit-btn svg{
-  width:12px;
-  height:12px;
+  width:14px;
+  height:14px;
 }
 
 .baby-delete-btn{
   position:absolute;
-  right:6px;
-  bottom:6px;
-  width:18px;
-  height:18px;
+  right:8px;
+  bottom:8px;
+  width:22px;
+  height:22px;
   padding:0;
   border:none;
   border-radius:50%;
@@ -515,8 +562,8 @@ button{
 }
 
 .baby-delete-btn svg{
-  width:11px;
-  height:11px;
+  width:13px;
+  height:13px;
 }
 
 /* 宝宝编辑弹窗 */
@@ -608,13 +655,6 @@ button{
 .baby-gender-option svg{
   width:28px;
   height:28px;
-}
-
-.baby-gender-option .baby-gender-icon{
-  width:28px;
-  height:28px;
-  object-fit:contain;
-  display:block;
 }
 
 .baby-modal-actions{
@@ -792,7 +832,7 @@ button{
   box-shadow:0 3px 10px rgba(50,40,20,.15)!important;
   font-size:12px!important;
   font-weight:700!important;
-  white-space:nowrap!important;
+  white-space:nowrap;
 }
 
 
@@ -862,6 +902,8 @@ button{
   font-size:20px;
   flex-shrink:0;
 }
+
+.ai-avatar img{width:30px;height:30px;object-fit:contain;display:block;}
 
 .ai-bubble{
   font-size:13px;
@@ -1551,6 +1593,21 @@ button{
   }
 
 }
+
+.home-banner-image{width:100%;height:100%;display:block;object-fit:contain;object-position:left center;}
+.banner-home{height:174px;padding:0;margin:4px 16px 8px;background:transparent;border-radius:0;}
+
+
+.place-favorite-btn{position:absolute;right:10px;top:10px;z-index:5;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#F3B43F;font-size:25px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;}
+.place-favorite-btn.saved{background:#FFF1C7;color:#E5A000;}
+.img-wrap{position:relative;}
+
+
+/* 收藏星星：童趣圆形按钮 */
+.place-favorite-btn{position:absolute;right:10px;top:10px;z-index:5;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#F3B43F;font-size:25px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;}
+.place-favorite-btn.saved{background:#FFF1C7;color:#E5A000;}
+.img-wrap{position:relative;}
+
 </style>
 </head>
 
@@ -1605,9 +1662,8 @@ button{
 
   </div>
 
-  <div class="banner-home">
-    <div class="banner-title">今天想带娃去哪？</div>
-    <div class="banner-subtitle">AI 为你推荐最适合的亲子目的地</div>
+  <div class="banner-home" aria-label="亲子出游主题图片">
+    <img class="home-banner-image" src="banner.png" alt="亲子出游主题插画" onerror="this.style.display='none'">
   </div>
 
   <div class="home-content">
@@ -1615,7 +1671,10 @@ button{
     <div class="home-card">
       <div class="home-card-head">
         <div class="home-card-title-wrap">
-          <div class="home-card-title">我的宝宝</div>
+          <div class="home-title-line">
+            <div class="home-card-title">我的宝宝</div>
+            <button type="button" class="memory-book-btn" onclick="openMemoryBook('records')" aria-label="查看出游记录和收藏地点">📒</button>
+          </div>
           <div class="home-card-subtitle">添加宝宝信息，获取更精准的推荐</div>
         </div>
         <button class="home-add" type="button" onclick="addBabyProfile()">＋ 添加宝宝</button>
@@ -1699,7 +1758,7 @@ button{
   <div class="ai-greet">
 
     <div class="ai-avatar">
-      <img src="icons/bear.svg" alt="" aria-hidden="true">
+      <img src="bear.png" alt="" aria-hidden="true">
     </div>
 
     <div class="ai-bubble">
@@ -1813,6 +1872,7 @@ button{
       </div>
 
     </div>
+
   </div>
 
 
@@ -2192,6 +2252,15 @@ button{
   </div>
 </div>
 
+
+<div class="memory-mask" id="memoryBookMask" onclick="closeMemoryBook(event)">
+  <div class="memory-panel" onclick="event.stopPropagation()">
+    <div class="memory-head"><div class="memory-title">📒 宝贝出游小本本</div><button class="memory-close" onclick="closeMemoryBook()" aria-label="关闭">×</button></div>
+    <div class="memory-tabs"><button id="memoryRecordsTab" class="memory-tab active" onclick="switchMemoryTab('records')">🧸 出游记录</button><button id="memoryFavoritesTab" class="memory-tab" onclick="switchMemoryTab('favorites')">⭐ 收藏地点</button></div>
+    <div id="memoryBookList" class="memory-list"></div>
+  </div>
+</div>
+
 <div
   class="toast"
   id="toast"
@@ -2245,6 +2314,36 @@ var endName="";
 
 var recommendedPlaces=[];
 var currentDest=null;
+var memoryBookTab='records';
+var outingRecords=loadMemoryData('kidTripOutingRecords');
+var favoritePlaces=loadMemoryData('kidTripFavoritePlaces');
+
+function loadMemoryData(key){
+  try{var value=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(value)?value:[];}catch(e){return [];}
+}
+function saveMemoryData(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(e){}}
+function isPlaceFavorited(place){
+  if(!place) return false;
+  return favoritePlaces.some(function(item){return item.name===place.name && item.address===place.address;});
+}
+function togglePlaceFavorite(index,event){
+  if(event){event.preventDefault();event.stopPropagation();}
+  var place=recommendedPlaces[index];if(!place)return;
+  var found=-1;for(var i=0;i<favoritePlaces.length;i++){if(favoritePlaces[i].name===place.name&&favoritePlaces[i].address===place.address){found=i;break;}}
+  if(found>=0){favoritePlaces.splice(found,1);showToast('已取消收藏');}else{favoritePlaces.unshift({name:place.name,address:place.address||'',dist:place.dist||0,purpose:selectedPurpose,addedAt:new Date().toISOString(),point:place.point?{lat:place.point.lat,lng:place.point.lng}:null});showToast('收藏成功，放进小本本啦⭐');}
+  saveMemoryData('kidTripFavoritePlaces',favoritePlaces);
+  var buttons=document.querySelectorAll('.place-favorite-btn');for(var j=0;j<buttons.length;j++){var idx=parseInt(buttons[j].getAttribute('data-favorite-index'),10);buttons[j].textContent=isPlaceFavorited(recommendedPlaces[idx])?'★':'☆';buttons[j].classList.toggle('saved',isPlaceFavorited(recommendedPlaces[idx]));}
+  if(document.getElementById('memoryBookMask').classList.contains('show')&&memoryBookTab==='favorites')renderMemoryBook();
+}
+function openMemoryBook(tab){memoryBookTab=tab||'records';switchMemoryTab(memoryBookTab);document.getElementById('memoryBookMask').classList.add('show');}
+function closeMemoryBook(event){if(event&&event.target!==event.currentTarget)return;var el=document.getElementById('memoryBookMask');if(el)el.classList.remove('show');}
+function switchMemoryTab(tab){memoryBookTab=tab;document.getElementById('memoryRecordsTab').classList.toggle('active',tab==='records');document.getElementById('memoryFavoritesTab').classList.toggle('active',tab==='favorites');renderMemoryBook();}
+function renderMemoryBook(){
+  var box=document.getElementById('memoryBookList');if(!box)return;box.innerHTML='';var data=memoryBookTab==='records'?outingRecords:favoritePlaces;
+  if(!data.length){box.innerHTML='<div class="memory-empty">'+(memoryBookTab==='records'?'🌈 还没有出游记录，选个喜欢的地方开启第一次小冒险吧！':'✨ 还没有收藏地点，看到喜欢的地方点亮小星星就能收进来。')+'</div>';return;}
+  data.forEach(function(item,index){var row=document.createElement('div');row.className='memory-item';var emoji=memoryBookTab==='records'?'🎒':'⭐';row.innerHTML='<div class="memory-item-emoji">'+emoji+'</div><div class="memory-item-main"><div class="memory-item-name"></div><div class="memory-item-meta"></div></div><button class="memory-item-action">'+(memoryBookTab==='records'?'再去一次':'取消收藏')+'</button>';row.querySelector('.memory-item-name').textContent=item.name||'亲子目的地';row.querySelector('.memory-item-meta').textContent=(item.dateText||item.addedAt||'').toString().slice(0,10)+(item.purpose?' · '+item.purpose:'')+(item.address?' · '+item.address:'');row.querySelector('button').onclick=function(){if(memoryBookTab==='favorites'){favoritePlaces.splice(index,1);saveMemoryData('kidTripFavoritePlaces',favoritePlaces);renderMemoryBook();}else{var place=recommendedPlaces.find(function(p){return p.name===item.name;});if(place){closeMemoryBook();selectDestination(place);}else{showToast('请重新搜索该地点后规划路线');}}};box.appendChild(row);});
+}
+
 
 var facilityMarkers=[];
 var facilityData=[];
@@ -3511,7 +3610,7 @@ function escapeHtml(value){
 }
 
 function genderIconSvg(gender){
-  var file=gender==='女'?'girl.png':(gender==='男'?'boy.png':'baby.png');
+  var file=gender==='女'?'girl.svg':(gender==='男'?'boy.svg':'baby.svg');
   return '<img class="baby-gender-icon" src="icons/'+file+'" alt="" aria-hidden="true">';
 }
 
@@ -4298,6 +4397,7 @@ function renderRecommendCards(){
         '<img class="place-photo fallback" src="'+ICON_BASE+(p.iconFile||'')+'" alt="" aria-hidden="true"'+
           (p.iconFile ? '' : ' style="display:none"')+'>'+
         '<div class="photo-shade" style="display:none"></div>'+
+        '<button type="button" class="place-favorite-btn '+(isPlaceFavorited(p)?'saved':'')+'" data-favorite-index="'+i+'" aria-label="收藏地点" onclick="togglePlaceFavorite('+i+', event)">'+(isPlaceFavorited(p)?'★':'☆')+'</button>'+
 
       '</div>'+
 
@@ -4394,6 +4494,11 @@ function selectDestination(
 ){
 
   currentDest=place;
+  var recordKey=(place.name||'')+'|'+(place.address||'');
+  if(!outingRecords.some(function(item){return item.key===recordKey && item.dateText===new Date().toLocaleDateString();})){
+    outingRecords.unshift({key:recordKey,name:place.name,address:place.address||'',purpose:selectedPurpose,dateText:new Date().toLocaleDateString(),addedAt:new Date().toISOString()});
+    outingRecords=outingRecords.slice(0,100);saveMemoryData('kidTripOutingRecords',outingRecords);
+  }
 
   endPoint=
     place.point;
