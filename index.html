@@ -1608,6 +1608,43 @@ button{
 .place-favorite-btn.saved{background:#FFF1C7;color:#E5A000;}
 .img-wrap{position:relative;}
 
+
+
+/* 宝宝卡片手机适配：昵称完整换行显示，不再省略 */
+.baby-card{
+  padding:12px 8px 32px;
+}
+.baby-info-row{
+  flex-direction:column;
+  align-items:center;
+  gap:7px;
+}
+.baby-detail{
+  width:100%;
+  text-align:center;
+}
+.baby-name{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  font-size:15px;
+  line-height:1.3;
+}
+.baby-age{
+  white-space:normal;
+  font-size:12px;
+}
+.baby-avatar{
+  flex:0 0 42px;
+}
+@media(max-width:390px){
+  .baby-list{gap:6px;}
+  .baby-card{padding-left:5px;padding-right:5px;}
+  .baby-name{font-size:14px;}
+}
+
 </style>
 </head>
 
@@ -3609,9 +3646,20 @@ function escapeHtml(value){
     .replace(/'/g,'&#39;');
 }
 
-function genderIconSvg(gender){
-  var file=gender==='女'?'girl.svg':(gender==='男'?'boy.svg':'baby.svg');
-  return '<img class="baby-gender-icon" src="icons/'+file+'" alt="" aria-hidden="true">';
+function genderIconSvg(gender,birthYear){
+  var age=getBabyAgeYears(birthYear);
+  var file;
+  if(age!==null && age<3){
+    file='baby.png';
+  }else if(gender==='女'){
+    file='girl.png';
+  }else if(gender==='男'){
+    file='boy.png';
+  }else{
+    file='baby.png';
+  }
+  var fallback=gender==='女'?'icons/girl.svg':(gender==='男'?'icons/boy.svg':'icons/baby.svg');
+  return '<img class="baby-gender-icon" src="'+file+'" alt="" aria-hidden="true" onerror="this.onerror=null;this.src=\''+fallback+'\'">';
 }
 
 function editIconSvg(){
@@ -3639,7 +3687,7 @@ function renderBabyProfiles(){
 
     card.innerHTML=
       '<div class="baby-info-row">'+
-        '<div class="baby-avatar">'+genderIconSvg(b.gender)+'</div>'+
+        '<div class="baby-avatar">'+genderIconSvg(b.gender,b.birthYear)+'</div>'+
         '<div class="baby-detail">'+
           '<span class="baby-name">'+escapeHtml(b.name)+'</span>'+
           '<div class="baby-age">'+escapeHtml(getBabyAgeText(b.birthYear))+'</div>'+
